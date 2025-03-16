@@ -1,4 +1,4 @@
-﻿namespace TASON;
+namespace TASON;
 
 public class TasonTypeRegistry
 {

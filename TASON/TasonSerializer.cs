@@ -21,6 +21,11 @@ public class TasonSerializer
     public TasonTypeRegistry Registry { get; }
 
     /// <summary>
+    /// 默认TASON序列化器
+    /// </summary>
+    public static TasonSerializer Default { get; } = new TasonSerializer();
+
+    /// <summary>
     /// 创建<see cref="TasonSerializer"/>的新实例
     /// </summary>
     /// <param name="options">序列化选项</param>
@@ -34,7 +39,7 @@ public class TasonSerializer
         Registry = registry;
     }
 
-    public T Deserialize<T>(string text)
+    public object? Deserialize(string text)
     {
         throw new NotImplementedException();
     }

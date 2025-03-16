@@ -18,11 +18,6 @@ public class SerializerOptions
     public bool UseBuiltinDictionary { get; set; } = false;
 
     /// <summary>
-    /// 反序列化对象时是否采用`Object.create(null)`，默认<see langword="false"/>
-    /// </summary>
-    public bool NullPrototypeObject { get; set; } = false;
-
-    /// <summary>
     /// 是否允许对象拥有重复的键，默认<see langword="true"/>
     /// </summary>
     public bool AllowDuplicatedKeys { get; set; } = true;

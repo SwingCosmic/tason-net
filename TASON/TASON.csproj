@@ -11,8 +11,8 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="cd Grammar &amp;&amp; antlr4 -package TASON.Grammar -Dlanguage=CSharp TASON.g4" />
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="$(Configuration)!='Debug'">
+    <Exec Command="cd Grammar &amp;&amp; antlr4 -package TASON.Grammar -visitor -Dlanguage=CSharp TASON.g4" />
   </Target>
 
   <ItemGroup>
