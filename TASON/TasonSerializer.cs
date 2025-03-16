@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Antlr4.Runtime;
+using TASON.Grammar;
 
 namespace TASON;
 
@@ -41,7 +43,17 @@ public class TasonSerializer
 
     public object? Deserialize(string text)
     {
-        throw new NotImplementedException();
+        var lexer = new TASONLexer(new AntlrInputStream(text));
+        var parser = new TASONParser(new CommonTokenStream(lexer));
+
+        var visitor = new TasonVisitor(Registry, Options);
+        return visitor.Start(parser.start());
+    }
+
+    public T DeserializeObject<T>(string text) where T : class
+    {
+        var obj = Deserialize(text)!;
+        return (T)obj;
     }
 
     public string Serialize(object? value)
