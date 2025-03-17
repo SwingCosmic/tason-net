@@ -24,7 +24,7 @@ public class ParseTest
                 } 
             }));
 
-        Assert.That(s.Deserialize("{\"a\": true, 'b': \"fo\\n\\ro\"}"),
+        Assert.That(s.Deserialize("{\"a\": true, b: \"fo\\n\\ro\"}"),
             Is.EqualTo(new Dictionary<string, object?> 
             { 
                 ["a"] = true, 

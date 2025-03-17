@@ -37,7 +37,7 @@ public class TasonSerializer
         options ??= new SerializerOptions();
         Options = options;
 
-        registry ??= new TasonTypeRegistry();
+        registry ??= new TasonTypeRegistry(options);
         Registry = registry;
     }
 
@@ -50,7 +50,7 @@ public class TasonSerializer
         return visitor.Start(parser.start());
     }
 
-    public T DeserializeObject<T>(string text) where T : class
+    public T DeserializeObjectType<T>(string text) where T : class
     {
         var obj = Deserialize(text)!;
         return (T)obj;

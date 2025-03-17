@@ -28,7 +28,7 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
             TASONParser.NumberValueContext numberValue => NumberValue(numberValue),
             TASONParser.ArrayValueContext arrayValue => ArrayValue(arrayValue),
             TASONParser.ObjectValueContext objectValue => ObjectValue(objectValue),
-            //TASONParser.TypeInstanceValueContext typeInstanceValue => TypeInstanceValue(typeInstanceValue),
+            TASONParser.TypeInstanceValueContext typeInstanceValue => TypeInstanceValue(typeInstanceValue),
             _ => throw new ArgumentException($"Unsupported value type: {ctx.GetType().Name}"),
         };
     }
@@ -57,10 +57,14 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
         return ctx.array().value().Select(ValueContext).ToArray();
     }
 
-    internal Dictionary<string, object?> ObjectValue(TASONParser.ObjectValueContext ctx)
+    internal Dictionary<string, object?> ObjectValue(TASONParser.ObjectValueContext ctx) {
+        return Object(ctx.@object());    
+    }
+
+    internal Dictionary<string, object?> Object(TASONParser.ObjectContext ctx)
     {
         var obj = new Dictionary<string, object?>();
-        var pairs = ctx.@object().pair().Select(Pair);
+        var pairs = ctx.pair().Select(Pair);
         if (!options.AllowDuplicatedKeys)
         {
             var keys = pairs.Select(p => p.Key).Distinct();
@@ -88,6 +92,48 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
             return identifier.GetText();
         }
         return GetTextValue((ctx as TASONParser.StringKeyContext)!.STRING());
+    }
+
+    internal object? TypeInstanceValue(TASONParser.TypeInstanceValueContext ctx)
+    {
+        var typeInstance = ctx.typeInstance();
+        return typeInstance switch
+        {
+            TASONParser.ScalarTypeInstanceContext scalarType => ScalarTypeInstance(scalarType),
+            TASONParser.ObjectTypeInstanceContext objectType => ObjectTypeInstance(objectType),
+            _ => throw new ArgumentException($"Unsupported type instance type: {typeInstance.GetType().Name}"),
+        };
+    }
+
+    internal object? ScalarTypeInstance(TASONParser.ScalarTypeInstanceContext ctx) {
+        var typeName = ctx.TYPE_NAME().GetText();
+        var str = GetTextValue(ctx.STRING());
+
+        return CreateTypeInstance(typeName, str);
+    }
+    internal object? ObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx) {
+        var typeName = ctx.TYPE_NAME().GetText();
+        var obj = Object(ctx.@object());
+
+        return CreateTypeInstance(typeName, obj);
+    }
+
+    private object? CreateTypeInstance(string typeName, Dictionary<string, object?> value) {
+        if (registry.GetDefaultType(typeName) is not ITasonObjectType typeInfo)
+        {
+            throw new ArgumentException($"Unregistered type: {typeName}");
+        }
+
+        return registry.CreateInstance(typeInfo, value);
+    }
+
+    private object? CreateTypeInstance(string typeName, string value) {
+        if (registry.GetDefaultType(typeName) is not ITasonScalarType typeInfo)
+        {
+            throw new ArgumentException($"Unregistered type: {typeName}");
+        }
+
+        return registry.CreateInstance(typeInfo, value);
     }
 
     private static string GetTextValue(ITerminalNode node)
