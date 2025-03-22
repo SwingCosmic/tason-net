@@ -6,22 +6,12 @@ namespace TASON.Types;
 /// 实现了<see cref="INumber{T}"/>的数字标量类型实现
 /// </summary>
 /// <typeparam name="T">对应的数字类型</typeparam>
-public abstract class TasonNumberScalar<T> : ITasonScalarType
+public abstract class TasonNumberScalar<T> : TasonScalarTypeBase<T>
     where T : struct, IEquatable<T>, INumber<T>
 {
-    /// <inheritdoc/>
-    public TasonTypeInstanceKind Kind { get; }
-    /// <inheritdoc/>
-    public Type Type { get; }
-
-    public TasonNumberScalar()
-    {
-        Type = typeof(T);
-        Kind = TasonTypeInstanceKind.Scalar;
-    }
 
     /// <inheritdoc/>
-    public object Deserialize(string text, SerializerOptions options)
+    protected override T DeserializeCore(string text, SerializerOptions options)
     {
         var (num, radix, isNegative) = PrimitiveHelpers.ParseBuiltinNumber(text);
         return ParseValue(num, radix, isNegative);
@@ -30,10 +20,9 @@ public abstract class TasonNumberScalar<T> : ITasonScalarType
     protected abstract T ParseValue(string text, int radix, bool isNegative);
 
     /// <inheritdoc/>
-    public string Serialize(object value, SerializerOptions options)
+    protected override string SerializeCore(T value, SerializerOptions options)
     {
-        var s = value.ToString() ?? "";
-        return s.Replace(PrimitiveHelpers.InfinitySymbol, PrimitiveHelpers.Infinity);
+        return value.ToString()!;
     }
 
     protected static string AddNegative(string text, bool isNegative)
@@ -114,6 +103,12 @@ public class Float32Type : TasonNumberScalar<float>
         }
         return float.Parse(text, CultureInfo.InvariantCulture);
     }
+
+    protected override string SerializeCore(float value, SerializerOptions options)
+    {
+        var s = value.ToString()!;
+        return s.Replace(PrimitiveHelpers.InfinitySymbol, PrimitiveHelpers.Infinity);
+    }
 }
 
 public class Float64Type : TasonNumberScalar<double>
@@ -125,6 +120,12 @@ public class Float64Type : TasonNumberScalar<double>
             throw new ArgumentException("Float64 only supports 10-based number");
         }
         return double.Parse(text, CultureInfo.InvariantCulture);
+    }
+
+    protected override string SerializeCore(double value, SerializerOptions options)
+    {
+        var s = value.ToString()!;
+        return s.Replace(PrimitiveHelpers.InfinitySymbol, PrimitiveHelpers.Infinity);
     }
 }
 
@@ -160,6 +161,11 @@ public class BigIntType : TasonNumberScalar<BigInteger>
 
     static BigInteger ParseOctalNumber(string oct)
     {
+        if (oct.Any(c => c is < '0' or > '7'))
+        {
+            // 和BigInteger.Parse方法提供一致的错误信息
+            throw new FormatException("The value could not be parsed.");
+        }
         return oct.Aggregate(new BigInteger(), (b, c) => b * 8 + (c - '0'));
     }
 }

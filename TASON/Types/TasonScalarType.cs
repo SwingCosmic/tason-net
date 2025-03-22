@@ -4,16 +4,42 @@ using System.Reflection;
 namespace TASON.Types;
 
 /// <summary>
-/// 标量类型实例信息的默认实现。默认实现要求类带有一个string参数的构造函数，
-/// 并且在<see cref="object.ToString"/>方法中返回序列化后的值
+/// <see cref="ITasonScalarType"/>实现的基类，提供了一个泛型版本方便实现
 /// </summary>
-public class TasonScalarType<T> : ITasonScalarType where T : notnull, IEquatable<T>
+/// <typeparam name="T">CLR类型</typeparam>
+public abstract class TasonScalarTypeBase<T> : ITasonScalarType where T : notnull
 {
     /// <inheritdoc/>
     public TasonTypeInstanceKind Kind { get; }
     /// <inheritdoc/>
     public Type Type { get; }
 
+    public TasonScalarTypeBase()
+    {
+        Type = typeof(T);
+        Kind = TasonTypeInstanceKind.Scalar;
+    }
+
+    public object Deserialize(string text, SerializerOptions options)
+    {
+        return DeserializeCore(text, options);
+    }
+
+    public string Serialize(object value, SerializerOptions options)
+    {
+        return SerializeCore((T)value, options);
+    }
+
+    protected abstract T DeserializeCore(string text, SerializerOptions options);
+    protected abstract string SerializeCore(T value, SerializerOptions options);
+}
+
+/// <summary>
+/// 标量类型实例信息的默认实现。默认实现要求类带有一个string参数的构造函数，
+/// 并且在<see cref="object.ToString"/>方法中返回序列化后的值
+/// </summary>
+public sealed class TasonScalarType<T> : TasonScalarTypeBase<T> where T : notnull, IEquatable<T>
+{
     /// <summary>
     /// 通过捕获外层的泛型使用静态属性缓存反射结果
     /// </summary>
@@ -33,20 +59,15 @@ public class TasonScalarType<T> : ITasonScalarType where T : notnull, IEquatable
         }
     }
 
-    public TasonScalarType()
+
+    /// <inheritdoc/>
+    protected override T DeserializeCore(string text, SerializerOptions options)
     {
-        Type = typeof(T);
-        Kind = TasonTypeInstanceKind.Scalar;
+        return (T)ReflectionCache.Ctor.Invoke([text]);
     }
 
     /// <inheritdoc/>
-    public virtual object Deserialize(string text, SerializerOptions options)
-    {
-        return ReflectionCache.Ctor.Invoke([text]);
-    }
-
-    /// <inheritdoc/>
-    public virtual string Serialize(object value, SerializerOptions options)
+    protected override string SerializeCore(T value, SerializerOptions options)
     {
         return value.ToString() ?? "";
     }

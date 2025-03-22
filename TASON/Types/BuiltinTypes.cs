@@ -10,6 +10,8 @@ public static class BuiltinTypes
         new Dictionary<string, ITasonTypeInfo>
         ([
             ..NumberTypes.Types,
+            new("UUID", new UUIDType()),
+            new("RegExp", new RegExpType()),
         ])
     );
 
