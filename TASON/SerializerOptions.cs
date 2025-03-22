@@ -31,4 +31,29 @@ public class SerializerOptions
     /// 最大递归深度，默认64
     /// </summary>
     public int MaxDepth { get; set; } = 64;
+
+    /// <summary>
+    /// 序列化时如何使用内置数值类型
+    /// </summary>
+    public BuiltinNumberOption UseBuiltinNumber { get; set; } = BuiltinNumberOption.UnsafeOnly;
+}
+
+/// <summary>
+/// 指示序列化时如何使用内置数值类型
+/// </summary>
+public enum BuiltinNumberOption
+{
+    /// <summary>
+    /// 默认值，仅当数值有可能超过<see langword="double"/>所能安全表示的范围时，才使用内置类型。
+    /// 对<see langword="long"/>, <see langword="decimal"/>和<see cref="System.Numerics.BigInteger"/>生效。
+    /// </summary>
+    UnsafeOnly,
+    /// <summary>始终使用数字字面量，可能导致精度丢失和溢出</summary>    
+    None,
+    /// <summary>始终使用内置数值类型，会大幅增加序列化生成的字符串长度</summary>
+    All,
+    /// <summary>在<see cref="ITasonObjectType"/>的属性中相当于<see cref="All"/>，
+    /// 在其他地方相当于<see cref="UnsafeOnly"/>
+    /// </summary>
+    ObjectTypeProperty,
 }

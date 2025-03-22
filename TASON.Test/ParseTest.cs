@@ -12,7 +12,7 @@ public class ParseTest
     {
         var s = TasonSerializer.Default;
         Assert.That(s.Deserialize("null"), Is.EqualTo(null));
-        Assert.That(s.Deserialize("[0o777, 'ds', [Infinity, []]]"),
+        Assert.That(s.Deserialize("[0o777, 'ds', [Infinity, [Int64('-0xabCDef123456789')]]]"),
             Is.EqualTo(new object[] 
             { 
                 511, 
@@ -20,7 +20,10 @@ public class ParseTest
                 new object[] 
                 { 
                     double.PositiveInfinity,
-                    Array.Empty<object>()
+                    new object[]
+                    {
+                        -0xabCDef123456789L
+                    }
                 } 
             }));
 

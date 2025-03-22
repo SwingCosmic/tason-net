@@ -40,7 +40,7 @@ public interface ITasonScalarType : ITasonTypeInfo
     object Deserialize(string text, SerializerOptions options);
 }
 
-
+/// <summary>对象类型实例信息接口，自定义类型可以由此派生</summary>
 public interface ITasonObjectType : ITasonTypeInfo
 {
     /// <summary>

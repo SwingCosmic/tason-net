@@ -1,7 +1,7 @@
 
 using System.Reflection;
 
-namespace TASON;
+namespace TASON.Types;
 
 /// <summary>
 /// 标量类型实例信息的默认实现。默认实现要求类带有一个string参数的构造函数，

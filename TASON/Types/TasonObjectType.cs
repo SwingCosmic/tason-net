@@ -1,7 +1,7 @@
 
 using System.Reflection;
 
-namespace TASON;
+namespace TASON.Types;
 
 
 /// <summary>
@@ -29,7 +29,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
         }
     }
 
-    
+
 
     public TasonObjectType()
     {

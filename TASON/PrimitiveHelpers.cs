@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Security.Cryptography;
+using System.Numerics;
 
 namespace TASON;
 
@@ -10,8 +11,9 @@ namespace TASON;
 /// </summary>
 public static class PrimitiveHelpers
 {
-    private const string NaN = "NaN";
-    private const string Infinity = "Infinity";
+    public const string NaN = "NaN";
+    public const string Infinity = "Infinity";
+    public const string InfinitySymbol = "∞";
 
     /// <summary>
     /// 去除字符串中的转义字符
@@ -151,6 +153,66 @@ public static class PrimitiveHelpers
                 {
                     throw new FormatException($"Invalid number format '{input}'", ex);
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 解析内置数字类型字符串为数字信息
+    /// </summary>
+    /// <param name="input">内置数字类型字符串</param>
+    /// <returns>解析后的数字信息，包括进制，去除进制前缀的数字，是否为负数</returns>
+    public static (string value, int radix, bool isNegative) ParseBuiltinNumber(string input) 
+    {
+        // 处理特殊值 NaN 和 Infinity
+        if (input == NaN || input == '+' + NaN || input == '-' + NaN)
+        {
+            return (NaN, 10, false);
+        }
+        else if (input == Infinity || input == '+' + Infinity)
+        {
+            return (InfinitySymbol, 10, false);
+        }
+        else if (input == '-' + Infinity)
+        {
+            return ("-" + InfinitySymbol, 10, true);
+        }
+        else
+        {
+            // 处理数值部分
+            var isNegative = false;
+            if (input.StartsWith('-'))
+            {
+                isNegative = true;
+                input = input[1..];
+            }
+            else if (input.StartsWith('+'))
+            {
+                input = input[1..];
+            }
+
+            // 处理十六进制
+            if (input.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                var hex = input[2..];
+                return (hex, 16, isNegative);
+            }
+            // 处理八进制
+            else if (input.StartsWith("0o", StringComparison.OrdinalIgnoreCase))
+            {
+                var oct = input[2..];
+                return (oct, 8, isNegative);
+            }
+            // 处理二进制
+            else if (input.StartsWith("0b", StringComparison.OrdinalIgnoreCase))
+            {
+                var bin = input[2..];
+                return (bin, 2, isNegative);
+            }
+            // 处理十进制
+            else
+            {
+                return (input, 10, isNegative);
             }
         }
     }

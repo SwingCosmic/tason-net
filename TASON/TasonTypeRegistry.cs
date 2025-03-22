@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using TASON.Types;
 
 namespace TASON;
 
@@ -11,9 +12,19 @@ internal record class TasonRegistryEntry(string Name, List<ITasonTypeInfo> Types
 /// 而是从实例的<see cref="TasonSerializer.Registry"/>属性进行克隆
 /// </summary>
 /// <param name="options">选项</param>
-public class TasonTypeRegistry(SerializerOptions options)
+public class TasonTypeRegistry
 {
     Dictionary<string, TasonRegistryEntry> types = new();
+    private readonly SerializerOptions options;
+
+    public TasonTypeRegistry(SerializerOptions options)
+    {
+        this.options = options;
+        foreach (var (name, type) in BuiltinTypes.Types)
+        {
+            RegisterType(name, type);
+        }
+    }
 
     /// <summary>使用当前实例的选项与注册类型创建副本，以进行独立的操作</summary>
     public TasonTypeRegistry Clone()
@@ -117,27 +128,53 @@ public class TasonTypeRegistry(SerializerOptions options)
 
     #endregion
 
-
+    /// <summary>
+    /// 根据类型名称和表示对象属性的字典创建TASON对象类型实例
+    /// </summary>
+    /// <param name="typeName">类型名称</param>
+    /// <param name="arg">表示对象属性的字典</param>
+    /// <returns>TASON对象类型实例</returns>
+    /// <exception cref="ArgumentException">类型未注册，或者不是对象类型</exception>
     public object CreateInstance(string typeName, Dictionary<string, object?> arg) {
-        if (GetDefaultType(typeName) is not ITasonObjectType type)
+        return GetDefaultType(typeName) switch
         {
-            throw new ArgumentException($"Unregistered type: {typeName}");
-        }
-        return CreateInstance(type, arg);
+            null => throw new ArgumentException($"Unregistered type: {typeName}"),
+            ITasonObjectType type => CreateInstance(type, arg),
+            _ => throw new ArgumentException($"{typeName} is not an {nameof(ITasonObjectType)}"),
+        };
     }
+    /// <summary>
+    /// 根据类型名称和表示标量的字符串创建TASON标量类型实例
+    /// </summary>
+    /// <param name="typeName">类型名称</param>
+    /// <param name="arg">表示标量的字符串</param>
+    /// <returns>TASON标量类型实例</returns>
+    /// <exception cref="ArgumentException">类型未注册，或者不是标量类型</exception>
     public object CreateInstance(string typeName, string arg) {
-        if (GetDefaultType(typeName) is not ITasonScalarType type)
+        return GetDefaultType(typeName) switch
         {
-            throw new ArgumentException($"Unregistered type: {typeName}");
-        }
-        return CreateInstance(type, arg);
+            null => throw new ArgumentException($"Unregistered type: {typeName}"),
+            ITasonScalarType type => CreateInstance(type, arg),
+            _ => throw new ArgumentException($"{typeName} is not an {nameof(ITasonScalarType)}"),
+        };
     }
-
+    /// <summary>
+    /// 根据类型信息和表示对象属性的字典创建TASON对象类型实例
+    /// </summary>
+    /// <param name="type">TASON对象类型信息</param>
+    /// <param name="arg">表示对象属性的字典</param>
+    /// <returns>TASON对象类型实例</returns>
     public object CreateInstance(ITasonObjectType type, Dictionary<string, object?> arg) {
-        return null!;
+        return type.Deserialize(arg, options);
     }
+    /// <summary>
+    /// 根据类型信息和表示标量的字符串创建TASON标量类型实例
+    /// </summary>
+    /// <param name="type">TASON标量类型信息</param>
+    /// <param name="arg">表示标量的字符串</param>
+    /// <returns>TASON标量类型实例</returns>
     public object CreateInstance(ITasonScalarType type, string arg) {
-        return null!;
+        return type.Deserialize(arg, options);
     }
 
 
