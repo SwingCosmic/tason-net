@@ -15,6 +15,7 @@ public static class NumberTypes
     public static Int16Type Int16 { get; } = new();
     public static Int32Type Int32 { get; } = new();
     public static Int64Type Int64 { get; } = new();
+    public static Float16Type Float16 { get; } = new();
     public static Float32Type Float32 { get; } = new();
     public static Float64Type Float64 { get; } = new();
     public static Decimal128Type Decimal128 { get; } = new();
@@ -27,10 +28,22 @@ public static class NumberTypes
         [nameof(Int16)] = Int16,
         [nameof(Int32)] = Int32,
         [nameof(Int64)] = Int64,
+        [nameof(Float16)] = Float16,
         [nameof(Float32)] = Float32,
         [nameof(Float64)] = Float64,
         [nameof(Decimal128)] = Decimal128,
         [nameof(BigInt)] = BigInt,
+    };
+    
+    internal static readonly Dictionary<string, string> Aliases = new()
+    {
+        ["Byte"] = nameof(UInt8),
+        ["Short"] = nameof(Int16),
+        ["Int"] = nameof(Int32),
+        ["Long"] = nameof(Int64),
+        ["Half"] = nameof(Float16),
+        ["Single"] = nameof(Float32),
+        ["Double"] = nameof(Float64),
     };
 #pragma warning restore CS1591
 

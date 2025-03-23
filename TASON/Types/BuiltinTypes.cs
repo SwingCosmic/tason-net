@@ -14,5 +14,13 @@ public static class BuiltinTypes
             new("RegExp", new RegExpType()),
         ])
     );
+    
+    /// <summary>内置类型列表</summary>
+    public static ReadOnlyDictionary<string, string> Aliases { get; } = new(
+        new Dictionary<string, string>
+        ([
+            ..NumberTypes.Aliases,
+        ])
+    );
 
 }

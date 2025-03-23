@@ -3,7 +3,14 @@ using TASON.Types;
 
 namespace TASON;
 
-internal record class TasonRegistryEntry(string Name, List<ITasonTypeInfo> Types) {
+internal record class TasonRegistryEntry {
+    public string Name { get; }
+    public List<ITasonTypeInfo> Types { get; }
+    public TasonRegistryEntry(string name, List<ITasonTypeInfo> types) 
+    {
+        Name = name;
+        Types = types;
+    }
 
 }
 
@@ -23,6 +30,10 @@ public class TasonTypeRegistry
         foreach (var (name, type) in BuiltinTypes.Types)
         {
             RegisterType(name, type);
+        }
+        foreach (var (name, type) in BuiltinTypes.Aliases)
+        {
+            RegisterTypeAlias(name, type);
         }
     }
 
@@ -90,7 +101,11 @@ public class TasonTypeRegistry
     /// <param name="obj">类型实例对象</param>
     public ITasonTypeInfo? GetType(string name, object obj)
     {
-        ArgumentNullException.ThrowIfNull(obj, nameof(obj));
+        if (obj is null)
+        {
+            throw new ArgumentNullException(nameof(obj));
+        }
+
         if (!types.TryGetValue(name, out var entry))
         {
             return null;

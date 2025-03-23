@@ -9,7 +9,15 @@ namespace TASON.Types;
 /// </summary>
 public partial class UUIDType : TasonScalarTypeBase<Guid>
 {
-    static readonly Regex pattern = PatternRegex();
+
+
+#if NET7_0_OR_GREATER
+    [GeneratedRegex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", RegexOptions.IgnoreCase)]
+    private static partial Regex PatternRegex();
+    private static readonly Regex pattern = PatternRegex();
+#else
+    private static readonly Regex pattern = new Regex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", RegexOptions.IgnoreCase);
+#endif
     protected override Guid DeserializeCore(string text, SerializerOptions options)
     {
         if (!pattern.IsMatch(text))
@@ -24,6 +32,5 @@ public partial class UUIDType : TasonScalarTypeBase<Guid>
         return value.ToString("D");
     }
 
-    [GeneratedRegex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", RegexOptions.IgnoreCase)]
-    private static partial Regex PatternRegex();
+
 }

@@ -7,7 +7,11 @@ namespace TASON.Types;
 /// </summary>
 /// <typeparam name="T">对应的数字类型</typeparam>
 public abstract class TasonNumberScalar<T> : TasonScalarTypeBase<T>
-    where T : struct, IEquatable<T>, INumber<T>
+    where T : struct, 
+#if NET7_0_OR_GREATER
+    INumber<T>,
+#endif
+    IEquatable<T>
 {
 
     /// <inheritdoc/>
@@ -93,6 +97,24 @@ public class Int64Type : TasonNumberScalar<long>
     }
 }
 
+public class Float16Type : TasonNumberScalar<Half>
+{
+    protected override Half ParseValue(string text, int radix, bool isNegative)
+    {
+        if (radix != 10)
+        {
+            throw new ArgumentException("Float16 only supports 10-based number");
+        }
+        return Half.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
+    }
+
+    protected override string SerializeCore(Half value, SerializerOptions options)
+    {
+        var s = value.ToString()!;
+        return s.Replace(PrimitiveHelpers.InfinitySymbol, PrimitiveHelpers.Infinity);
+    }
+}
+
 public class Float32Type : TasonNumberScalar<float>
 {
     protected override float ParseValue(string text, int radix, bool isNegative)
@@ -101,7 +123,7 @@ public class Float32Type : TasonNumberScalar<float>
         {
             throw new ArgumentException("Float32 only supports 10-based number");
         }
-        return float.Parse(text, CultureInfo.InvariantCulture);
+        return float.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
     }
 
     protected override string SerializeCore(float value, SerializerOptions options)
@@ -119,7 +141,7 @@ public class Float64Type : TasonNumberScalar<double>
         {
             throw new ArgumentException("Float64 only supports 10-based number");
         }
-        return double.Parse(text, CultureInfo.InvariantCulture);
+        return double.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
     }
 
     protected override string SerializeCore(double value, SerializerOptions options)
@@ -137,7 +159,7 @@ public class Decimal128Type : TasonNumberScalar<decimal>
         {
             throw new ArgumentException("Decimal128 only supports 10-based number");
         }
-        return decimal.Parse(text, CultureInfo.InvariantCulture);
+        return decimal.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
     }
 }
 
@@ -150,7 +172,11 @@ public class BigIntType : TasonNumberScalar<BigInteger>
             BigInteger sign = isNegative ? -1 : 1;
             return radix switch
             {
+#if NET8_0_OR_GREATER
                 2 => sign * BigInteger.Parse(text, NumberStyles.BinaryNumber),
+#else
+                2 => sign * ParseBinaryNumber(text),
+#endif
                 8 => sign * ParseOctalNumber(text),
                 16 => sign * BigInteger.Parse(text, NumberStyles.HexNumber),
                 _ => throw new FormatException($"Invalid radix '{radix}'"),
@@ -159,6 +185,16 @@ public class BigIntType : TasonNumberScalar<BigInteger>
         return BigInteger.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
     }
 
+#if !NET8_0_OR_GREATER
+    static BigInteger ParseBinaryNumber(string bin)
+    {
+        if (bin.Any(c => c != '0' && c != '1'))
+        {
+            throw new FormatException("The value could not be parsed.");
+        }
+        return bin.Aggregate(new BigInteger(0), (b, c) => b * 2 + (c - '0'));
+    }
+#endif
     static BigInteger ParseOctalNumber(string oct)
     {
         if (oct.Any(c => c is < '0' or > '7'))

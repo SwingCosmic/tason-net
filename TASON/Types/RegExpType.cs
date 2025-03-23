@@ -6,8 +6,21 @@ namespace TASON.Types;
 
 public partial class RegExpType : TasonScalarTypeBase<Regex>
 {
+
+#if NET7_0_OR_GREATER
+    [GeneratedRegex(@"^/(.+)/([gimnsxuy]*)$")]
+    private static partial Regex Pattern();
+
+    // 不精确匹配，仅快速检查存在内联选项或者内联注释的正则表达式
+    [GeneratedRegex(@"\(\?(#|[imnsx-]+)")]
+    private static partial Regex InlineOptionPattern();
+
     private static Regex regexpPattern = Pattern();
     private static Regex inlineOptionPattern = InlineOptionPattern();
+#else
+    private static Regex regexpPattern = new Regex(@"^/(.+)/([gimnsxuy]*)$");
+    private static Regex inlineOptionPattern = new Regex(@"\(\?(#|[imnsx-]+)");
+#endif
     protected override Regex DeserializeCore(string text, SerializerOptions options)
     {
         var match = regexpPattern.Match(text);
@@ -65,10 +78,4 @@ public partial class RegExpType : TasonScalarTypeBase<Regex>
         return $"/{s}/{flags}";
     }
 
-    [GeneratedRegex(@"^/(.+)/([gimnsxuy]*)$")]
-    private static partial Regex Pattern();
-    
-    // 不精确匹配，仅快速检查存在内联选项或者内联注释的正则表达式
-    [GeneratedRegex(@"\(\?(#|[imnsx-]+)")]
-    private static partial Regex InlineOptionPattern();
 }
