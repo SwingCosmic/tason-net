@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Security.Cryptography;
 using System.Numerics;
+using System.Buffers;
 
 namespace TASON;
 
@@ -84,6 +85,51 @@ public static class PrimitiveHelpers
         i += 4;
         return (char)unicodeValue;
     }
+
+    /// <summary>
+    /// Converts the specified string, which encodes binary data as hex characters, to an equivalent 8-bit unsigned integer array.
+    /// </summary>
+    /// <param name="str">The string to convert.</param>
+    /// <returns>An array of 8-bit unsigned integers that is equivalent to <paramref name="str"/>.</returns>
+    public static byte[] FromHexString(string str)
+    {
+#if NET5_0_OR_GREATER
+        return Convert.FromHexString(str);
+#else
+        if (str.Length % 2 != 0)
+        {
+            throw new FormatException("The input is not a valid hex string as its length is not a multiple of 2.");
+        }
+
+        var bytes = new byte[str.Length / 2];
+        for (int i = 0; i < str.Length; i += 2)
+        {
+            bytes[i / 2] = Convert.ToByte(str.Substring(i, 2), 16);
+        }
+        
+        return bytes;
+#endif
+    }
+
+    /// <summary>
+    /// Converts an array of 8-bit unsigned integers to its equivalent string representation that is encoded with uppercase hex characters.
+    /// </summary>
+    /// <param name="bytes">An array of 8-bit unsigned integers.</param>
+    /// <returns>The string representation in hex of the elements in <paramref name="bytes"/>.</returns>
+    public static string ToHexString(byte[] bytes)
+    {
+#if NET5_0_OR_GREATER
+        return Convert.ToHexString(bytes);
+#else
+        var sb = new StringBuilder(bytes.Length * 2);
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            sb.Append(bytes[i].ToString("X2"));
+        }
+        return sb.ToString();
+#endif
+    }
+
 
     /// <summary>
     /// 解析TASON数字字符串为<see langword="double"/>

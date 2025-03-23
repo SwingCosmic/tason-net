@@ -12,6 +12,7 @@ public static class BuiltinTypes
             ..NumberTypes.Types,
             new("UUID", new UUIDType()),
             new("RegExp", new RegExpType()),
+            new("Buffer", new BufferType()),
         ])
     );
     

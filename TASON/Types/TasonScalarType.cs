@@ -20,17 +20,31 @@ public abstract class TasonScalarTypeBase<T> : ITasonScalarType where T : notnul
         Kind = TasonTypeInstanceKind.Scalar;
     }
 
+    /// <inheritdoc/>
     public object Deserialize(string text, SerializerOptions options)
     {
         return DeserializeCore(text, options);
     }
 
+    /// <inheritdoc/>
     public string Serialize(object value, SerializerOptions options)
     {
         return SerializeCore((T)value, options);
     }
 
+    /// <summary>
+    /// 泛型版本的反序列化方法
+    /// </summary>
+    /// <param name="text">要序列化的标量类型实例</param>
+    /// <param name="options">选项</param>
+    /// <returns></returns>
     protected abstract T DeserializeCore(string text, SerializerOptions options);
+    /// <summary>
+    /// 泛型版本的序列化方法
+    /// </summary>
+    /// <param name="value">代表该类型的字符串</param>
+    /// <param name="options">选项</param>
+    /// <returns></returns>
     protected abstract string SerializeCore(T value, SerializerOptions options);
 }
 
