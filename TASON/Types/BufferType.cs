@@ -73,6 +73,8 @@ public sealed class Buffer : IEquatable<Buffer>
         }
     }
 
+    public byte[] Data => data;
+
     /// <summary>
     /// 将<see cref="Buffer"/>序列化成<see cref="Type"/>指定的字符串格式
     /// </summary>

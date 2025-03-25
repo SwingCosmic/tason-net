@@ -27,6 +27,7 @@ public class TasonTypeRegistry
     public TasonTypeRegistry(SerializerOptions options)
     {
         this.options = options;
+        // 注册存在依赖关系，顺序必须依次为默认类型，别名，然后是鸭子类型
         foreach (var (name, type) in BuiltinTypes.Types)
         {
             RegisterType(name, type);
@@ -34,6 +35,13 @@ public class TasonTypeRegistry
         foreach (var (name, type) in BuiltinTypes.Aliases)
         {
             RegisterTypeAlias(name, type);
+        }
+        foreach (var (name, types) in BuiltinTypes.DuckTypes)
+        {
+            foreach (var type in types)
+            {
+                RegisterType(name, type);
+            }
         }
     }
 

@@ -24,4 +24,12 @@ public static class BuiltinTypes
         ])
     );
 
+    /// <summary>鸭子类型实现列表，即多种.NET类型序列化为同一种TASON类型</summary>
+    public static ReadOnlyDictionary<string, ITasonTypeInfo[]> DuckTypes { get; } = new(
+        new Dictionary<string, ITasonTypeInfo[]>
+        ([
+            new("UInt16", [NumberTypes.Char]), // char和ushort在内存的表示完全一致
+        ])
+    );
+
 }

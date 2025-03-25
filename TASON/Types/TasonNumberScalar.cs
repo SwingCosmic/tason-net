@@ -36,6 +36,22 @@ public abstract class TasonNumberScalar<T> : TasonScalarTypeBase<T>
 }
 
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
+public class Int8Type : TasonNumberScalar<sbyte>
+
+{
+    protected override sbyte ParseValue(string text, int radix, bool isNegative)
+    {
+        if (radix != 10 && isNegative)
+        {
+            return (sbyte)(-1 * Convert.ToSByte(text, radix));
+        }
+        else
+        {
+            return Convert.ToSByte(AddNegative(text, isNegative), radix);
+        }
+    }
+}
+
 public class UInt8Type : TasonNumberScalar<byte>
 
 {
@@ -67,6 +83,38 @@ public class Int16Type : TasonNumberScalar<short>
     }
 }
 
+public class UInt16Type : TasonNumberScalar<ushort>
+{
+    protected override ushort ParseValue(string text, int radix, bool isNegative)
+    {
+        if (isNegative)
+        {
+            throw new ArgumentException("UInt16 cannot be negative");
+        }
+        else
+        {
+            return Convert.ToUInt16(text, radix);
+        }
+    }
+}
+
+public class CharType : TasonNumberScalar<char>
+{
+    protected override char ParseValue(string text, int radix, bool isNegative)
+    {
+        if (isNegative)
+        {
+            throw new ArgumentException("Char cannot be negative");
+        }
+        else
+        {
+            return (char)Convert.ToUInt16(text, radix);
+        }
+    }
+}
+
+
+
 public class Int32Type : TasonNumberScalar<int>
 {
     protected override int ParseValue(string text, int radix, bool isNegative)
@@ -78,6 +126,21 @@ public class Int32Type : TasonNumberScalar<int>
         else
         {
             return Convert.ToInt32(AddNegative(text, isNegative), radix);
+        }
+    }
+}
+
+public class UInt32Type : TasonNumberScalar<uint>
+{
+    protected override uint ParseValue(string text, int radix, bool isNegative)
+    {
+        if (isNegative)
+        {
+            throw new ArgumentException("UInt32 cannot be negative");
+        }
+        else
+        {
+            return Convert.ToUInt32(text, radix);
         }
     }
 }
@@ -96,6 +159,46 @@ public class Int64Type : TasonNumberScalar<long>
         }
     }
 }
+
+public class UInt64Type : TasonNumberScalar<ulong>
+{
+    protected override ulong ParseValue(string text, int radix, bool isNegative)
+    {
+        if (isNegative)
+        {
+            throw new ArgumentException("UInt64 cannot be negative");
+        }
+        else
+        {
+            return Convert.ToUInt64(text, radix);
+        }
+    }
+}
+
+#if NET7_0_OR_GREATER
+public class Int128Type : TasonNumberScalar<Int128>
+{
+    protected override Int128 ParseValue(string text, int radix, bool isNegative)
+    {
+        return Int128.Parse(BigIntType.ParseBigInteger(text, radix, isNegative).ToString());
+    }
+}
+
+public class UInt128Type : TasonNumberScalar<UInt128>
+{
+    protected override UInt128 ParseValue(string text, int radix, bool isNegative)
+    {
+        if (isNegative)
+        {
+            throw new ArgumentException("UInt128 cannot be negative");
+        }
+        else
+        {
+            return UInt128.Parse(BigIntType.ParseBigInteger(text, radix, false).ToString());
+        }
+    }
+}
+#endif
 
 public class Float16Type : TasonNumberScalar<Half>
 {
@@ -165,7 +268,7 @@ public class Decimal128Type : TasonNumberScalar<decimal>
 
 public class BigIntType : TasonNumberScalar<BigInteger>
 {
-    protected override BigInteger ParseValue(string text, int radix, bool isNegative)
+    internal static BigInteger ParseBigInteger(string text, int radix, bool isNegative)
     {
         if (radix != 10)
         {
@@ -183,6 +286,10 @@ public class BigIntType : TasonNumberScalar<BigInteger>
             };
         }
         return BigInteger.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
+    }
+    protected override BigInteger ParseValue(string text, int radix, bool isNegative)
+    {
+        return ParseBigInteger(text, radix, isNegative);
     }
 
 #if !NET8_0_OR_GREATER
