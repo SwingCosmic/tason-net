@@ -4,12 +4,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using TASON;
 using TASON.Types;
+using TASON.Types.SystemTextJson;
+using System.Text.Json;
 
 public class ParseTest
 {
     [SetUp]
     public void Setup()
     {
+        TasonSerializer.Default.Registry
+            .AddSystemTextJson(new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 
     [Test]
@@ -47,7 +51,10 @@ public class ParseTest
 
         var reg = s.Deserialize("RegExp('/([A-Z]+)\\\\1/mi')") as Regex;
         var expect = new Regex("([A-Z]+)\\1", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-        Assert.That(RegexComparer.ToString(reg!), Is.EqualTo(RegexComparer.ToString(expect))); 
+        Assert.That(RegexComparer.ToString(reg!), Is.EqualTo(RegexComparer.ToString(expect)));
+
+        var json = s.Deserialize("JSONArray('[1,2,3]')") as JSON;
+        Assert.That(json!.GetValue<List<int>>(), Is.EqualTo(new List<int> { 1, 2, 3 }));
     }
 }
 

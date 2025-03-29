@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
+using TASON.Serialization;
 using TASON.Types;
 
 namespace TASON;
@@ -24,6 +25,8 @@ public class TasonTypeRegistry
 {
     Dictionary<string, TasonRegistryEntry> types = new();
     private readonly SerializerOptions options;
+
+    public SerializerOptions Options => options;
 
     public TasonTypeRegistry(SerializerOptions options)
     {
@@ -70,7 +73,7 @@ public class TasonTypeRegistry
     /// <exception cref="InvalidOperationException">原有的类型未注册</exception>
     public void RegisterTypeAlias(string name, string originName) 
     {
-        if (!types.TryGetValue(name, out var entry))
+        if (!types.TryGetValue(originName, out var entry))
         {
             throw new InvalidOperationException($"Type '{originName}' does not exist");
         };
@@ -157,6 +160,18 @@ public class TasonTypeRegistry
     /// <returns>是否找到</returns>
     public bool TryGetTypeInfo(object value, [NotNullWhen(true)]out TasonNamedTypeInfo? typeInfo) 
     {
+        if (value is ITasonTypeDiscriminator discriminator)
+        {
+            var name = discriminator.GetTypeName();
+            if (GetType(name, value) is ITasonTypeInfo info)
+            {
+                typeInfo = new (name, info);
+                return true;
+            }
+            throw new InvalidOperationException(
+                $"Object returned its type '{name}' in type discriminator, which is not registered in the registry.");
+        }
+
         var valueType = value.GetType();
         foreach (var entry in types)
         {

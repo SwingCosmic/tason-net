@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>12.0</LangVersion>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>TASON.Types.SystemTextJson</Title>
+		<Version>0.1.0</Version>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\TASON\TASON.csproj" />
+	</ItemGroup>
+
+</Project>

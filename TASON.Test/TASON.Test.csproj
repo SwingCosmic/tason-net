@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TASON.Types.SystemTextJson\TASON.Types.SystemTextJson.csproj" />
     <ProjectReference Include="..\TASON\TASON.csproj" />
   </ItemGroup>
 

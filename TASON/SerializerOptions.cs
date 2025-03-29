@@ -36,6 +36,12 @@ public class SerializerOptions
     /// 序列化时如何使用内置数值类型
     /// </summary>
     public BuiltinNumberOption UseBuiltinNumber { get; set; } = BuiltinNumberOption.UnsafeOnly;
+
+
+    /// <summary>
+    /// 由其他库提供的额外选项
+    /// </summary>
+    public Dictionary<string, object?> ExtraOptions { get; set; } = new();
 }
 
 /// <summary>

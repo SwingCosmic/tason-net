@@ -10,7 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TASON.Test", "TASON.Test\TASON.Test.csproj", "{0E549D2F-8F01-4E23-AAE0-895C02413985}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASON.Test", "TASON.Test\TASON.Test.csproj", "{0E549D2F-8F01-4E23-AAE0-895C02413985}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASON.Types.SystemTextJson", "TASON.Types.SystemTextJson\TASON.Types.SystemTextJson.csproj", "{3217BAFC-E344-4074-93FA-09877CAB7BA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,10 @@ Global
 		{0E549D2F-8F01-4E23-AAE0-895C02413985}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E549D2F-8F01-4E23-AAE0-895C02413985}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E549D2F-8F01-4E23-AAE0-895C02413985}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3217BAFC-E344-4074-93FA-09877CAB7BA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3217BAFC-E344-4074-93FA-09877CAB7BA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3217BAFC-E344-4074-93FA-09877CAB7BA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3217BAFC-E344-4074-93FA-09877CAB7BA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -117,8 +117,7 @@ public sealed class Buffer : IEquatable<Buffer>
         return (left, right) switch 
         {
             (null, null) => true,
-            (null, _) => false,
-            (_, null) => false,
+            (null, _) or (_, null) => false,
             _ => left.Equals(right),
         };
     }
