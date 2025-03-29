@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using static TASON.ReflectionHelpers;
+using static TASON.Util.ReflectionHelpers;
 namespace TASON;
 
 public partial class TasonGenerator
@@ -18,9 +18,13 @@ public partial class TasonGenerator
     private static readonly Regex identifierPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]*$");
 #endif
 
-    string TypeInstanceValue(object value, ITasonTypeInfo type)
+    string TypeInstanceValue(object value, ITasonTypeInfo type, string name)
     {
         return "";
+    }
+    string TypeInstanceValue(object value, TasonNamedTypeInfo type)
+    {
+        return TypeInstanceValue(value, type.TypeInfo, type.Name);
     }
 
     string Key(string key)
@@ -63,7 +67,10 @@ public partial class TasonGenerator
     string MaybeObjectValue(object value, Type type)
     {
         ThrowIfBanTypes(type);
-        return "";
+        if (registry.TryGetTypeInfo(value, out var typeInfo))
+            return TypeInstanceValue(value, (TasonNamedTypeInfo)typeInfo);
+        else
+            return ObjectValue(value, type);
     }
 
     string ObjectValue(object value, Type type) 

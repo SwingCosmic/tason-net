@@ -1,7 +1,7 @@
 
 using System.Reflection;
 
-namespace TASON.Types;
+namespace TASON.Serialization;
 
 /// <summary>
 /// <see cref="ITasonScalarType"/>实现的基类，提供了一个泛型版本方便实现

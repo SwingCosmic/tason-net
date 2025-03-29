@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using static TASON.ReflectionHelpers;
+using TASON.Util;
+using static TASON.Util.ReflectionHelpers;
 namespace TASON;
 
 public partial class TasonGenerator

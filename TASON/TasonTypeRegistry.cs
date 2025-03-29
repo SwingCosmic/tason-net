@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 using TASON.Types;
 
@@ -146,6 +147,30 @@ public class TasonTypeRegistry
             return [];
         };
         return [.. entry.Types];
+    }
+
+    /// <summary>
+    /// 尝试获取指定对象注册的TASON类型实例，包含名称
+    /// </summary>
+    /// <param name="value">待判断的对象</param>
+    /// <param name="typeInfo">返回的包含名称的TASON类型实例</param>
+    /// <returns>是否找到</returns>
+    public bool TryGetTypeInfo(object value, [NotNullWhen(true)]out TasonNamedTypeInfo? typeInfo) 
+    {
+        var valueType = value.GetType();
+        foreach (var entry in types)
+        {
+            foreach (var type in entry.Value.Types)
+            {
+                if (type.Type.IsAssignableFrom(valueType))
+                {
+                    typeInfo = new(entry.Key, type);
+                    return true;
+                }
+            }
+        }
+        typeInfo = null;
+        return false;
     }
 
 

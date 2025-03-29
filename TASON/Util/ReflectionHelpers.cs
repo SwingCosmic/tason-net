@@ -2,8 +2,9 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
-namespace TASON;
+namespace TASON.Util;
 
 internal enum EnumerableType
 {
@@ -64,40 +65,40 @@ internal static class ReflectionHelpers
 
     public static FieldInfo FieldOf<T>(Expression<Func<T>> expression)
     {
-        var body = expression.Body as MemberExpression ??  
+        var body = expression.Body as MemberExpression ??
             throw new InvalidOperationException("Expression must be a member access");
         return body.Member as FieldInfo ?? throw new InvalidOperationException("Member must be a field");
     }
     public static PropertyInfo PropertyOf<T>(Expression<Func<T>> expression)
     {
-        var body = expression.Body as MemberExpression ??  
+        var body = expression.Body as MemberExpression ??
             throw new InvalidOperationException("Expression must be a member access");
         return body.Member as PropertyInfo ?? throw new InvalidOperationException("Member must be a property");
     }
 
     public static MethodInfo MethodOf<T>(Expression<Func<T>> expression)
     {
-        var body = expression.Body as MethodCallExpression ??  
+        var body = expression.Body as MethodCallExpression ??
             throw new InvalidOperationException("Expression must be a method call");
         return body.Method;
     }
 
     public static MethodInfo MethodOf<TThis, T>(Expression<Func<TThis, T>> expression)
     {
-        var body = expression.Body as MethodCallExpression ??  
+        var body = expression.Body as MethodCallExpression ??
             throw new InvalidOperationException("Expression must be a method call");
         return body.Method;
     }
 
     public static MethodInfo MethodOf(Expression<Action> expression)
     {
-        var body = expression.Body as MethodCallExpression ??  
+        var body = expression.Body as MethodCallExpression ??
             throw new InvalidOperationException("Expression must be a method call");
         return body.Method;
     }
     public static MethodInfo MethodOf<TThis>(Expression<Action<TThis>> expression)
     {
-        var body = expression.Body as MethodCallExpression ??  
+        var body = expression.Body as MethodCallExpression ??
             throw new InvalidOperationException("Expression must be a method call");
         return body.Method;
     }
@@ -107,7 +108,7 @@ internal static class ReflectionHelpers
         var m = genericMethod.MakeGenericMethod(genericArgs);
         return (T)m.Invoke(thisArg, args);
     }
-    
+
     public static void CallGenericMethod(MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
     {
         var m = genericMethod.MakeGenericMethod(genericArgs);

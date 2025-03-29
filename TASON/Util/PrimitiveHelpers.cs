@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Numerics;
 using System.Buffers;
 
-namespace TASON;
+namespace TASON.Util;
 
 /// <summary>
 /// 包含一些基础类型的工具方法
@@ -26,7 +26,7 @@ public static class PrimitiveHelpers
     {
         var result = new StringBuilder();
         int i = 0;
-        
+
         while (i < str.Length)
         {
             char c = str[i];
@@ -106,7 +106,7 @@ public static class PrimitiveHelpers
         {
             bytes[i / 2] = Convert.ToByte(str.Substring(i, 2), 16);
         }
-        
+
         return bytes;
 #endif
     }
@@ -208,7 +208,7 @@ public static class PrimitiveHelpers
     /// </summary>
     /// <param name="input">内置数字类型字符串</param>
     /// <returns>解析后的数字信息，包括进制，去除进制前缀的数字，是否为负数</returns>
-    public static (string value, int radix, bool isNegative) ParseBuiltinNumber(string input) 
+    public static (string value, int radix, bool isNegative) ParseBuiltinNumber(string input)
     {
         // 处理特殊值 NaN 和 Infinity
         if (input == NaN || input == '+' + NaN || input == '-' + NaN)

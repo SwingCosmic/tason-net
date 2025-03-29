@@ -1,7 +1,8 @@
 
 using System.Reflection;
+using TASON.Util;
 
-namespace TASON.Types;
+namespace TASON.Serialization;
 
 
 /// <summary>
@@ -25,7 +26,23 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
         static ReflectionCache()
         {
             var type = typeof(T);
-            Properties = type.GetProperties().ToDictionary(p => p.Name, p => p);
+            Properties = new();
+
+            var contractAttr = type.GetCustomAttribute<TasonNamingContractAttribute>(true);
+            foreach (var p in type.GetProperties())
+            {
+                if (p.GetCustomAttribute<TasonIgnoreAttribute>(true) is not null)
+                    continue;
+
+                var realName = p.Name;
+                var aliasAttr = p.GetCustomAttribute<TasonPropertyAttribute>(true);
+                if (aliasAttr is not null)
+                    realName = aliasAttr.Name;
+                else if (contractAttr is not null)
+                    realName = p.Name.ToCase(contractAttr.Policy);
+
+                Properties[realName] = p;
+            }
         }
     }
 
@@ -34,7 +51,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     public TasonObjectType()
     {
         Type = typeof(T);
-        Kind = TasonTypeInstanceKind.Scalar;
+        Kind = TasonTypeInstanceKind.Object;
     }
 
     /// <inheritdoc/>

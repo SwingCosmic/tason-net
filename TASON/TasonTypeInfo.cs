@@ -58,3 +58,27 @@ public interface ITasonObjectType : ITasonTypeInfo
     /// <returns>标量类型实例</returns>
     object Deserialize(Dictionary<string, object?> dict, SerializerOptions options);
 }
+
+
+/// <summary>
+/// 表示带有类型名称的<see cref="ITasonTypeInfo"/>。
+/// 采用<see langword="readonly"/> <see langword="struct"/>是因为此类型仅作为临时状态返回，不应该修改和长期持有。
+/// </summary>
+public readonly record struct TasonNamedTypeInfo
+{
+    /// <summary>TASON类型的名称</summary>
+    public string Name { get; }
+    /// <summary>封装的<see cref="ITasonTypeInfo"/></summary>
+    public ITasonTypeInfo TypeInfo { get; }
+    /// <summary>
+    /// 创建<see langword="readonly"/> <see langword="struct"/> <see cref="TasonNamedTypeInfo"/>的新实例
+    /// </summary>
+    /// <param name="name">TASON类型的名称</param>
+    /// <param name="typeInfo">该TASON类型对应的<see cref="ITasonTypeInfo"/></param>
+    public TasonNamedTypeInfo(string name, ITasonTypeInfo typeInfo)
+    {
+        Name = name;
+        TypeInfo = typeInfo;
+    }
+
+}
