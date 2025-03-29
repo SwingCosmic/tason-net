@@ -38,7 +38,7 @@ public partial class TasonGenerator
             return BooleanValue(b);
         else if (value is string s)
             return StringValue(s);
-        else if (TryGetNumberValue(value, out var number)) 
+        else if (TryGetNumberValue(value, out var number, scope)) 
             return number;
         else if (value is Enum e)
             return EnumValue(e);
