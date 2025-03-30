@@ -40,7 +40,11 @@ public class TasonSerializer
         registry ??= new TasonTypeRegistry(options);
         Registry = registry;
     }
-
+    /// <summary>
+    /// 将TASON字符串反序列化为.NET对象，类型根据TASON描述信息自动推断
+    /// </summary>
+    /// <param name="text">TASON字符串</param>
+    /// <returns>反序列化的.NET对象</returns>
     public object? Deserialize(string text)
     {
         var lexer = new TASONLexer(new AntlrInputStream(text));
@@ -56,8 +60,14 @@ public class TasonSerializer
         return (T)obj;
     }
 
+    /// <summary>
+    /// 将.NET对象序列化为TASON字符串
+    /// </summary>
+    /// <param name="value">待序列化的对象</param>
+    /// <returns>TASON字符串</returns>
     public string Serialize(object? value)
     {
-        throw new NotImplementedException();
+        var generator = new TasonGenerator(Options, Registry);
+        return generator.Generate(value);
     }
 }

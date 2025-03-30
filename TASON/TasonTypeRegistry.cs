@@ -70,12 +70,12 @@ public class TasonTypeRegistry
     /// </summary>
     /// <param name="name">别名</param>
     /// <param name="originName">原有类型名称</param>
-    /// <exception cref="InvalidOperationException">原有的类型未注册</exception>
+    /// <exception cref="TasonTypeNotFoundException">原有的类型未注册</exception>
     public void RegisterTypeAlias(string name, string originName) 
     {
         if (!types.TryGetValue(originName, out var entry))
         {
-            throw new InvalidOperationException($"Type '{originName}' does not exist");
+            throw new TasonTypeNotFoundException(originName);
         };
         types[name] = entry;
     }
@@ -197,11 +197,13 @@ public class TasonTypeRegistry
     /// <param name="typeName">类型名称</param>
     /// <param name="arg">表示对象属性的字典</param>
     /// <returns>TASON对象类型实例</returns>
-    /// <exception cref="ArgumentException">类型未注册，或者不是对象类型</exception>
-    public object CreateInstance(string typeName, Dictionary<string, object?> arg) {
+    /// <exception cref="TasonTypeNotFoundException">类型未注册</exception>
+    /// <exception cref="ArgumentException">不是<see cref="ITasonObjectType" />类型</exception>
+    public object CreateInstance(string typeName, Dictionary<string, object?> arg) 
+    {
         return GetDefaultType(typeName) switch
         {
-            null => throw new ArgumentException($"Unregistered type: {typeName}"),
+            null => throw new TasonTypeNotFoundException(typeName),
             ITasonObjectType type => CreateInstance(type, arg),
             _ => throw new ArgumentException($"{typeName} is not an {nameof(ITasonObjectType)}"),
         };
@@ -212,11 +214,13 @@ public class TasonTypeRegistry
     /// <param name="typeName">类型名称</param>
     /// <param name="arg">表示标量的字符串</param>
     /// <returns>TASON标量类型实例</returns>
-    /// <exception cref="ArgumentException">类型未注册，或者不是标量类型</exception>
-    public object CreateInstance(string typeName, string arg) {
+    /// <exception cref="TasonTypeNotFoundException">类型未注册</exception>
+    /// <exception cref="ArgumentException">不是<see cref="ITasonScalarType" />类型</exception>
+    public object CreateInstance(string typeName, string arg) 
+    {
         return GetDefaultType(typeName) switch
         {
-            null => throw new ArgumentException($"Unregistered type: {typeName}"),
+            null => throw new TasonTypeNotFoundException(typeName),
             ITasonScalarType type => CreateInstance(type, arg),
             _ => throw new ArgumentException($"{typeName} is not an {nameof(ITasonScalarType)}"),
         };
@@ -227,7 +231,8 @@ public class TasonTypeRegistry
     /// <param name="type">TASON对象类型信息</param>
     /// <param name="arg">表示对象属性的字典</param>
     /// <returns>TASON对象类型实例</returns>
-    public object CreateInstance(ITasonObjectType type, Dictionary<string, object?> arg) {
+    public object CreateInstance(ITasonObjectType type, Dictionary<string, object?> arg) 
+    {
         return type.Deserialize(arg, options);
     }
     /// <summary>
@@ -240,6 +245,26 @@ public class TasonTypeRegistry
         return type.Deserialize(arg, options);
     }
 
+    public object SerializeToArg(string typeName, object value)
+    {
+        var type = GetType(typeName, value) ?? throw new TasonTypeNotFoundException(typeName);
+        return type switch
+        {
+            ITasonScalarType scalar => SerializeToArg(scalar, value),
+            ITasonObjectType obj => SerializeToArg(obj, value),
+            _ => throw new InvalidOperationException(),
+        };
+    }       
+    
+    public string SerializeToArg(ITasonScalarType type, object value)
+    {
+        return type.Serialize(value, options);
+    }    
+    
+    public Dictionary<string, object?> SerializeToArg(ITasonObjectType type, object value)
+    {
+        return type.Serialize(value, options);
+    }
 
     private TasonRegistryEntry GetEntry(string name)
     {

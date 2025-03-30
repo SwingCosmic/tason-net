@@ -26,6 +26,10 @@ public static class JSONExtensions
         return registry;
     }
 
+    /// <summary>
+    /// 从<paramref name="options"/>中获取<see cref="JsonSerializerOptions"/>
+    /// </summary>
+    /// <param name="options">已添加<see cref="JsonSerializerOptions"/>的TASON序列化选项，通常通过<see cref="AddSystemTextJson" />设置</param>
     public static JsonSerializerOptions GetJsonOptions(this SerializerOptions options)
     {
         if (options.ExtraOptions.TryGetValue(LibName, out var jsonOptions))

@@ -18,13 +18,28 @@ public partial class TasonGenerator
     private static readonly Regex identifierPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]*$");
 #endif
 
-    string TypeInstanceValue(object value, ITasonTypeInfo type, string name)
+    string TypeInstanceValue(object value, ITasonScalarType type, string name)
     {
-        return "";
+        var arg = registry.SerializeToArg(type, value);
+        var argStr = StringValue(arg);
+        return $"{name}({argStr})";
     }
+    
+    string TypeInstanceValue(object value, ITasonObjectType type, string name)
+    {
+        var arg = registry.SerializeToArg(type, value);
+        var argStr = DictionaryValue<string, object?>(arg);
+        return $"{name}({argStr})";
+    }
+
     string TypeInstanceValue(object value, TasonNamedTypeInfo type)
     {
-        return TypeInstanceValue(value, type.TypeInfo, type.Name);
+        return type.TypeInfo switch
+        {
+            ITasonScalarType scalar => TypeInstanceValue(value, scalar, type.Name),
+            ITasonObjectType obj => TypeInstanceValue(value, obj, type.Name),
+            _ => throw new InvalidOperationException(),
+        };
     }
 
     string Key(string key)

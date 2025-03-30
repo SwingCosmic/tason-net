@@ -75,7 +75,7 @@ public partial class TasonGenerator
 
     private static readonly JsonSerializerOptions jsonStringOption = new()
     {
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

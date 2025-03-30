@@ -24,9 +24,8 @@ public class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
     public JSON(string json, JsonSerializerOptions options, JSONSubType subType = JSONSubType.All)
     {
         this.options = options;
-        JsonString = json.Trim();
+        JsonString = json;
         SubType = subType;
-        CheckSubType();
     }
     
     public JSON(object? obj, JsonSerializerOptions options, JSONSubType subType = JSONSubType.All)
@@ -34,24 +33,43 @@ public class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
         this.options = options;
         JsonString = JsonSerializer.Serialize(obj, options);
         SubType = subType;
-        CheckSubType();
     }
 
+    private string jsonString;
+
     /// <summary>JSON字符串值</summary>
-    public string JsonString { get; set; }
+    public string JsonString 
+    {
+        get => jsonString;
+        set
+        {
+            var text = value.Trim();
+            CheckSubType(text);
+            // 仅检查JSON字符串是否合法，丢弃结果
+            _ = JsonDocument.Parse(text);
+            jsonString = text;
+        }
+    }
+
     /// <summary>JSON子类型</summary>
     public JSONSubType SubType { get; }
 
     /// <summary>反序列化JSON字符串为.NET对象</summary>
     public T? GetValue<T>() => JsonSerializer.Deserialize<T>(JsonString, options);
 
-    void CheckSubType()
+    /// <summary>替换JSON字符串代表的对象</summary>
+    public void ReplaceValue(object? obj)
     {
-        if (SubType == JSONSubType.Array && !JsonString.StartsWith('['))
+        JsonString = JsonSerializer.Serialize(obj, options);
+    }
+
+    void CheckSubType(string jsonString)
+    {
+        if (SubType == JSONSubType.Array && !jsonString.StartsWith('['))
         {
             throw new ArgumentException("value is not a valid JSONArray");
         }
-        if (SubType == JSONSubType.Object && !JsonString.StartsWith('{'))
+        if (SubType == JSONSubType.Object && !jsonString.StartsWith('{'))
         {
             throw new ArgumentException("value is not a valid JSONObject");
         }
