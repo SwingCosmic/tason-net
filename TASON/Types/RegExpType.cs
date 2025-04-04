@@ -2,7 +2,8 @@
 
 using System.Text.RegularExpressions;
 using TASON.Serialization;
-
+using TASON.Util;
+using RO = System.Text.RegularExpressions.RegexOptions;
 namespace TASON.Types;
 
 public partial class RegExpType : TasonScalarTypeBase<Regex>
@@ -33,19 +34,19 @@ public partial class RegExpType : TasonScalarTypeBase<Regex>
         var pattern = match.Groups[1].Value;
         var flags = match.Groups[2].Value ?? "";
 
-        var option = RegexOptions.None;
+        var option = RO.None;
         foreach (var flag in flags) 
         {
             option |= flag switch 
             {
-                'g' => RegexOptions.None,// 没有影响
-                'i' => RegexOptions.IgnoreCase,
-                'm' => RegexOptions.Multiline,
-                'n' => RegexOptions.ExplicitCapture,
-                's' => RegexOptions.Singleline,
-                'x' => RegexOptions.IgnorePatternWhitespace,
-                'u' => RegexOptions.None,// .NET始终支持Unicode
-                'y' => RegexOptions.None,// 没有影响
+                'g' => RO.None,// 没有影响
+                'i' => RO.IgnoreCase,
+                'm' => RO.Multiline,
+                'n' => RO.ExplicitCapture,
+                's' => RO.Singleline,
+                'x' => RO.IgnorePatternWhitespace,
+                'u' => RO.None,// .NET始终支持Unicode
+                'y' => RO.None,// 没有影响
                 _ => throw new FormatException($"Flag {flag} is not supported")
             };
         }
@@ -62,17 +63,17 @@ public partial class RegExpType : TasonScalarTypeBase<Regex>
         }
 
         var flags = "";
-        if (value.Options.HasFlag(RegexOptions.IgnoreCase))
+        if (value.Options.HasFlagFast(RO.IgnoreCase))
             flags += 'i';
-        if (value.Options.HasFlag(RegexOptions.Multiline))
+        if (value.Options.HasFlagFast(RO.Multiline))
             flags += 'm';
-        if (value.Options.HasFlag(RegexOptions.ExplicitCapture))
+        if (value.Options.HasFlagFast(RO.ExplicitCapture))
             flags += 'n';
-        if (value.Options.HasFlag(RegexOptions.Singleline))
+        if (value.Options.HasFlagFast(RO.Singleline))
             flags += 's';        
-        if (value.Options.HasFlag(RegexOptions.IgnorePatternWhitespace))
+        if (value.Options.HasFlagFast(RO.IgnorePatternWhitespace))
             flags += 'x';
-        if (value.Options.HasFlag(RegexOptions.RightToLeft))
+        if (value.Options.HasFlagFast(RO.RightToLeft))
             throw new NotSupportedException("RightToLeft is not supported");
 
         flags += 'u';// .NET始终支持Unicode

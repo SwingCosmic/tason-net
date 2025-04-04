@@ -58,4 +58,13 @@ public class SerializeTest
         var json2 = new JSON(@"{""啊？\r\n"":1}", options, JSONSubType.Object);
         Assert.That(s.Serialize(json2), Is.EqualTo(@"JSONObject(""{\""啊？\\r\\n\"":1}"")"));
     }
+
+    [Test]
+    public void RegExpTest()
+    {
+        var s = TasonSerializer.Default;
+
+        var reg = new Regex("[a-z]+", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        Assert.That(s.Serialize(reg), Is.EqualTo("RegExp(\"/[a-z]+/imu\")"));
+    }
 }

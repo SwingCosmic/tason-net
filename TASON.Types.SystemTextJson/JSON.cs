@@ -7,7 +7,7 @@ namespace TASON.Types.SystemTextJson;
 /// <summary>
 /// 表示一个JSON对象
 /// </summary>
-public class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
+public sealed record class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
 #if NET7_0_OR_GREATER
     , IEqualityOperators<JSON, JSON, bool>
 #endif
@@ -82,11 +82,6 @@ public class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
         return JsonString == other.JsonString && SubType == other.SubType;
     }
 
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        return Equals(obj as JSON);
-    }
 
     /// <inheritdoc/>
     public override int GetHashCode()
@@ -105,19 +100,6 @@ public class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
         };
     }
 
-    /// <inheritdoc/>
-    public static bool operator ==(JSON? left, JSON? right)
-    {
-        return (left, right) switch
-        {
-            (null, null) => true,
-            (null, _) or (_, null) => false,
-            _ => left.Equals(right),
-        };
-    }
-
-    /// <inheritdoc/>
-    public static bool operator !=(JSON? left, JSON? right) => !(left == right);
 }
 
 

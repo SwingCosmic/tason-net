@@ -19,7 +19,7 @@ public enum BufferDataFormat
 /// <summary>
 /// 表示一段以字节为单位的二进制数据
 /// </summary>
-public sealed class Buffer : IEquatable<Buffer>
+public sealed record class Buffer : IEquatable<Buffer>
 #if NET7_0_OR_GREATER
     , IEqualityOperators<Buffer, Buffer, bool>
 #endif
@@ -81,7 +81,7 @@ public sealed class Buffer : IEquatable<Buffer>
     /// 将<see cref="Buffer"/>序列化成<see cref="Type"/>指定的字符串格式
     /// </summary>
     /// <returns>序列化后的字符串</returns>
-    public override string ToString()
+    public string SerializeToString()
     {
         if (Type == BufferDataFormat.Hex)
         {
@@ -99,31 +99,20 @@ public sealed class Buffer : IEquatable<Buffer>
         return Type == other.Type && data.AsSpan().SequenceEqual(other.data.AsSpan());
     }
 
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        return Equals(obj as Buffer);
-    }
 
     /// <inheritdoc/>
     public override int GetHashCode()
     {
+#if NET6_0_OR_GREATER
+        var hashCode = new HashCode();
+        hashCode.Add(Type);
+        hashCode.AddBytes(data);
+        return hashCode.ToHashCode();
+#else
+        // NOTE: data是byte[]，理论上应该按内存值比较，不过更低版本.NET没有提供原生方法，写起来也太麻烦
         return HashCode.Combine(Type, data);
+#endif
     }
-
-    /// <inheritdoc/>
-    public static bool operator ==(Buffer? left, Buffer? right)
-    {
-        return (left, right) switch 
-        {
-            (null, null) => true,
-            (null, _) or (_, null) => false,
-            _ => left.Equals(right),
-        };
-    }
-
-    /// <inheritdoc/>
-    public static bool operator !=(Buffer? left, Buffer? right) => !(left == right);
 }
 
 /// <summary>
@@ -140,6 +129,6 @@ public class BufferType : TasonScalarTypeBase<Buffer>
     /// <inheritdoc/>
     protected override string SerializeCore(Buffer value, SerializerOptions options)
     {
-        return value.ToString();
+        return value.SerializeToString();
     }
 }

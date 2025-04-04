@@ -262,4 +262,47 @@ public static class PrimitiveHelpers
             }
         }
     }
+
+
+    /// <summary>
+    /// Determines whether one or more bit fields are set in the current instance.<br/>
+    /// 该方法假定枚举类型<typeparamref name="E"/>对应值的数字类型是<typeparamref name="N"/>，
+    /// 如果不匹配会产生未定义的行为
+    /// </summary>
+    /// <param name="flags">具有标志位的枚举值</param>
+    /// <param name="value">An enumeration value.</param>
+    public static bool HasFlagFast<E, N>(this E flags, E value) 
+        where N : unmanaged
+#if NET7_0_OR_GREATER
+        , IBinaryInteger<N>
+#endif
+        where E : struct, Enum
+    { 
+#if NET7_0_OR_GREATER
+        N left = Unsafe.As<E, N>(ref flags);
+        N right = Unsafe.As<E, N>(ref value);
+        return (left & right) == right;
+#else
+        return flags.HasFlag(value);
+#endif
+    }    
+    
+    /// <summary>
+    /// Determines whether one or more bit fields are set in the current instance.<br/>
+    /// 该方法假定枚举类型<typeparamref name="E"/>对应值的数字类型是<see langword="int"/>，
+    /// 如果不匹配会产生未定义的行为
+    /// </summary>
+    /// <param name="flags">具有标志位的枚举值</param>
+    /// <param name="value">An enumeration value.</param>
+    public static bool HasFlagFast<E>(this E flags, E value) 
+        where E : struct, Enum
+    { 
+#if NET7_0_OR_GREATER
+        int left = Unsafe.As<E, int>(ref flags);
+        int right = Unsafe.As<E, int>(ref value);
+        return (left & right) == right;
+#else
+        return flags.HasFlag(value);
+#endif
+    }
 }
