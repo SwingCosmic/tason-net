@@ -47,8 +47,8 @@ internal static class ReflectionHelpers
         var dict = interfaces.FirstOrDefault(t => t.Name.StartsWith("IDictionary`2"));
         if (dict is not null)
         {
-            elementType = i.GenericTypeArguments[1];
-            keyType = i.GenericTypeArguments[0];
+            elementType = dict.GenericTypeArguments[1];
+            keyType = dict.GenericTypeArguments[0];
             return EnumerableType.Dictionary;
         }
 

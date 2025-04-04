@@ -38,10 +38,10 @@ public class SerializeTest
         Assert.That(s.Serialize(array), Is.EqualTo(
 """
 [
-  1, 
-  { 
-    a: 1 
-  }, 
+  1,
+  {
+    a: 1
+  },
   Int64("43981")
 ]
 """.ReplaceLineEndings("\n")

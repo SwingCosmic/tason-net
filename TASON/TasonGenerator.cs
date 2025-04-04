@@ -3,8 +3,6 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Unicode;
 
 namespace TASON;
 
@@ -73,15 +71,12 @@ public partial class TasonGenerator
     }
 
 
-    private static readonly JsonSerializerOptions jsonStringOption = new()
-    {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    };
+    private static readonly JavaScriptEncoder stringEncoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static string StringValue(string value)
     {
-        return JsonSerializer.Serialize(value, jsonStringOption);
+        return "\"" + stringEncoder.Encode(value) + "\"";
     }
 
 
