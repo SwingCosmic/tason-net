@@ -33,7 +33,7 @@ public partial class TasonGenerator
         if (value == null)
             return "null";
         else if (value is bool b)
-            return BooleanValue(b);
+            return b ? "true" : "false";
         else if (value is string s)
             return StringValue(s);
         else if (TryGetNumberValue(value, out var number, scope)) 
@@ -56,11 +56,6 @@ public partial class TasonGenerator
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static string BooleanValue(bool value)
-    {
-        return value ? "true" : "false";
-    }
 
     string EnumValue(Enum value)
     {

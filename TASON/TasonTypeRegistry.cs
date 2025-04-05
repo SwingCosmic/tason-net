@@ -191,6 +191,8 @@ public class TasonTypeRegistry
 
     #endregion
 
+    #region 创建类型实例
+
     /// <summary>
     /// 根据类型名称和表示对象属性的字典创建TASON对象类型实例
     /// </summary>
@@ -199,7 +201,7 @@ public class TasonTypeRegistry
     /// <returns>TASON对象类型实例</returns>
     /// <exception cref="TasonTypeNotFoundException">类型未注册</exception>
     /// <exception cref="ArgumentException">不是<see cref="ITasonObjectType" />类型</exception>
-    public object CreateInstance(string typeName, Dictionary<string, object?> arg) 
+    public object CreateInstance(string typeName, Dictionary<string, object?> arg)
     {
         return GetDefaultType(typeName) switch
         {
@@ -216,7 +218,7 @@ public class TasonTypeRegistry
     /// <returns>TASON标量类型实例</returns>
     /// <exception cref="TasonTypeNotFoundException">类型未注册</exception>
     /// <exception cref="ArgumentException">不是<see cref="ITasonScalarType" />类型</exception>
-    public object CreateInstance(string typeName, string arg) 
+    public object CreateInstance(string typeName, string arg)
     {
         return GetDefaultType(typeName) switch
         {
@@ -231,7 +233,7 @@ public class TasonTypeRegistry
     /// <param name="type">TASON对象类型信息</param>
     /// <param name="arg">表示对象属性的字典</param>
     /// <returns>TASON对象类型实例</returns>
-    public object CreateInstance(ITasonObjectType type, Dictionary<string, object?> arg) 
+    public object CreateInstance(ITasonObjectType type, Dictionary<string, object?> arg)
     {
         return type.Deserialize(arg, options);
     }
@@ -241,9 +243,12 @@ public class TasonTypeRegistry
     /// <param name="type">TASON标量类型信息</param>
     /// <param name="arg">表示标量的字符串</param>
     /// <returns>TASON标量类型实例</returns>
-    public object CreateInstance(ITasonScalarType type, string arg) {
+    public object CreateInstance(ITasonScalarType type, string arg)
+    {
         return type.Deserialize(arg, options);
     }
+
+    #endregion
 
     public object SerializeToArg(string typeName, object value)
     {

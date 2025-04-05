@@ -10,6 +10,7 @@ public static class BuiltinTypes
         new Dictionary<string, ITasonTypeInfo>
         ([
             ..NumberTypes.Types,
+            ..DateTypes.Types,
             new("UUID", new UUIDType()),
             new("RegExp", new RegExpType()),
             new("Buffer", new BufferType()),
@@ -28,7 +29,10 @@ public static class BuiltinTypes
     public static ReadOnlyDictionary<string, ITasonTypeInfo[]> DuckTypes { get; } = new(
         new Dictionary<string, ITasonTypeInfo[]>
         ([
-            new("UInt16", [NumberTypes.Char]), // char和ushort在内存的表示完全一致
+            // char和ushort在内存的表示完全一致
+            new("UInt16", [NumberTypes.Char]),
+            // 语义上一致，但因为DateTimeOffset的精度更高，所以单独作为鸭子类型而不是类型默认实现
+            new("Timestamp", [DateTypes.DateTimeOffset]), 
         ])
     );
 

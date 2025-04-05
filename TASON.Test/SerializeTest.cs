@@ -25,15 +25,15 @@ public class SerializeTest
         {
             Indent = 2,
         }, TasonSerializer.Default.Registry.Clone());
-
+        long? int64 = 0xabcdL;
         var array = new object[] 
         { 
             1, 
             new Dictionary<string, object> 
             {
                 ["a"] = 1,
-            }, 
-            0xabcdL 
+            },
+            int64
         };
         Assert.That(s.Serialize(array), Is.EqualTo(
 """
