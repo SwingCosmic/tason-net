@@ -19,6 +19,24 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
         return ValueContext(context.value());
     }
 
+    /// <summary>
+    /// 遍历parse tree并将其代表的TypeInstanceValue以<typeparamref name="T"/>类型反序列化
+    /// </summary>
+    /// <typeparam name="T">TASON TypeInstance对应的CLR类型</typeparam>
+    /// <param name="context">The parse tree.</param>
+    /// <returns>反序列化的<typeparamref name="T"/>类型实例</returns>
+    /// <exception cref="InvalidOperationException">Parse tree不代表TypeInstanceValue</exception>
+    public T StartTypeInstanceValue<T>(TASONParser.StartContext context) where T : notnull
+    {
+        var ctx = context.value();
+        if (ctx is not TASONParser.TypeInstanceValueContext typeInstanceValue)
+        {
+            throw new InvalidOperationException($"{ctx.GetType().Name} is not a TypeInstanceValue");
+        }
+
+        return (T)TypeInstanceValue(typeInstanceValue);
+    }
+
     internal object? ValueContext(TASONParser.ValueContext ctx)
     {
         return ctx switch
@@ -95,7 +113,7 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
         return GetTextValue((ctx as TASONParser.StringKeyContext)!.STRING());
     }
 
-    internal object? TypeInstanceValue(TASONParser.TypeInstanceValueContext ctx)
+    internal object TypeInstanceValue(TASONParser.TypeInstanceValueContext ctx)
     {
         var typeInstance = ctx.typeInstance();
         return typeInstance switch
@@ -106,20 +124,20 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
         };
     }
 
-    internal object? ScalarTypeInstance(TASONParser.ScalarTypeInstanceContext ctx) {
+    internal object ScalarTypeInstance(TASONParser.ScalarTypeInstanceContext ctx) {
         var typeName = ctx.TYPE_NAME().GetText();
         var str = GetTextValue(ctx.STRING());
 
         return CreateTypeInstance(typeName, str);
     }
-    internal object? ObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx) {
+    internal object ObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx) {
         var typeName = ctx.TYPE_NAME().GetText();
         var obj = Object(ctx.@object());
 
         return CreateTypeInstance(typeName, obj);
     }
 
-    private object? CreateTypeInstance(string typeName, Dictionary<string, object?> value) {
+    private object CreateTypeInstance(string typeName, Dictionary<string, object?> value) {
         if (registry.GetDefaultType(typeName) is not ITasonObjectType typeInfo)
         {
             throw new ArgumentException($"Unregistered type: {typeName}");
@@ -128,7 +146,7 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
         return registry.CreateInstance(typeInfo, value);
     }
 
-    private object? CreateTypeInstance(string typeName, string value) {
+    private object CreateTypeInstance(string typeName, string value) {
         if (registry.GetDefaultType(typeName) is not ITasonScalarType typeInfo)
         {
             throw new ArgumentException($"Unregistered type: {typeName}");

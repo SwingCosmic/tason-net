@@ -26,27 +26,9 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
         static ReflectionCache()
         {
             var type = typeof(T);
-            Properties = new();
-
-            var contractAttr = type.GetCustomAttribute<TasonNamingContractAttribute>(true);
-            foreach (var p in type.GetProperties())
-            {
-                if (p.GetCustomAttribute<TasonIgnoreAttribute>(true) is not null)
-                    continue;
-
-                var realName = p.Name;
-                var aliasAttr = p.GetCustomAttribute<TasonPropertyAttribute>(true);
-                if (aliasAttr is not null)
-                    realName = aliasAttr.Name;
-                else if (contractAttr is not null)
-                    realName = p.Name.ToCase(contractAttr.Policy);
-
-                Properties[realName] = p;
-            }
+            Properties = new ObjectTypePropertyInfo(type).Properties;
         }
     }
-
-
 
     public TasonObjectType()
     {

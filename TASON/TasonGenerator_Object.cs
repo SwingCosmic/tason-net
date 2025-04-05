@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using TASON.Serialization;
+using TASON.Util;
 using static TASON.Util.ReflectionHelpers;
 namespace TASON;
 
@@ -90,7 +93,27 @@ public partial class TasonGenerator
 
     string ObjectValue(object value, Type type) 
     {
-        return "{}";
+        List<string> pairs = new();
+
+        var props = GetClassProperties(type);
+        indentLevel++;
+        {
+            CheckDepth();
+            foreach (var (key, propInfo) in props)
+            {
+                var propValue = propInfo.GetValue(value);
+                var valueStr = Value(propValue);
+                pairs.Add($"{Indent()}{key}:{Space()}{valueStr}");
+            }
+        }
+        indentLevel--;
+
+        if (pairs.Count == 0) return "{}";
+
+        if (options.Indent is null)
+            return $"{{{string.Join(',', pairs)}}}";
+        else
+            return $"{{\n{string.Join(",\n", pairs)}\n{Indent()}}}";
     }
 
     string DictionaryValue(IDictionary dict)

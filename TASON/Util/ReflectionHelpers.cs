@@ -2,7 +2,9 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using TASON.Serialization;
 
 namespace TASON.Util;
 
@@ -103,16 +105,31 @@ internal static class ReflectionHelpers
         return body.Method;
     }
 
-    public static T CallGenericMethod<T>(MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
+#if NET5_0_OR_GREATER
+    [RequiresUnreferencedCode("该方法使用MethodInfo.MakeGenericMethod()")]
+#endif
+    public static T? CallGenericMethod<T>(MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
     {
         var m = genericMethod.MakeGenericMethod(genericArgs);
-        return (T)m.Invoke(thisArg, args);
+        return (T?)m.Invoke(thisArg, args);
     }
 
+#if NET5_0_OR_GREATER
+    [RequiresUnreferencedCode("该方法使用MethodInfo.MakeGenericMethod()")]
+#endif
     public static void CallGenericMethod(MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
     {
         var m = genericMethod.MakeGenericMethod(genericArgs);
         m.Invoke(thisArg, args);
     }
 
+    public static Dictionary<string, PropertyInfo> GetClassProperties(Type type)
+    {
+        if (!type.IsClass || type.IsAbstract)
+        {
+            throw new InvalidOperationException("Invalid type");
+        }
+
+        return new ObjectTypePropertyInfo(type).Properties;
+    }
 }

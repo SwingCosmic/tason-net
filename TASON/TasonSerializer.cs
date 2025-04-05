@@ -54,10 +54,19 @@ public class TasonSerializer
         return visitor.Start(parser.start());
     }
 
-    public T DeserializeObjectType<T>(string text) where T : class
+    /// <summary>
+    /// 将代表TypeInstance的TASON字符串反序列化为.NET对象，类型为<typeparamref name="T"/>
+    /// </summary>
+    /// <typeparam name="T">TypeInstance对应的CLR类型</typeparam>
+    /// <param name="text">TASON字符串</param>
+    /// <returns>反序列化的.NET对象</returns>
+    public T DeserializeTypeInstance<T>(string text) where T : notnull
     {
-        var obj = Deserialize(text)!;
-        return (T)obj;
+        var lexer = new TASONLexer(new AntlrInputStream(text));
+        var parser = new TASONParser(new CommonTokenStream(lexer));
+
+        var visitor = new TasonVisitor(Registry, Options);
+        return visitor.StartTypeInstanceValue<T>(parser.start());
     }
 
     /// <summary>
