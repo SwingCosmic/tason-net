@@ -1,5 +1,9 @@
 # tason-net
 
+![nuget](https://img.shields.io/nuget/v/TASON?label=TASON)
+![nuget](https://img.shields.io/nuget/v/TASON.Types.SystemTextJson?label=TASON.Types.SystemTextJson)
+
+
 [TASON](https://github.com/SwingCosmic/tason)的.NET/C#实现
 
 默认提供`.NET Standard 2.1`(Unity), `.NET 6`和`.NET 8`的nuget包，对于高于`netstandard2.1`的其它.NET版本，可以自行编译。

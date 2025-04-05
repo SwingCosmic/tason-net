@@ -1,15 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
+	<TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <LangVersion>12.0</LangVersion>
+	<LangVersion>12.0</LangVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>TASON</Title>
-    <Version>0.4.3</Version>
+    <Version>0.7.4</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Authors>LoveKicher</Authors>
+    <Description>TASON(Type-Augmented Serialization Object Notation)的.NET实现</Description>
+    <RepositoryUrl>https://github.com/SwingCosmic/tason-net</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <Target Name="GenerateCode" Inputs="Grammar/TASON.g4" Outputs="Grammar/*.cs">
@@ -20,6 +24,13 @@
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' != 'Debug'">
     <CallTarget Targets="GenerateCode" />
   </Target>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />

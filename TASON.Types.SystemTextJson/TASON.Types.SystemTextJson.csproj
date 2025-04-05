@@ -7,10 +7,21 @@
 		<LangVersion>12.0</LangVersion>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>TASON.Types.SystemTextJson</Title>
-		<Version>0.1.0</Version>
+		<Version>0.7.4</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Authors>LoveKicher</Authors>
+    <Description>基于System.Text.Json的TASON JSON类型实现</Description>
+    <RepositoryUrl>https://github.com/SwingCosmic/tason-net</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+	<ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="System.Text.Json" Version="8.0.5" />
