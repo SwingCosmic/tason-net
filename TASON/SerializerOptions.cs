@@ -5,7 +5,7 @@ namespace TASON;
 /// <summary>
 /// 序列化选项
 /// </summary>
-public class SerializerOptions
+public record class SerializerOptions
 {
     /// <summary>
     /// 是否允许使用不安全的类型，默认<see langword="false"/>
@@ -42,6 +42,7 @@ public class SerializerOptions
     /// 由其他库提供的额外选项
     /// </summary>
     public Dictionary<string, object?> ExtraOptions { get; set; } = new();
+
 }
 
 /// <summary>

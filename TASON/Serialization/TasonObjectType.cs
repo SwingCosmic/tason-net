@@ -44,7 +44,10 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
         {
             if (dict.TryGetValue(name, out var value))
             {
-                prop.SetValue(obj, value);
+                if (prop.CanWrite)
+                {
+                    prop.SetValue(obj, value);
+                }
             }
         }
         return obj;

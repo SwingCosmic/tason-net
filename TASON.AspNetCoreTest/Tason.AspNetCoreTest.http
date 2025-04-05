@@ -1,0 +1,6 @@
+@TASON.AspNetCoreTest_HostAddress = http://localhost:5222
+
+GET {{TASON.AspNetCoreTest_HostAddress}}/weatherforecast/
+Accept: application/x-tason
+
+###

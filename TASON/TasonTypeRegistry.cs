@@ -80,6 +80,28 @@ public class TasonTypeRegistry
         types[name] = entry;
     }
 
+    /// <summary>
+    /// 通过反射创建并注册一个自动实现的<see cref="ITasonObjectType"/>
+    /// </summary>
+    /// <param name="type">要注册的类型，必须有无参构造函数</param>
+    /// <returns>创建的<see cref="ITasonObjectType"/></returns>
+    /// <exception cref="ArgumentException">类型不是类、是抽象类、是泛型类或者没有公共无参构造函数</exception>
+#if NET5_0_OR_GREATER
+    [RequiresUnreferencedCode("该方法使用Type.MakeGenericType()")]
+#endif
+    public ITasonObjectType CreateObjectType(Type type)
+    {
+        if (!type.IsClass || type.IsAbstract || type.IsGenericType || type.GetConstructor([]) is null)
+        {
+            throw new ArgumentException("Invalid type");
+        }
+
+        var objType = typeof(TasonObjectType<>).MakeGenericType(type);
+        var typeInfo = (ITasonObjectType)Activator.CreateInstance(objType)!;
+        RegisterType(type.Name, typeInfo);
+        return typeInfo;
+    }
+
 
     #region 获取类型信息
 
