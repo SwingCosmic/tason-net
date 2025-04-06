@@ -4,3 +4,13 @@ GET {{TASON.AspNetCoreTest_HostAddress}}/weatherforecast/
 Accept: application/x-tason
 
 ###
+
+POST {{TASON.AspNetCoreTest_HostAddress}}/weatherforecast/update
+Accept: application/x-tason
+Content-Type: application/x-tason
+
+WeatherForecast({
+  'TemperatureC': Int('17'),
+  'Summary': 'Cool',
+})
+###

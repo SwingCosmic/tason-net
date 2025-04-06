@@ -30,10 +30,10 @@ public partial class TasonGenerator
                 result = ArrayValue((value as IEnumerable)!);
                 break;
             case EnumerableType.Dictionary:
-                result = CallGenericMethod<string>(dictionaryMethod, [keyType!, elementType!], this, [value]);
+                result = dictionaryMethod.CallGeneric<string>([keyType!, elementType!], this, [value]);
                 break;
             case EnumerableType.Enumerable:
-                result = CallGenericMethod<string>(arrayMethod, [elementType!], this, [value]);
+                result = arrayMethod.CallGeneric<string>([elementType!], this, [value]);
                 break;
             default:
                 result = null;

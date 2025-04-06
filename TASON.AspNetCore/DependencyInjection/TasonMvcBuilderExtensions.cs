@@ -56,6 +56,7 @@ internal sealed class TasonMvcOptionsSetup(IOptions<MvcTasonOptions> _options) :
     public void Configure(MvcOptions mvcOptions)
     {
         var options = _options.Value;
+        mvcOptions.InputFormatters.Add(new TasonInputFormatter(options, mvcOptions));
         mvcOptions.OutputFormatters.Add(new TasonOutputFormatter(options, mvcOptions));
         if (options.GetAutoRegisterObjectTypes is not null)
         {

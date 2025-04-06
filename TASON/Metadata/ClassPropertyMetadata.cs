@@ -1,18 +1,19 @@
 
 using System.Reflection;
+using TASON.Serialization;
 using TASON.Util;
 
-namespace TASON.Serialization;
+namespace TASON.Metadata;
 
 /// <summary>
 /// 获取指定类型的TASON属性信息
 /// </summary>
-internal class ObjectTypePropertyInfo
+internal class ClassPropertyMetadata
 {
     /// <summary>类的属性</summary>
     public Dictionary<string, PropertyInfo> Properties { get; }
 
-    public ObjectTypePropertyInfo(Type type)
+    public ClassPropertyMetadata(Type type)
     {
         Properties = new();
 

@@ -16,6 +16,12 @@ public class ParseTest
             .AddSystemTextJson(new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 
+    record class A
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+    }
+
     [Test]
     public void Primitives()
     {
@@ -42,6 +48,9 @@ public class ParseTest
                 ["a"] = true, 
                 ["b"] = "fo\n\ro" 
             }));
+
+        s.Registry.CreateObjectType(typeof(A));
+        Assert.That(s.Deserialize("A({\nX:Int('1'),Y:Int('2')\n})"), Is.EqualTo(new A() { X = 1, Y = 2 }));
     }
 
     [Test]
@@ -77,6 +86,7 @@ public class ParseTest
         Assert.That(json!.GetValue<List<int>>(), Is.EqualTo(new List<int> { 1, 2, 3 }));
     }
 }
+
 
 public class RegexComparer : EqualityComparer<Regex>
 {

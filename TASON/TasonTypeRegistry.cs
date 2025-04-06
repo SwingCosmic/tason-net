@@ -5,14 +5,8 @@ using TASON.Types;
 
 namespace TASON;
 
-internal record class TasonRegistryEntry {
-    public string Name { get; }
-    public List<ITasonTypeInfo> Types { get; }
-    public TasonRegistryEntry(string name, List<ITasonTypeInfo> types) 
-    {
-        Name = name;
-        Types = types;
-    }
+internal record class TasonRegistryEntry(string Name, List<ITasonTypeInfo> Types)
+{
 
 }
 
@@ -86,9 +80,8 @@ public class TasonTypeRegistry
     /// <param name="type">要注册的类型，必须有无参构造函数</param>
     /// <returns>创建的<see cref="ITasonObjectType"/></returns>
     /// <exception cref="ArgumentException">类型不是类、是抽象类、是泛型类或者没有公共无参构造函数</exception>
-#if NET5_0_OR_GREATER
+
     [RequiresUnreferencedCode("该方法使用Type.MakeGenericType()")]
-#endif
     public ITasonObjectType CreateObjectType(Type type)
     {
         if (!type.IsClass || type.IsAbstract || type.IsGenericType || type.GetConstructor([]) is null)

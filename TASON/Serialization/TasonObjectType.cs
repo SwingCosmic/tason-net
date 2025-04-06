@@ -1,5 +1,6 @@
 
 using System.Reflection;
+using TASON.Metadata;
 using TASON.Util;
 
 namespace TASON.Serialization;
@@ -26,7 +27,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
         static ReflectionCache()
         {
             var type = typeof(T);
-            Properties = new ObjectTypePropertyInfo(type).Properties;
+            Properties = new ClassPropertyMetadata(type).Properties;
         }
     }
 

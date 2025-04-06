@@ -6,7 +6,7 @@ using TASON.Util;
 
 namespace TASON;
 
-public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
+public partial class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
 {
     
     /// <summary>
@@ -17,26 +17,8 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
     public object? Start(TASONParser.StartContext context)
     {
         return ValueContext(context.value());
-    }
-
-    /// <summary>
-    /// 遍历parse tree并将其代表的TypeInstanceValue以<typeparamref name="T"/>类型反序列化
-    /// </summary>
-    /// <typeparam name="T">TASON TypeInstance对应的CLR类型</typeparam>
-    /// <param name="context">The parse tree.</param>
-    /// <returns>反序列化的<typeparamref name="T"/>类型实例</returns>
-    /// <exception cref="InvalidOperationException">Parse tree不代表TypeInstanceValue</exception>
-    public T StartTypeInstanceValue<T>(TASONParser.StartContext context) where T : notnull
-    {
-        var ctx = context.value();
-        if (ctx is not TASONParser.TypeInstanceValueContext typeInstanceValue)
-        {
-            throw new InvalidOperationException($"{ctx.GetType().Name} is not a TypeInstanceValue");
-        }
-
-        return (T)TypeInstanceValue(typeInstanceValue);
-    }
-
+    }   
+    
     internal object? ValueContext(TASONParser.ValueContext ctx)
     {
         return ctx switch
@@ -73,7 +55,12 @@ public class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
 
     internal object?[] ArrayValue(TASONParser.ArrayValueContext ctx)
     {
-        return ctx.array().value().Select(ValueContext).ToArray();
+        return Array(ctx.array().value());
+    }    
+    
+    internal object?[] Array(TASONParser.ValueContext[] ctx)
+    {
+        return ctx.Select(ValueContext).ToArray();
     }
 
     internal Dictionary<string, object?> ObjectValue(TASONParser.ObjectValueContext ctx) {

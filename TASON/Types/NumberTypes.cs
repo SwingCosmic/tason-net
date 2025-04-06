@@ -1,6 +1,7 @@
 
 using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace TASON.Types;
 
@@ -51,7 +52,7 @@ public static class NumberTypes
         [nameof(Decimal128)] = Decimal128,
         [nameof(BigInt)] = BigInt,
     };
-    
+
     internal static readonly Dictionary<string, string> Aliases = new()
     {
         ["SByte"] = nameof(Int8),

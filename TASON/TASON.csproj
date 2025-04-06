@@ -7,13 +7,14 @@
 	<LangVersion>12.0</LangVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>TASON</Title>
-    <Version>0.7.4</Version>
+    <Version>0.8.3</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>LoveKicher</Authors>
     <Description>TASON(Type-Augmented Serialization Object Notation)的.NET实现</Description>
     <RepositoryUrl>https://github.com/SwingCosmic/tason-net</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+	<PolySharpIncludeRuntimeSupportedAttributes>True</PolySharpIncludeRuntimeSupportedAttributes>
   </PropertyGroup>
 
   <Target Name="GenerateCode" Inputs="Grammar/TASON.g4" Outputs="Grammar/*.cs">
@@ -34,6 +35,10 @@
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>  
 	
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">

@@ -55,6 +55,36 @@ public class TasonSerializer
     }
 
     /// <summary>
+    /// 将TASON字符串反序列化为指定类型的.NET对象
+    /// </summary>
+    /// <param name="text">TASON字符串</param>
+    /// <param name="type">类型</param>
+    /// <returns>反序列化的.NET对象</returns>
+    public object? Deserialize(string text, Type type)
+    {
+        var lexer = new TASONLexer(new AntlrInputStream(text));
+        var parser = new TASONParser(new CommonTokenStream(lexer));
+
+        var visitor = new TasonVisitor(Registry, Options);
+        return visitor.StartDeserialize(parser.start(), type);
+    }
+    
+    /// <summary>
+    /// 将TASON字符串反序列化为指定类型的.NET对象
+    /// </summary>
+    /// <typeparam name="T">类型</typeparam>
+    /// <param name="text">TASON字符串</param>
+    /// <returns>反序列化的.NET对象</returns>
+    public T? Deserialize<T>(string text) where T : notnull
+    {
+        var lexer = new TASONLexer(new AntlrInputStream(text));
+        var parser = new TASONParser(new CommonTokenStream(lexer));
+
+        var visitor = new TasonVisitor(Registry, Options);
+        return visitor.StartDeserialize<T>(parser.start());
+    }
+
+    /// <summary>
     /// 将代表TypeInstance的TASON字符串反序列化为.NET对象，类型为<typeparamref name="T"/>
     /// </summary>
     /// <typeparam name="T">TypeInstance对应的CLR类型</typeparam>

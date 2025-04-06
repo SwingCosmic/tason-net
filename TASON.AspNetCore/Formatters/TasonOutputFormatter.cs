@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using TASON;
 
 namespace Microsoft.AspNetCore.Mvc.Formatters;
-
+/// <summary>
+/// 实现TASON格式响应输出
+/// </summary>
 public class TasonOutputFormatter : TextOutputFormatter
 {
-    public const string MimeType = "application/x-tason";
-
     MvcTasonOptions options;
     MvcOptions mvcOptions;
     public TasonOutputFormatter(MvcTasonOptions options, MvcOptions mvcOptions)
@@ -16,9 +16,11 @@ public class TasonOutputFormatter : TextOutputFormatter
         this.options = options;
         this.mvcOptions = mvcOptions;
 
-        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MimeType));
+        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(TasonConstants.MimeType));
         SupportedEncodings.Add(Encoding.UTF8);
     }
+
+    /// <inheritdoc/>
     public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
     {
         if (selectedEncoding.EncodingName != Encoding.UTF8.EncodingName)
@@ -29,7 +31,7 @@ public class TasonOutputFormatter : TextOutputFormatter
         var response = context.HttpContext.Response;
         var data = context.Object;
 
-        context.ContentType = MimeType;
+        context.ContentType = TasonConstants.MimeType;
 
         await using (var writer = context.WriterFactory(response.Body, selectedEncoding))
         {

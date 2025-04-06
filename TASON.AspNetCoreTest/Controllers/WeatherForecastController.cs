@@ -28,6 +28,13 @@ namespace TASON.AspNetCoreTest.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        } 
+        
+        [HttpPost("update")]
+        public WeatherForecast UpdateInfo([FromBody] WeatherForecast weather)
+        {
+            weather.Date = DateTime.Now;
+            return weather;
         }
     }
 }

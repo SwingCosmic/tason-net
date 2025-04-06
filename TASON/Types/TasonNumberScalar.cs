@@ -15,6 +15,10 @@ public abstract class TasonNumberScalar<T> : TasonScalarTypeBase<T>
 #endif
     IEquatable<T>
 {
+    internal T DeserializeInternal(string text, SerializerOptions options)
+    {
+        return DeserializeCore(text, options);
+    }
 
     /// <inheritdoc/>
     protected override T DeserializeCore(string text, SerializerOptions options)
