@@ -16,21 +16,6 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     /// <inheritdoc/>
     public Type Type { get; }
 
-    /// <summary>
-    /// 通过捕获外层的泛型使用静态属性缓存反射结果
-    /// </summary>
-    internal static class ReflectionCache
-    {
-        /// <summary>类的属性</summary>
-        public static Dictionary<string, PropertyInfo> Properties { get; }
-
-        static ReflectionCache()
-        {
-            var type = typeof(T);
-            Properties = new ClassPropertyMetadata(type).Properties;
-        }
-    }
-
     public TasonObjectType()
     {
         Type = typeof(T);
@@ -41,7 +26,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     public virtual object Deserialize(Dictionary<string, object?> dict, SerializerOptions options)
     {
         var obj = new T();
-        foreach (var (name, prop) in ReflectionCache.Properties)
+        foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)
         {
             if (dict.TryGetValue(name, out var value))
             {
@@ -58,7 +43,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     public virtual Dictionary<string, object?> Serialize(object value, SerializerOptions options)
     {
         var dict = new Dictionary<string, object?>();
-        foreach (var (name, prop) in ReflectionCache.Properties)
+        foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)
         {
             dict[name] = prop.GetValue(value);
         }

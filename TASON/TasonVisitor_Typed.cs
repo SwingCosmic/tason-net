@@ -18,6 +18,10 @@ public partial class TasonVisitor
     
     static readonly MethodInfo typedCollectionMethod = ReflectionHelpers
         .MethodOf((TasonVisitor v) => v.TypedCollection<int>(default!, default!))
+        .GetGenericMethodDefinition();     
+    
+    static readonly MethodInfo typedObjectMethod = ReflectionHelpers
+        .MethodOf((TasonVisitor v) => v.TypedObject<object>(default!))
         .GetGenericMethodDefinition(); 
     
     static readonly MethodInfo enumerableFactoryMethod = ReflectionHelpers
@@ -115,13 +119,20 @@ public partial class TasonVisitor
             {
                 throw new InvalidCastException($"Type '{type.Name}' is not an Enumerable");
             }
-        }
-        return ctx switch
+        } 
+        else if (ctx is TASONParser.ObjectValueContext objectValue)
         {
-            TASONParser.ObjectValueContext objectValue => ObjectValue(objectValue),
-            TASONParser.TypeInstanceValueContext typeInstanceValue => TypeInstanceValue(typeInstanceValue),
-            _ => throw new ArgumentException($"Unsupported value type: {ctx.GetType().Name}"),
-        };
+            if (!ReflectionHelpers.CanDirectConstruct(type))
+            {
+                throw new InvalidOperationException($"Cannot deserialize plain object to type '{type}', please register type instance instead.");
+            }
+            return typedObjectMethod.CallGeneric<object>([type], this, [objectValue.@object()]);
+        } 
+        else if (ctx is TASONParser.TypeInstanceValueContext typeInstanceValue)
+        {
+            return TypeInstanceValue(typeInstanceValue);
+        }
+        throw new ArgumentException($"Unsupported value type: {ctx.GetType().Name}");
     }
 
 
@@ -170,6 +181,28 @@ public partial class TasonVisitor
             return new Stack(data);
         else
             throw new NotSupportedException($"Non-generic collection type '{collectionType}' is not supported.Shoud not use non-generic collection type any more.");
+    }
+
+    internal T TypedObject<T>(TASONParser.ObjectContext ctx) where T : class, new()
+    {
+        var obj = new T();
+        var propSet = new HashSet<string>();
+        foreach (var pair in ctx.pair())
+        {
+            var key = Key(pair.key());
+            if (!ClassPropertyMetadata.Cache<T>.Properties.TryGetValue(key, out var prop))
+                continue;
+            
+            if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
+                throw new ArgumentException($"Duplicate key '{key}' in object");
+
+            if (!prop.CanWrite)
+                continue;
+
+            var value = TypedValueContext(pair.value(), prop.PropertyType);
+            prop.SetValue(obj, value);
+        }
+        return obj;
     }
 
 

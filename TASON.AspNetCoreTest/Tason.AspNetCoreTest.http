@@ -10,7 +10,7 @@ Accept: application/x-tason
 Content-Type: application/x-tason
 
 WeatherForecast({
-  'TemperatureC': Int('17'),
-  'Summary': 'Cool',
+  TemperatureC: 17,
+  Summary: Cool,
 })
 ###

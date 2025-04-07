@@ -28,6 +28,12 @@ public class ParseGenericTest
             .AddSystemTextJson(options);
     }
 
+    record class A
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+    }
+
     [Test]
     public void CollectionTest()
     {
@@ -47,6 +53,15 @@ public class ParseGenericTest
         
         var list3 = s.Deserialize<ReadOnlyCollection<string>>(stringListTason);
         Assert.That(list3, Is.EqualTo(new ReadOnlyCollection<string>(stringList)));
+    }
+
+    [Test]
+    public void ObjectTest()
+    {
+        var s = TasonSerializer.Default;
+
+        s.Registry.CreateObjectType(typeof(A));
+        Assert.That(s.Deserialize<A>("{'X':1,'Y':2}"), Is.EqualTo(new A() { X = 1, Y = 2 }));
     }
 
 }

@@ -33,4 +33,18 @@ internal class ClassPropertyMetadata
             Properties[realName] = p;
         }
     }
+
+    /// <summary>
+    /// 通过静态泛型类缓存反射结果
+    /// </summary>
+    /// <typeparamref name="T">缓存的类型</typeparamref>
+    public static class Cache<T>
+    {
+        public static Dictionary<string, PropertyInfo> Properties { get; }
+
+        static Cache()
+        {
+            Properties = new ClassPropertyMetadata(typeof(T)).Properties;
+        }
+    }
 }

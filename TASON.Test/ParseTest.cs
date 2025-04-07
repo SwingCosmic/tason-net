@@ -49,8 +49,7 @@ public class ParseTest
                 ["b"] = "fo\n\ro" 
             }));
 
-        s.Registry.CreateObjectType(typeof(A));
-        Assert.That(s.Deserialize("A({\nX:Int('1'),Y:Int('2')\n})"), Is.EqualTo(new A() { X = 1, Y = 2 }));
+        
     }
 
     [Test]

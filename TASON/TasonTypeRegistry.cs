@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 using TASON.Serialization;
 using TASON.Types;
+using TASON.Util;
 
 namespace TASON;
 
@@ -84,7 +85,7 @@ public class TasonTypeRegistry
     [RequiresUnreferencedCode("该方法使用Type.MakeGenericType()")]
     public ITasonObjectType CreateObjectType(Type type)
     {
-        if (!type.IsClass || type.IsAbstract || type.IsGenericType || type.GetConstructor([]) is null)
+        if (!ReflectionHelpers.CanDirectConstruct(type))
         {
             throw new ArgumentException("Invalid type");
         }

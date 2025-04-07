@@ -215,4 +215,13 @@ internal static class ReflectionHelpers
 
         return new ClassPropertyMetadata(type).Properties;
     }
+
+    public static bool CanDirectConstruct(Type type)
+    {
+        return type.IsClass && 
+            !type.IsAbstract && 
+            !type.IsGenericType && 
+            type.GetConstructor([]) is not null;
+    }
+
 }
