@@ -58,10 +58,10 @@ public class ParseGenericTest
     [Test]
     public void ObjectTest()
     {
-        var s = TasonSerializer.Default;
+        var s = TasonSerializer.Default.Clone();
 
         s.Registry.CreateObjectType(typeof(A));
-        Assert.That(s.Deserialize<A>("{'X':1,'Y':2}"), Is.EqualTo(new A() { X = 1, Y = 2 }));
+        Assert.That(s.Deserialize<A>("{X:1, Y:2, }"), Is.EqualTo(new A() { X = 1, Y = 2 }));
     }
 
 }

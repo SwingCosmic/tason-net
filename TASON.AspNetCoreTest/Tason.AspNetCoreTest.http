@@ -11,6 +11,6 @@ Content-Type: application/x-tason
 
 WeatherForecast({
   TemperatureC: 17,
-  Summary: Cool,
+  Summary: 'Cool',
 })
 ###

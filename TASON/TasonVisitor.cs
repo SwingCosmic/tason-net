@@ -112,25 +112,24 @@ public partial class TasonVisitor(TasonTypeRegistry registry, SerializerOptions 
     }
 
     internal object ScalarTypeInstance(TASONParser.ScalarTypeInstanceContext ctx) {
-        var typeName = ctx.TYPE_NAME().GetText();
+        var typeName = ctx.IDENTIFIER().GetText();
         var str = GetTextValue(ctx.STRING());
 
         return CreateTypeInstance(typeName, str);
     }
     internal object ObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx) {
-        var typeName = ctx.TYPE_NAME().GetText();
-        var obj = Object(ctx.@object());
+        var typeName = ctx.IDENTIFIER().GetText();
 
-        return CreateTypeInstance(typeName, obj);
+        return CreateTypeInstance(typeName, ctx.@object());
     }
 
-    private object CreateTypeInstance(string typeName, Dictionary<string, object?> value) {
+    private object CreateTypeInstance(string typeName, TASONParser.ObjectContext obj) {
         if (registry.GetDefaultType(typeName) is not ITasonObjectType typeInfo)
         {
             throw new ArgumentException($"Unregistered type: {typeName}");
         }
 
-        return registry.CreateInstance(typeInfo, value);
+        return registry.CreateInstance(typeInfo, TypedObjectArg(obj, typeInfo.Type));
     }
 
     private object CreateTypeInstance(string typeName, string value) {

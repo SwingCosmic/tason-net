@@ -109,4 +109,14 @@ public class TasonSerializer
         var generator = new TasonGenerator(Options, Registry);
         return generator.Generate(value);
     }
+
+
+    /// <summary>
+    /// 根据当前的<see cref="Options"/>和<see cref="Registry"/>创建<see cref="TasonSerializer"/>的副本
+    /// </summary>
+    /// <returns>新的副本</returns>
+    public TasonSerializer Clone()
+    {
+        return new TasonSerializer(Options with { }, Registry.Clone());
+    }
 }

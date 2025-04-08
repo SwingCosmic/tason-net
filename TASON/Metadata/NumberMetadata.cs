@@ -2,6 +2,8 @@ using System.Numerics;
 using TASON.Types;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using TASON.Util;
+using System.Reflection;
 
 namespace TASON.Metadata;
 
@@ -55,7 +57,21 @@ internal static class NumberMetadata
 #endif
         IEquatable<T>
     {
-        var typeInfo = (TasonNumberScalar<T>)ClrTypeMapping[typeof(T)];
+        var type = typeof(T);
+        var typeInfo = (TasonNumberScalar<T>)ClrTypeMapping[type];
+        if (type.IsPrimitive)
+        {
+            return (T)Convert.ChangeType(PrimitiveHelpers.ParseTasonNumber(number), type);
+        }
         return typeInfo.DeserializeInternal(number, options);
+    }
+
+    static readonly MethodInfo deserializeMethod = ReflectionHelpers
+        .MethodOf(() => Deserialize<int>(null!, null!))
+        .GetGenericMethodDefinition();
+
+    public static ValueType Deserialize(Type type, string number, SerializerOptions options)
+    {
+        return deserializeMethod.CallGeneric<ValueType>([type], null, [number, options])!;
     }
 }

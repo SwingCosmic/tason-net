@@ -139,16 +139,12 @@ public partial class TasonVisitor
 
     ValueType TypedNumberValue(TASONParser.NumberValueContext ctx, Type type)
     {
-        if (!NumberMetadata.TryGetClrType(type, out var typeInfo))
+        if (!NumberMetadata.TryGetClrType(type, out var _))
         {
             throw new InvalidCastException($"Cannot cast type '{type.Name}' to number");
         }
 
-        if (type.IsPrimitive)
-        {
-            return (ValueType)Convert.ChangeType(NumberValue(ctx), type);
-        }
-        return (ValueType)typeInfo.Deserialize(ctx.number().GetText(), options);
+        return NumberMetadata.Deserialize(type, ctx.number().GetText(), options);
     }
 
     T[] TypedArray<T>(TASONParser.ValueContext[] array)
@@ -201,6 +197,29 @@ public partial class TasonVisitor
 
             var value = TypedValueContext(pair.value(), prop.PropertyType);
             prop.SetValue(obj, value);
+        }
+        return obj;
+    }
+    
+    internal Dictionary<string, object?> TypedObjectArg(TASONParser.ObjectContext ctx, Type type)
+    {
+        var obj = new Dictionary<string, object?>();
+        var properties = ReflectionHelpers.GetClassProperties(type);
+        var propSet = new HashSet<string>();
+        foreach (var pair in ctx.pair())
+        {
+            var key = Key(pair.key());
+            if (!properties.TryGetValue(key, out var prop))
+                continue;
+            
+            if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
+                throw new ArgumentException($"Duplicate key '{key}' in object");
+
+            if (!prop.CanWrite)
+                continue;
+
+            var value = TypedValueContext(pair.value(), prop.PropertyType);
+            obj[key] = value;
         }
         return obj;
     }

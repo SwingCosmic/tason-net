@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<LangVersion>12.0</LangVersion>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Title>TASON.Types.SystemTextJson</Title>
-		<Version>0.7.4</Version>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Authors>LoveKicher</Authors>
+	<TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+	<LangVersion>12.0</LangVersion>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<Title>TASON.Types.SystemTextJson</Title>
+	<Version>0.9.0</Version>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<Authors>LoveKicher</Authors>
     <Description>基于System.Text.Json的TASON JSON类型实现</Description>
     <RepositoryUrl>https://github.com/SwingCosmic/tason-net</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>

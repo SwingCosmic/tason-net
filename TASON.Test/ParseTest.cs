@@ -49,7 +49,9 @@ public class ParseTest
                 ["b"] = "fo\n\ro" 
             }));
 
-        
+        var s2 = s.Clone();
+        s2.Registry.CreateObjectType(typeof(A));
+        Assert.That(s2.Deserialize("A({X:1,Y:2})"), Is.EqualTo(new A() { X = 1, Y = 2 }));
     }
 
     [Test]
