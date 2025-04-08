@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<LangVersion>12.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>TASON</Title>
     <Version>0.9.2</Version>
@@ -14,7 +14,7 @@
     <Description>TASON(Type-Augmented Serialization Object Notation)的.NET实现</Description>
     <RepositoryUrl>https://github.com/SwingCosmic/tason-net</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-	<PolySharpIncludeRuntimeSupportedAttributes>True</PolySharpIncludeRuntimeSupportedAttributes>
+    <PolySharpIncludeRuntimeSupportedAttributes>True</PolySharpIncludeRuntimeSupportedAttributes>
   </PropertyGroup>
 
   <Target Name="GenerateCode" Inputs="Grammar/TASON.g4" Outputs="Grammar/*.cs">
@@ -22,12 +22,12 @@
     <Exec Command="cd Grammar &amp;&amp; antlr4 -package TASON.Grammar -Dlanguage=CSharp TASON.g4" />
   </Target>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' != 'Debug'">
+  <!-- <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' != 'Debug'">
     <CallTarget Targets="GenerateCode" />
-  </Target>
+  </Target> -->
 
   <ItemGroup>
-    <None Include="..\README.md">
+    <None Include="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -40,10 +40,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>  
-	
+  
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Half" Version="1.0.0" />
-	  <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
   </ItemGroup>
 
 </Project>
