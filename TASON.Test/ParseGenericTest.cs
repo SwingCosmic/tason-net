@@ -34,6 +34,13 @@ public class ParseGenericTest
         public int Y { get; set; }
     }
 
+
+    class ADict : Dictionary<A, int>
+    {
+
+    }
+
+
     [Test]
     public void CollectionTest()
     {
@@ -62,6 +69,34 @@ public class ParseGenericTest
 
         s.Registry.CreateObjectType(typeof(A));
         Assert.That(s.Deserialize<A>("{X:1, Y:2, }"), Is.EqualTo(new A() { X = 1, Y = 2 }));
+
+
+    }    
+    
+    
+    [Test]
+    public void DictionaryTest()
+    {
+        var pairs = "[A({X:1,Y:2}),1],[A({X:2,Y:4}),2]";
+        var tason = $"Dictionary({{keyValuePairs:[{pairs}]}})";
+
+        var s = TasonSerializer.Default.Clone();
+        s.Options.UseBuiltinDictionary = true;
+        s.Registry.CreateObjectType(typeof(A));
+
+        Assert.That(s.Deserialize<ADict>(tason), 
+            Is.EqualTo(new ADict() 
+            {
+                [new A { X = 1,Y = 2 }] = 1,
+                [new A { X = 2,Y = 4 }] = 2,
+            }));
+
+
+        var s2 = TasonSerializer.Default.Clone();
+        s2.Options.UseBuiltinDictionary = false;
+        s2.Registry.CreateObjectType(typeof(A));
+
+        Assert.Throws<ArgumentException>(() => s2.Deserialize<ADict>(tason));
     }
 
 }

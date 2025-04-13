@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Antlr4.Runtime.Tree;
 using TASON.Grammar;
+using TASON.Types;
 using TASON.Util;
 
 namespace TASON;
@@ -111,19 +112,22 @@ public partial class TasonVisitor(TasonTypeRegistry registry, SerializerOptions 
         };
     }
 
-    internal object ScalarTypeInstance(TASONParser.ScalarTypeInstanceContext ctx) {
+    internal object ScalarTypeInstance(TASONParser.ScalarTypeInstanceContext ctx) 
+    {
         var typeName = ctx.IDENTIFIER().GetText();
         var str = GetTextValue(ctx.STRING());
 
         return CreateTypeInstance(typeName, str);
     }
-    internal object ObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx) {
+    internal object ObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx) 
+    {
         var typeName = ctx.IDENTIFIER().GetText();
 
         return CreateTypeInstance(typeName, ctx.@object());
-    }
+    }    
 
-    private object CreateTypeInstance(string typeName, TASONParser.ObjectContext obj) {
+    private object CreateTypeInstance(string typeName, TASONParser.ObjectContext obj) 
+    {
         if (registry.GetDefaultType(typeName) is not ITasonObjectType typeInfo)
         {
             throw new ArgumentException($"Unregistered type: {typeName}");
@@ -131,15 +135,17 @@ public partial class TasonVisitor(TasonTypeRegistry registry, SerializerOptions 
 
         return registry.CreateInstance(typeInfo, TypedObjectArg(obj, typeInfo.Type));
     }
+    
 
-    private object CreateTypeInstance(string typeName, string value) {
+    private object CreateTypeInstance(string typeName, string value) 
+    {
         if (registry.GetDefaultType(typeName) is not ITasonScalarType typeInfo)
         {
             throw new ArgumentException($"Unregistered type: {typeName}");
         }
 
         return registry.CreateInstance(typeInfo, value);
-    }
+    }   
 
     private static string GetTextValue(ITerminalNode node)
     {

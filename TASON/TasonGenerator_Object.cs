@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using TASON.Serialization;
+using TASON.Types;
 using TASON.Util;
 using static TASON.Util.ReflectionHelpers;
 namespace TASON;
@@ -31,7 +32,7 @@ public partial class TasonGenerator
     string TypeInstanceValue(object value, ITasonObjectType type, string name)
     {
         var arg = registry.SerializeToArg(type, value);
-        var argStr = DictionaryValue<string, object?>(arg);
+        var argStr = DictionaryValueNoCheck(arg);
         return $"{name}({argStr})";
     }
 
@@ -139,6 +140,21 @@ public partial class TasonGenerator
     }
 
     string DictionaryValue<K, V>(IDictionary<K, V> dict)
+    {
+        if (options.UseBuiltinDictionary)
+        {
+            var objDict = ObjectDictionary<K, V>.From(dict);
+            string argStr = DictionaryValueNoCheck(objDict.SerializeToArg());
+            return $"{DictionaryType.TypeName}({argStr})";
+        }
+        return DictionaryValueNoCheck(dict);
+    }
+
+    /// <summary>
+    /// 不检查<see cref="options"/>.UseBuiltinDictionary的版本。
+    /// 防止在检查时，以及序列化<see cref="ITasonObjectType"/>的参数时循环调用
+    /// </summary>
+    string DictionaryValueNoCheck<K, V>(IDictionary<K, V> dict)
     {
         if (typeof(K) != typeof(string))
             throw new NotSupportedException("Cannot serialize Dictionary with non string key");

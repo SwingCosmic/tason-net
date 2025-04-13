@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Antlr4.Runtime.Tree;
 using TASON.Grammar;
 using TASON.Metadata;
+using TASON.Types;
 using TASON.Util;
 
 namespace TASON;
@@ -22,6 +23,10 @@ public partial class TasonVisitor
     
     static readonly MethodInfo typedObjectMethod = ReflectionHelpers
         .MethodOf((TasonVisitor v) => v.TypedObject<object>(default!))
+        .GetGenericMethodDefinition(); 
+    
+    static readonly MethodInfo typedDictMethod = ReflectionHelpers
+        .MethodOf((TasonVisitor v) => v.TypedDictionaryArg<object, object>(default!, null!))
         .GetGenericMethodDefinition(); 
     
     static readonly MethodInfo enumerableFactoryMethod = ReflectionHelpers
@@ -43,7 +48,7 @@ public partial class TasonVisitor
             throw new InvalidOperationException($"{ctx.GetType().Name} is not a TypeInstanceValue");
         }
 
-        return (T)TypeInstanceValue(typeInstanceValue);
+        return (T)MaybeTypeInstanceValue(typeInstanceValue, typeof(T));
     }
 
     /// <summary>
@@ -122,15 +127,20 @@ public partial class TasonVisitor
         } 
         else if (ctx is TASONParser.ObjectValueContext objectValue)
         {
-            if (!ReflectionHelpers.CanDirectConstruct(type))
+            if (ReflectionHelpers.CanDirectConstruct(type))
             {
-                throw new InvalidOperationException($"Cannot deserialize plain object to type '{type}', please register type instance instead.");
+                return typedObjectMethod.CallGeneric<object>([type], this, [objectValue.@object()]);
             }
-            return typedObjectMethod.CallGeneric<object>([type], this, [objectValue.@object()]);
+            var enumerableType = ReflectionHelpers.IsEnumerable(type, out var elementType, out var keyType);
+            if (enumerableType == EnumerableType.Dictionary)
+            {
+                return typedDictMethod.CallGeneric<object>([keyType!, elementType!], this, [objectValue.@object(), type]);
+            }
+            throw new InvalidOperationException($"Cannot deserialize plain object to type '{type}', please register type instance instead.");
         } 
         else if (ctx is TASONParser.TypeInstanceValueContext typeInstanceValue)
         {
-            return TypeInstanceValue(typeInstanceValue);
+            return MaybeTypeInstanceValue(typeInstanceValue, type);
         }
         throw new ArgumentException($"Unsupported value type: {ctx.GetType().Name}");
     }
@@ -178,6 +188,32 @@ public partial class TasonVisitor
         else
             throw new NotSupportedException($"Non-generic collection type '{collectionType}' is not supported.Shoud not use non-generic collection type any more.");
     }
+        
+    internal object MaybeTypeInstanceValue(TASONParser.TypeInstanceValueContext ctx, Type type)
+    {
+        var typeInstance = ctx.typeInstance();
+        return typeInstance switch
+        {
+            TASONParser.ScalarTypeInstanceContext scalarType => ScalarTypeInstance(scalarType),
+            TASONParser.ObjectTypeInstanceContext objectType => MaybeObjectTypeInstance(objectType, type),
+            _ => throw new ArgumentException($"Unsupported type instance type: {typeInstance.GetType().Name}"),
+        };
+    }
+
+    internal object MaybeObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx, Type type)
+    {
+        var typeName = ctx.IDENTIFIER().GetText();
+        if (options.UseBuiltinDictionary && typeName == DictionaryType.TypeName)
+        {
+            var enumerableType = ReflectionHelpers.IsEnumerable(type, out var elementType, out var keyType);
+            if (enumerableType != EnumerableType.Dictionary)
+            {
+                throw new InvalidCastException($"Type '{type.Name}' is not a Dictionary");
+            }
+            return typedDictMethod.CallGeneric<object>([keyType!, elementType!], this, [ctx.@object(), type])!;
+        }
+        return CreateTypeInstance(typeName, ctx.@object(), type);
+    }
 
     internal T TypedObject<T>(TASONParser.ObjectContext ctx) where T : class, new()
     {
@@ -222,6 +258,79 @@ public partial class TasonVisitor
             obj[key] = value;
         }
         return obj;
+    }   
+    
+    internal IDictionary<K, V> TypedDictionaryArg<K, V>(TASONParser.ObjectContext ctx, Type type)
+    {
+        IDictionary<K, V> obj;
+        if (type.GetConstructor([]) is ConstructorInfo ctor)
+            obj = (IDictionary<K, V>)ctor.Invoke([]);
+        else if (type.IsAssignableFrom(typeof(Dictionary<K, V>)))
+            obj = new Dictionary<K, V>();
+        else
+            throw new NotSupportedException($"Cannot deserialize TASON dictionary to type '{type.Name}'.Try creating your own type instance instead.");
+
+        TASONParser.ArrayContext? arrayContext = null;
+        foreach (var pair in ctx.pair())
+        {
+            var key = Key(pair.key());
+            if (key != nameof(ObjectDictionary<K, V>.keyValuePairs))
+                continue;
+
+            var valueContext = pair.value();
+            if (valueContext is TASONParser.ArrayValueContext arrayValue)
+            {
+                arrayContext = arrayValue.array();
+                break;
+            }     
+        }
+
+        if (arrayContext is null) goto INVALID;
+
+        var kt = typeof(K);
+        var vt = typeof(V);
+
+        foreach (var item in arrayContext.value())
+        {
+            if (item is TASONParser.ArrayValueContext arrayValue)
+            {
+                var pair = arrayValue.array().value();
+                if (pair.Length != 2)
+                    goto INVALID;
+
+                K key = (K)TypedValueContext(pair[0], kt)!;
+                V value = (V)TypedValueContext(pair[1], vt)!;
+                obj[key] =value;
+            } else
+            {
+                goto INVALID;
+            }
+        }
+
+        return obj;
+
+INVALID:
+        throw new InvalidOperationException("Invalid object arg for TASON Dictionary");
+    }
+
+    private object CreateTypeInstance(string typeName, TASONParser.ObjectContext obj, Type implType)
+    {
+        if (registry.GetType(typeName, implType) is not ITasonObjectType typeInfo)
+        {
+            throw new ArgumentException($"Unregistered type: {typeName}(Implementation: {implType.FullName})");
+        }
+
+        return registry.CreateInstance(typeInfo, TypedObjectArg(obj, typeInfo.Type));
+    }
+
+    private object CreateTypeInstance(string typeName, string value, Type implType)
+    {
+        if (registry.GetType(typeName, implType) is not ITasonScalarType typeInfo)
+        {
+            throw new ArgumentException($"Unregistered type: {typeName}(Implementation: {implType.FullName})");
+        }
+
+        return registry.CreateInstance(typeInfo, value);
     }
 
 

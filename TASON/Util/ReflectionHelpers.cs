@@ -73,6 +73,21 @@ internal static class ReflectionHelpers
         return EnumerableType.Enumerable;
     }
 
+    public static bool IsValueTuple(Type type, out Type[] types)
+    {
+        types = [];
+        if (!type.IsGenericType || !type.IsValueType)
+        {
+            return false;
+        }
+        if (!type.Name.StartsWith("ValueTuple`"))
+        {
+            return false;
+        }
+        types = type.GetGenericArguments();
+        return true;
+    }
+
     /// <summary>
     /// 返回一个工厂方法，将<typeparamref name="E"/>类型的数组转换为集合类型<typeparamref name="T"/>
     /// </summary>
@@ -196,14 +211,14 @@ internal static class ReflectionHelpers
     public static R? CallGeneric<R>(this MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
     {
         var m = genericMethod.MakeGenericMethod(genericArgs);
-        return (R?)m.Invoke(thisArg, args);
+        return (R?)m.Invoke(thisArg, BindingFlags.DoNotWrapExceptions, null, args, null);
     }
 
     [RequiresUnreferencedCode(UseMakeGenericMethod)]
     public static void CallGeneric(this MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
     {
         var m = genericMethod.MakeGenericMethod(genericArgs);
-        m.Invoke(thisArg, args);
+        m.Invoke(thisArg, BindingFlags.DoNotWrapExceptions, null, args, null);
     }
 
     public static Dictionary<string, PropertyInfo> GetClassProperties(Type type)

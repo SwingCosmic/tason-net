@@ -7,6 +7,20 @@ using System.Text.Json;
 
 public class SerializeTest
 {
+
+    record class A
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+    }
+
+
+    class ADict : Dictionary<A, int>
+    {
+
+    }
+
+
     JsonSerializerOptions options = null!;
 
     [SetUp]
@@ -66,5 +80,30 @@ public class SerializeTest
 
         var reg = new Regex("[a-z]+", RegexOptions.IgnoreCase | RegexOptions.Multiline);
         Assert.That(s.Serialize(reg), Is.EqualTo("RegExp(\"/[a-z]+/imu\")"));
+    }
+
+    [Test]
+    public void DictionaryTest()
+    {
+        var pairs = "[A({X:1,Y:2}),1],[A({X:2,Y:4}),2]";
+        var tason = $"Dictionary({{keyValuePairs:[{pairs}]}})";
+
+        var s = TasonSerializer.Default.Clone();
+        s.Options.UseBuiltinDictionary = true;
+        s.Registry.CreateObjectType(typeof(A));
+
+        var expect = new ADict()
+        {
+            [new A { X = 1, Y = 2 }] = 1,
+            [new A { X = 2, Y = 4 }] = 2,
+        };
+        Assert.That(s.Serialize(expect), Is.EqualTo(tason));
+
+
+        var s2 = TasonSerializer.Default.Clone();
+        s2.Options.UseBuiltinDictionary = false;
+        s2.Registry.CreateObjectType(typeof(A));
+
+        Assert.Throws<NotSupportedException>(() => s2.Serialize(expect));
     }
 }

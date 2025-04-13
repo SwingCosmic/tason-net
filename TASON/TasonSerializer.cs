@@ -64,6 +64,7 @@ public class TasonSerializer
     {
         var lexer = new TASONLexer(new AntlrInputStream(text));
         var parser = new TASONParser(new CommonTokenStream(lexer));
+        parser.AddErrorListener(new ThrowingErrorListener());
 
         var visitor = new TasonVisitor(Registry, Options);
         return visitor.StartDeserialize(parser.start(), type);
@@ -79,6 +80,7 @@ public class TasonSerializer
     {
         var lexer = new TASONLexer(new AntlrInputStream(text));
         var parser = new TASONParser(new CommonTokenStream(lexer));
+        parser.AddErrorListener(new ThrowingErrorListener());
 
         var visitor = new TasonVisitor(Registry, Options);
         return visitor.StartDeserialize<T>(parser.start());
