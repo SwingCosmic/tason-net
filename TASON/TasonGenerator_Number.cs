@@ -10,9 +10,9 @@ namespace TASON;
 
 public partial class TasonGenerator
 {
-    bool TryGetNumberValue(object value, [NotNullWhen(true)] out string? result, ValueScope scope = ValueScope.Normal)
+    bool TryWriteNumberValue(object value, ValueScope scope = ValueScope.Normal)
     {
-        result = value switch 
+        return value switch 
         {
             byte u8 => SafeNumber(u8, NumberTypes.UInt8, nameof(NumberTypes.UInt8), scope),
             sbyte i8 => SafeNumber(i8, NumberTypes.Int8, nameof(NumberTypes.Int8), scope),
@@ -51,43 +51,51 @@ public partial class TasonGenerator
                 : SafeNumber((float)nf.Value, NumberTypes.Float32, nameof(NumberTypes.Float32), scope),
 #endif
 
-            _ => null,
+            _ => false,
         };
-        return result is not null;
     }
 
-    string SafeNumber<T>(T value, TasonNumberScalar<T> type, string name, ValueScope scope)
+    bool SafeNumber<T>(T value, TasonNumberScalar<T> type, string name, ValueScope scope)
         where T : struct, 
 #if NET7_0_OR_GREATER
         INumber<T>,
 #endif
         IEquatable<T>    
     {
-        return options.UseBuiltinNumber switch
+        if (options.UseBuiltinNumber == BuiltinNumberOption.All)
+            TypeInstanceValue(value, type, name);
+        else if (options.UseBuiltinNumber == BuiltinNumberOption.ObjectTypeProperty)
         {
-            BuiltinNumberOption.All => TypeInstanceValue(value, type, name),
-            BuiltinNumberOption.ObjectTypeProperty => scope == ValueScope.ObjectValue 
-                ? TypeInstanceValue(value, type, name) 
-                : value.ToString()!,
-            _ => value.ToString()!,
-        };
+            if (scope == ValueScope.ObjectValue)
+                TypeInstanceValue(value, type, name);
+            else 
+                writer.Write(value.ToString()!);
+        } 
+        else 
+            writer.Write(value.ToString()!);
+        return true;
     }
 
-    string LargeNumber<T>(T value, TasonNumberScalar<T> type, string name, ValueScope scope) 
+    bool LargeNumber<T>(T value, TasonNumberScalar<T> type, string name, ValueScope scope) 
         where T : struct, 
 #if NET7_0_OR_GREATER
         INumber<T>,
 #endif
         IEquatable<T>
     {
-        return options.UseBuiltinNumber switch
+        if (options.UseBuiltinNumber == BuiltinNumberOption.None) 
+            writer.Write(value.ToString()!);
+        else if (options.UseBuiltinNumber == BuiltinNumberOption.ObjectTypeProperty) 
         {
-            BuiltinNumberOption.None => value.ToString()!,
-            BuiltinNumberOption.ObjectTypeProperty => scope == ValueScope.ObjectValue 
-                ? TypeInstanceValue(value, type, name) 
-                : value.ToString()!,
-            _ => TypeInstanceValue(value, type, name),
-        };
+            if (scope == ValueScope.ObjectValue) 
+                TypeInstanceValue(value, type, name);
+            else 
+                writer.Write(value.ToString()!);
+        } 
+        else
+            TypeInstanceValue(value, type, name);
+        
+        return true;
     } 
 
 

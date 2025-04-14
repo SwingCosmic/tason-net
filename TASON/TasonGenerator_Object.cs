@@ -22,161 +22,146 @@ public partial class TasonGenerator
     private static readonly Regex identifierPattern = new Regex(@"^[a-zA-Z_][a-zA-Z0-9_]*$");
 #endif
 
-    string TypeInstanceValue(object value, ITasonScalarType type, string name)
+    void TypeInstanceValue(object value, ITasonScalarType type, string name)
     {
         var arg = registry.SerializeToArg(type, value);
-        var argStr = StringValue(arg);
-        return $"{name}({argStr})";
+        writer.WriteTypeInstance(name, () => writer.WriteString(arg));
     }
     
-    string TypeInstanceValue(object value, ITasonObjectType type, string name)
+    void TypeInstanceValue(object value, ITasonObjectType type, string name)
     {
         var arg = registry.SerializeToArg(type, value);
-        var argStr = DictionaryValueNoCheck(arg);
-        return $"{name}({argStr})";
+        writer.WriteTypeInstance(name, () => DictionaryValueNoCheck(arg));
     }
 
-    string TypeInstanceValue(object value, TasonNamedTypeInfo type)
+    void TypeInstanceValue(object value, TasonNamedTypeInfo type)
     {
-        return type.TypeInfo switch
+        if (type.TypeInfo is ITasonScalarType scalar)
         {
-            ITasonScalarType scalar => TypeInstanceValue(value, scalar, type.Name),
-            ITasonObjectType obj => TypeInstanceValue(value, obj, type.Name),
-            _ => throw new InvalidOperationException(),
-        };
+            TypeInstanceValue(value, scalar, type.Name);
+            return;
+        }
+        else if (type.TypeInfo is ITasonObjectType obj)
+        {
+            TypeInstanceValue(value, obj, type.Name);
+            return;
+        } 
+        throw new InvalidOperationException();
     }
 
-    string Key(string key)
+    void Key(string key)
     {
         if (identifierPattern.IsMatch(key))
-            return key;
-        return StringValue(key);
+            writer.Write(key);
+        else
+            writer.WriteString(key);
     }
 
     // 非泛型字典允许不可序列化的key和value，需要丢弃
-    bool TryGetPair(DictionaryEntry keyValue, out (string Key, string Value) pair)
+    bool TryWritePair(DictionaryEntry keyValue)
     {
         if (keyValue.Key is not string key)
         {
-            pair = default;
             return false;
         }
 
-        var value = Value(keyValue.Value, ValueScope.ObjectValue);
-        if (value == null)
+        if (keyValue.Value is not null && IsBanTypes(keyValue.Value.GetType()))
         {
-            pair = default;
             return false;
         }
-        pair = (Key(key), value);
+
+        writer.WriteObjectPair(() => Key(key), () => Value(keyValue.Value, ValueScope.ObjectValue));
         return true;
     }
 
     // 泛型字典的key, value类型均已校验，不会遇到不可序列化的类型
-    (string Key, string Value) Pair<K, V>(KeyValuePair<K, V> keyValue)
+    void Pair<K, V>(KeyValuePair<K, V> keyValue)
     {
         if (keyValue.Key is not string key)
         {
             // 仅用于过类型校验，不应该走到这里
             throw new InvalidOperationException("Key must be a string");
         }
-        return (Key(key), Value(keyValue.Value, ValueScope.ObjectValue)!);
+        writer.WriteObjectPair(() => Key(key), () => Value(keyValue.Value, ValueScope.ObjectValue));
     }
 
-    string MaybeObjectValue(object value, Type type)
+    void MaybeObjectValue(object value, Type type)
     {
         ThrowIfBanTypes(type);
         if (registry.TryGetTypeInfo(value, out var typeInfo))
-            return TypeInstanceValue(value, (TasonNamedTypeInfo)typeInfo);
+            TypeInstanceValue(value, (TasonNamedTypeInfo)typeInfo);
         else
-            return ObjectValue(value, type);
+            ObjectValue(value, type);
     }
 
-    string ObjectValue(object value, Type type) 
+    void ObjectValue(object value, Type type) 
     {
-        List<string> pairs = new();
-
         var props = GetClassProperties(type);
-        indentLevel++;
+        writer.WriteStartObject();
         {
-            CheckDepth();
-            foreach (var (key, propInfo) in props)
+            writer.CheckDepth();
+            writer.Join(v => 
             {
-                var propValue = propInfo.GetValue(value);
-                var valueStr = Value(propValue);
-                pairs.Add($"{Indent()}{key}:{Space()}{valueStr}");
-            }
+                Pair(v);
+                return true;
+            }, 
+            props.Select(p => 
+            {
+                var (key, propInfo) = p;
+                return new KeyValuePair<string, object?>(key, propInfo.GetValue(value));
+            }).ToArray());
         }
-        indentLevel--;
-
-        if (pairs.Count == 0) return "{}";
-
-        if (options.Indent is null)
-            return $"{{{string.Join(',', pairs)}}}";
-        else
-            return $"{{\n{string.Join(",\n", pairs)}\n{Indent()}}}";
+        writer.WriteEndObject();
     }
 
-    string DictionaryValue(IDictionary dict)
+    void DictionaryValue(IDictionary dict)
     {
-        List<string> pairs = new(); 
-        indentLevel++;
+        writer.WriteStartObject();
         {
-            CheckDepth();
-            foreach (DictionaryEntry pair in dict)
+            writer.CheckDepth();
+            writer.Join(v => 
             {
-                if (!TryGetPair(pair, out var p)) continue;
-                pairs.Add($"{Indent()}{p.Key}:{Space()}{p.Value}");
-            }
+                if (!TryWritePair(v)) 
+                    return false;
+                return true;
+            }, dict.Cast<DictionaryEntry>().ToArray());
         }
-        indentLevel--;
-
-        if (pairs.Count == 0) return "{}";
-
-        if (options.Indent is null)
-            return $"{{{string.Join(',', pairs)}}}";
-        else
-            return $"{{\n{string.Join(",\n", pairs)}\n{Indent()}}}";
+        writer.WriteEndObject();
     }
 
-    string DictionaryValue<K, V>(IDictionary<K, V> dict)
+    void DictionaryValue<K, V>(IDictionary<K, V> dict)
     {
         if (options.UseBuiltinDictionary)
         {
             var objDict = ObjectDictionary<K, V>.From(dict);
-            string argStr = DictionaryValueNoCheck(objDict.SerializeToArg());
-            return $"{DictionaryType.TypeName}({argStr})";
+            writer.WriteTypeInstance(DictionaryType.TypeName, 
+                () => DictionaryValueNoCheck(objDict.SerializeToArg()));
+        } else
+        {
+            DictionaryValueNoCheck(dict);
         }
-        return DictionaryValueNoCheck(dict);
     }
 
     /// <summary>
     /// 不检查<see cref="options"/>.UseBuiltinDictionary的版本。
     /// 防止在检查时，以及序列化<see cref="ITasonObjectType"/>的参数时循环调用
     /// </summary>
-    string DictionaryValueNoCheck<K, V>(IDictionary<K, V> dict)
+    void DictionaryValueNoCheck<K, V>(IDictionary<K, V> dict)
     {
         if (typeof(K) != typeof(string))
             throw new NotSupportedException("Cannot serialize Dictionary with non string key");
         ThrowIfBanTypes(typeof(V));
 
-        List<string> pairs = new(); 
-        indentLevel++;
+        writer.WriteStartObject();
         {
-            CheckDepth();
-            foreach (var pair in dict)
+            writer.CheckDepth();
+            writer.Join(v => 
             {
-                var p = Pair(pair);
-                pairs.Add($"{Indent()}{p.Key}:{Space()}{p.Value}");
-            }
+                Pair(v);
+                return true;
+            }, 
+            dict.ToArray());
         }
-        indentLevel--;
-
-        if (pairs.Count == 0) return "{}";
-
-        if (options.Indent is null)
-            return $"{{{string.Join(',', pairs)}}}";
-        else
-            return $"{{\n{string.Join(",\n", pairs)}\n{Indent()}}}";
+        writer.WriteEndObject();
     }
 }

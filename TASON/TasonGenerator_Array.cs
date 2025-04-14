@@ -15,7 +15,7 @@ public partial class TasonGenerator
         .GetGenericMethodDefinition();
 
 
-    bool TryGetArrayValue(object value, [NotNullWhen(true)] out string? result)
+    bool TryWriteArrayValue(object value)
     {
         var type = value.GetType();
         var isEnumerable = IsEnumerable(type, out var elementType, out var keyType);
@@ -24,69 +24,56 @@ public partial class TasonGenerator
             case EnumerableType.AsyncEnumerable:
                 throw new NotSupportedException("Cannot serialize async enumerable type");
             case EnumerableType.NonGenericDictionary:
-                result = DictionaryValue((value as IDictionary)!);
+                DictionaryValue((value as IDictionary)!);
                 break;
             case EnumerableType.NonGenericEnumerable:
-                result = ArrayValue((value as IEnumerable)!);
+                ArrayValue((value as IEnumerable)!);
                 break;
             case EnumerableType.Dictionary:
-                result = dictionaryMethod.CallGeneric<string>([keyType!, elementType!], this, [value]);
+                dictionaryMethod.CallGeneric([keyType!, elementType!], this, [value]);
                 break;
             case EnumerableType.Enumerable:
-                result = arrayMethod.CallGeneric<string>([elementType!], this, [value]);
+                arrayMethod.CallGeneric([elementType!], this, [value]);
                 break;
             default:
-                result = null;
                 return false;
         }
         return true;
     }
 
 
-    string ArrayValue(IEnumerable value)
+    void ArrayValue(IEnumerable value)
     {
-        string[] result;
-        indentLevel++;
+        writer.WriteStartArray();
         {
-            CheckDepth();
-            result = value
-                .Cast<object>()
-                .Select(e => 
+            writer.CheckDepth();
+            writer.Join(v => 
+            {
+                writer.WriteArrayItem(() => 
                 {
-                    var v = Value(e) ?? throw new InvalidOperationException("Non-serializable value");
-                    return Indent() + Value(e);
-                })
-                .ToArray();
+                    if (!Value(v))
+                    {
+                        throw new InvalidOperationException("Non-serializable value");
+                    }
+                });
+                return true;
+            }, value.Cast<object>().ToArray());
         }
-        indentLevel--;
-
-        if (result.Length == 0) return "[]";
-
-        if (options.Indent is null)
-            return $"[{string.Join(',', result)}]";
-        else 
-            return $"[\n{string.Join(",\n", result)}\n{Indent()}]";
-        
+        writer.WriteEndArray();
     }
-    string ArrayValue<T>(IEnumerable<T> value)
+
+    void ArrayValue<T>(IEnumerable<T> value)
     {
-        string[] result;
-        indentLevel++;
+        writer.WriteStartArray();
         {
-            CheckDepth();
-            result = value
-                .Select(e => Indent() + Value(e)!)
-                .ToArray();
+            writer.CheckDepth();
+            writer.Join(v => 
+            {
+                writer.WriteArrayItem(() => Value(v));
+                return true;
+            }, value.ToArray());
         }
-        indentLevel--;
-
-        if (result.Length == 0) return "[]";
-
-        if (options.Indent is null)
-            return $"[{string.Join(',', result)}]";
-        else 
-            return $"[\n{string.Join(",\n", result)}\n{Indent()}]";
-        
+        writer.WriteEndArray();
     }
 
 

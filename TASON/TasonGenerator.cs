@@ -1,7 +1,9 @@
 
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Encodings.Web;
 
 namespace TASON;
@@ -14,32 +16,46 @@ internal enum ValueScope
 
 public partial class TasonGenerator
 {
+    readonly TasonWriter writer;
     readonly SerializerOptions options;
     readonly TasonTypeRegistry registry;
-    public TasonGenerator(SerializerOptions options, TasonTypeRegistry registry)
+    public TasonGenerator(TasonWriter writer, SerializerOptions options, TasonTypeRegistry registry)
     {
+        this.writer = writer;
         this.options = options;
         this.registry = registry;
     }
 
-    private int indentLevel = 0;
-
-    public string Generate(object? value)
+    public static string ToTasonString(object? value, SerializerOptions options, TasonTypeRegistry registry)
     {
-        return Value(value)!;
+        var sb = new StringBuilder();
+        using (var writer = new TasonWriter(sb, options))
+        {
+            var generator = new TasonGenerator(writer, options, registry);
+            generator.Generate(value);
+        }
+        return sb.ToString();
     }
-    string? Value(object? value, ValueScope scope = ValueScope.Normal)
+
+
+    public void Generate(object? value)
+    {
+        Value(value);
+        writer.Flush();
+    }
+
+    bool Value(object? value, ValueScope scope = ValueScope.Normal)
     {
         if (value == null)
-            return "null";
+            writer.Write("null");
         else if (value is bool b)
-            return b ? "true" : "false";
+            writer.Write(b ? "true" : "false");
         else if (value is string s)
-            return StringValue(s);
-        else if (TryGetNumberValue(value, out var number, scope)) 
-            return number;
+            writer.WriteString(s);
+        else if (TryWriteNumberValue(value, scope))
+            return true;
         else if (value is Enum e)
-            return EnumValue(e);
+            EnumValue(e);
         else
         {
             var type = value.GetType();
@@ -47,42 +63,22 @@ public partial class TasonGenerator
             {
                 if (scope != ValueScope.ObjectValue)
                     ThrowIfBanTypes(type);
-                return null;
+                return false;
             }
-            if (TryGetArrayValue(value, out var array))
-                return array;
+            if (TryWriteArrayValue(value))
+                return true;
             else 
-                return MaybeObjectValue(value, type);
+                MaybeObjectValue(value, type);
         }
+        return true;
     }
 
 
-    string EnumValue(Enum value)
+    void EnumValue(Enum value)
     {
         var baseType = value.GetType().GetEnumUnderlyingType();
         var n = Convert.ChangeType(value, baseType);
-        TryGetNumberValue(n, out var ret);
-        return ret!;
-    }
-
-
-    private static readonly JavaScriptEncoder stringEncoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static string StringValue(string value)
-    {
-        return "\"" + stringEncoder.Encode(value) + "\"";
-    }
-
-
-    private void CheckDepth()
-    {
-        if (indentLevel > options.MaxDepth)
-        {
-            throw new StackOverflowException(
-              "Maximum object or array depth exceeded. Is there a circular reference?"
-            );
-        }
+        TryWriteNumberValue(n);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -104,13 +100,4 @@ public partial class TasonGenerator
             throw new NotSupportedException($"Cannot serialize abstract, interface, delegete or pointer type {type.Name}.");
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private string Indent() => options.Indent is null 
-        ? string.Empty
-        : new string(' ', options.Indent.Value * indentLevel);
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private string Space() => options.Indent is null 
-        ? string.Empty
-        : " ";
 }

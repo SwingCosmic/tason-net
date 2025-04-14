@@ -58,7 +58,7 @@ public class SerializeTest
   },
   Int64("43981")
 ]
-""".ReplaceLineEndings("\n")
+""".ReplaceLineEndings(Environment.NewLine)
             ));
     }
     [Test]
