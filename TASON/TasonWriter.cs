@@ -29,12 +29,19 @@ public class TasonWriter : IDisposable
 
     private int indentLevel = 0;
 
-    private TasonWriter(SerializerOptions? options = null) 
+    /// <summary>
+    /// 直接使用<see cref="TextWriter"/>创建<see cref="TasonWriter"/>的新实例
+    /// </summary>
+    /// <param name="writer">用于写入字符串的<see cref="TextWriter"/></param>
+    /// <param name="options">序列化选项</param>
+    public TasonWriter(TextWriter writer, SerializerOptions? options = null) 
     {
         options ??= new();
         this.options = options;
         Separator = options.Indent is null ? "," : $",{NewLine}";
         Space = options.Indent is null ? string.Empty : " ";
+
+        this.writer = writer;
     }
 
     /// <summary>
@@ -42,9 +49,9 @@ public class TasonWriter : IDisposable
     /// </summary>
     /// <param name="sb">用于写入字符串的<see cref="StringBuilder"/></param>
     /// <param name="options">序列化选项</param>
-    public TasonWriter(StringBuilder sb, SerializerOptions? options = null) : this(options)
+    public TasonWriter(StringBuilder sb, SerializerOptions? options = null) 
+        : this(new StringWriter(sb), options)
     {
-        writer = new StringWriter(sb); 
     }
 
     /// <summary>
@@ -53,13 +60,18 @@ public class TasonWriter : IDisposable
     /// <param name="stream">用于写入字符串的流</param>
     /// <param name="options">序列化选项</param>
     /// <exception cref="IOException"><paramref name="stream"/>不是可写的</exception>
-    public TasonWriter(Stream stream, SerializerOptions? options = null): this(options)
+    public TasonWriter(Stream stream, SerializerOptions? options = null)
+        : this(CreateWriterFromStream(stream), options)
+    {
+    }
+
+    static TextWriter CreateWriterFromStream(Stream stream)
     {
         if (!stream.CanWrite)
         {
             throw new IOException("Stream is not writable");
         }
-        writer = new StreamWriter(stream);
+        return new StreamWriter(stream);
     }
 
     /// <inheritdoc/>

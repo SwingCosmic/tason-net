@@ -7,7 +7,7 @@
     <LangVersion>12.0</LangVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>TASON</Title>
-    <Version>0.9.4</Version>
+    <Version>0.10.3</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>LoveKicher</Authors>

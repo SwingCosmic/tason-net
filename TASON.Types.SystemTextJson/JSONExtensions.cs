@@ -19,9 +19,14 @@ public static class JSONExtensions
         DefaultOptions = jsonOptions;
         registry.Options.ExtraOptions[LibName] = jsonOptions;
 
+        // 注册默认实现
         registry.RegisterType(nameof(JSONTypes.JSON), JSONTypes.JSON);
         registry.RegisterType(nameof(JSONTypes.JSONArray), JSONTypes.JSONArray);
         registry.RegisterType(nameof(JSONTypes.JSONObject), JSONTypes.JSONObject);
+
+        // 注册System.Text.Json类型为其它实现
+        registry.RegisterType(nameof(JSONTypes.JSON), JSONTypes.JsonDocument);
+        registry.RegisterType(nameof(JSONTypes.JSON), JSONTypes.JsonElement);
 
         return registry;
     }
@@ -38,5 +43,19 @@ public static class JSONExtensions
         }
         Console.WriteLine("[WARN] Cannot find registered JsonSerializerOptions.");
         return DefaultOptions;
+    }
+
+    /// <summary>
+    /// 从<see cref="JsonSerializerOptions"/>获取<see cref="JsonDocumentOptions"/>
+    /// </summary>
+    /// <param name="options"><see cref="JsonSerializerOptions"/></param>
+    public static JsonDocumentOptions GetDocumentOptions(this JsonSerializerOptions options)
+    {
+        return new JsonDocumentOptions
+        {
+            AllowTrailingCommas = options.AllowTrailingCommas,
+            CommentHandling = options.ReadCommentHandling,
+            MaxDepth = options.MaxDepth,
+        };
     }
 }

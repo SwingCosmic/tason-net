@@ -26,6 +26,9 @@ public partial class TasonVisitor
         .GetGenericMethodDefinition(); 
     
     static readonly MethodInfo typedDictMethod = ReflectionHelpers
+        .MethodOf((TasonVisitor v) => v.TypedDictionary<object>(default!, null!))
+        .GetGenericMethodDefinition(); 
+    static readonly MethodInfo typedDictArgMethod = ReflectionHelpers
         .MethodOf((TasonVisitor v) => v.TypedDictionaryArg<object, object>(default!, null!))
         .GetGenericMethodDefinition(); 
     
@@ -134,7 +137,11 @@ public partial class TasonVisitor
             var enumerableType = ReflectionHelpers.IsEnumerable(type, out var elementType, out var keyType);
             if (enumerableType == EnumerableType.Dictionary)
             {
-                return typedDictMethod.CallGeneric<object>([keyType!, elementType!], this, [objectValue.@object(), type]);
+                if (keyType != typeof(string))
+                {
+                    throw new InvalidOperationException("Cannot deserialize plain object to a Dictionary with non-string keys");
+                }
+                return typedDictMethod.CallGeneric<object>([elementType!], this, [objectValue.@object(), type]);
             }
             throw new InvalidOperationException($"Cannot deserialize plain object to type '{type}', please register type instance instead.");
         } 
@@ -194,13 +201,21 @@ public partial class TasonVisitor
         var typeInstance = ctx.typeInstance();
         return typeInstance switch
         {
-            TASONParser.ScalarTypeInstanceContext scalarType => ScalarTypeInstance(scalarType),
-            TASONParser.ObjectTypeInstanceContext objectType => MaybeObjectTypeInstance(objectType, type),
+            TASONParser.ScalarTypeInstanceContext scalarType => TypedScalarTypeInstance(scalarType, type),
+            TASONParser.ObjectTypeInstanceContext objectType => TypedObjectTypeInstance(objectType, type),
             _ => throw new ArgumentException($"Unsupported type instance type: {typeInstance.GetType().Name}"),
         };
     }
 
-    internal object MaybeObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx, Type type)
+    internal object TypedScalarTypeInstance(TASONParser.ScalarTypeInstanceContext ctx, Type type)
+    {
+        var typeName = ctx.IDENTIFIER().GetText();
+        var str = GetTextValue(ctx.STRING());
+
+        return CreateTypeInstance(typeName, str, type);
+    }
+
+    internal object TypedObjectTypeInstance(TASONParser.ObjectTypeInstanceContext ctx, Type type)
     {
         var typeName = ctx.IDENTIFIER().GetText();
         if (options.UseBuiltinDictionary && typeName == DictionaryType.TypeName)
@@ -210,7 +225,7 @@ public partial class TasonVisitor
             {
                 throw new InvalidCastException($"Type '{type.Name}' is not a Dictionary");
             }
-            return typedDictMethod.CallGeneric<object>([keyType!, elementType!], this, [ctx.@object(), type])!;
+            return typedDictArgMethod.CallGeneric<object>([keyType!, elementType!], this, [ctx.@object(), type])!;
         }
         return CreateTypeInstance(typeName, ctx.@object(), type);
     }
@@ -260,15 +275,9 @@ public partial class TasonVisitor
         return obj;
     }   
     
-    internal IDictionary<K, V> TypedDictionaryArg<K, V>(TASONParser.ObjectContext ctx, Type type)
+    internal IDictionary<K, V> TypedDictionaryArg<K, V>(TASONParser.ObjectContext ctx, Type type) where K : notnull
     {
-        IDictionary<K, V> obj;
-        if (type.GetConstructor([]) is ConstructorInfo ctor)
-            obj = (IDictionary<K, V>)ctor.Invoke([]);
-        else if (type.IsAssignableFrom(typeof(Dictionary<K, V>)))
-            obj = new Dictionary<K, V>();
-        else
-            throw new NotSupportedException($"Cannot deserialize TASON dictionary to type '{type.Name}'.Try creating your own type instance instead.");
+        var obj = ReflectionHelpers.CreateDictionary<K, V>(type);
 
         TASONParser.ArrayContext? arrayContext = null;
         foreach (var pair in ctx.pair())
@@ -311,6 +320,24 @@ public partial class TasonVisitor
 
 INVALID:
         throw new InvalidOperationException("Invalid object arg for TASON Dictionary");
+    }
+
+    internal IDictionary<string, V> TypedDictionary<V>(TASONParser.ObjectContext ctx, Type type)
+    {
+        var obj = ReflectionHelpers.CreateDictionary<string, V>(type);
+
+        var propSet = new HashSet<string>();
+        foreach (var pair in ctx.pair())
+        {
+            var key = Key(pair.key());
+
+            if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
+                throw new ArgumentException($"Duplicate key '{key}' in object");
+
+            var value = (V)TypedValueContext(pair.value(), typeof(V))!;
+            obj[key] = value;
+        }
+        return obj;
     }
 
     private object CreateTypeInstance(string typeName, TASONParser.ObjectContext obj, Type implType)

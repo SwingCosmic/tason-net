@@ -111,6 +111,16 @@ public class TasonSerializer
         return TasonGenerator.GenerateAsString(value, Options, Registry);
     }
 
+    /// <summary>
+    /// 将.NET对象序列化为TASON字符串并写入<see cref="TextWriter"/>
+    /// </summary>
+    /// <param name="value">待序列化的对象</param>
+    /// <param name="writer">要写入的<see cref="TextWriter"/></param>
+    public void Serialize(object? value, TextWriter writer)
+    {
+        TasonGenerator.GenerateToWriter(writer, value, Options, Registry);
+    }
+
 
     /// <summary>
     /// 根据当前的<see cref="Options"/>和<see cref="Registry"/>创建<see cref="TasonSerializer"/>的副本

@@ -166,6 +166,23 @@ internal static class ReflectionHelpers
         }
     }
 
+
+
+    public static IDictionary<K, V> CreateDictionary<K, V>(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type
+    ) where K : notnull
+    {
+        IDictionary<K, V> obj;
+        if (type.GetConstructor([]) is ConstructorInfo ctor)
+            obj = (IDictionary<K, V>)ctor.Invoke([]);
+        else if (type.IsAssignableFrom(typeof(Dictionary<K, V>)))
+            obj = new Dictionary<K, V>();
+        else
+            throw new NotSupportedException($"Cannot deserialize TASON dictionary to type '{type.Name}'.Try creating your own type instance instead.");
+        
+        return obj;
+    }
+
     public static FieldInfo FieldOf<T>(Expression<Func<T>> expression)
     {
         var body = expression.Body as MemberExpression ??

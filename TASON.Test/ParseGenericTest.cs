@@ -6,6 +6,8 @@ using TASON.Types.SystemTextJson;
 using System.Text.Json;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using TASON.Util;
 
 public class ParseGenericTest
 {
@@ -80,6 +82,7 @@ public class ParseGenericTest
         var pairs = "[A({X:1,Y:2}),1],[A({X:2,Y:4}),2]";
         var tason = $"Dictionary({{keyValuePairs:[{pairs}]}})";
 
+        // 测试UseBuiltinDictionary=true的非string key字典
         var s = TasonSerializer.Default.Clone();
         s.Options.UseBuiltinDictionary = true;
         s.Registry.CreateObjectType(typeof(A));
@@ -91,12 +94,46 @@ public class ParseGenericTest
                 [new A { X = 2,Y = 4 }] = 2,
             }));
 
-
+        // 测试UseBuiltinDictionary=false的非string key字典，应该报错
         var s2 = TasonSerializer.Default.Clone();
         s2.Options.UseBuiltinDictionary = false;
         s2.Registry.CreateObjectType(typeof(A));
 
         Assert.Throws<ArgumentException>(() => s2.Deserialize<ADict>(tason));
+    }
+
+    [Test]
+    public void JsonTest()
+    {
+        var s = TasonSerializer.Default;
+
+        var json = """
+{
+    "tags": {
+        "a": "foo",
+        "b": "bar"
+    }
+}
+""";
+        var expect = ReadJson(json);
+        // 测试JsonDocument
+        var tason = $"JSON(\"{PrimitiveHelpers.Escape(json)}\")";
+        var obj = s.Deserialize<JsonDocument>(tason)!;
+        Assert.That(obj.RootElement.ToString(), 
+            Is.EqualTo(expect.RootElement.ToString()));
+
+        // 测试含有JsonElement的嵌套字典
+        var inner = """{"a":"foo","b":"bar"}""";
+        var tason2 = "{'tags': " + $"JSON(\"{PrimitiveHelpers.Escape(inner)}\")" + "}";
+        var obj2 = s.Deserialize<Dictionary<string, JsonElement>>(tason2)!;
+        Assert.That(JsonSerializer.Serialize(obj2, options), 
+            Is.EqualTo(JsonSerializer.Serialize(expect.RootElement, options)));
+
+    }
+
+    JsonDocument ReadJson([StringSyntax(StringSyntaxAttribute.Json)] string json)
+    {
+        return JsonDocument.Parse(json, options.GetDocumentOptions());
     }
 
 }

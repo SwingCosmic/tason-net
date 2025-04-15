@@ -61,6 +61,22 @@ public partial class TasonGenerator
     }
 
     /// <summary>
+    /// 序列化对象到指定<see cref="TextWriter"/>
+    /// </summary>
+    /// <param name="textWriter">输出<see cref="TextWriter"/></param>
+    /// <param name="value">要序列化的对象</param>
+    /// <param name="options"><see cref="SerializerOptions"/></param>
+    /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
+    public static void GenerateToWriter(TextWriter textWriter, object? value, SerializerOptions options, TasonTypeRegistry registry)
+    {
+        using (var writer = new TasonWriter(textWriter, options))
+        {
+            var generator = new TasonGenerator(writer, options, registry);
+            generator.Generate(value);
+        }
+    }
+
+    /// <summary>
     /// 生成TASON字符串并向<see cref="TasonWriter"/>中写入
     /// </summary>
     /// <param name="value">要序列化的对象</param>

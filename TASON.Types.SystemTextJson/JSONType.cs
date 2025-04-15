@@ -53,7 +53,13 @@ public class JSONObjectType : TasonScalarTypeBase<JSON>
 
 public static class JSONTypes 
 {
+#pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
     public static JSONType JSON { get; } = new();
     public static JSONArrayType JSONArray { get; } = new();
     public static JSONObjectType JSONObject { get; } = new();
+
+
+    public static JsonDocumentType JsonDocument { get; } = new();
+    public static JsonElementType JsonElement { get; } = new();
+#pragma warning restore CS1591
 }
