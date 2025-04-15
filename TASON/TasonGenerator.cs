@@ -26,7 +26,14 @@ public partial class TasonGenerator
         this.registry = registry;
     }
 
-    public static string ToTasonString(object? value, SerializerOptions options, TasonTypeRegistry registry)
+    /// <summary>
+    /// 序列化对象为TASON字符串
+    /// </summary>
+    /// <param name="value">要序列化的对象</param>
+    /// <param name="options"><see cref="SerializerOptions"/></param>
+    /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
+    /// <returns>TASON字符串</returns>
+    public static string GenerateAsString(object? value, SerializerOptions options, TasonTypeRegistry registry)
     {
         var sb = new StringBuilder();
         using (var writer = new TasonWriter(sb, options))
@@ -37,7 +44,26 @@ public partial class TasonGenerator
         return sb.ToString();
     }
 
+    /// <summary>
+    /// 序列化对象到指定流
+    /// </summary>
+    /// <param name="stream">输出流</param>
+    /// <param name="value">要序列化的对象</param>
+    /// <param name="options"><see cref="SerializerOptions"/></param>
+    /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
+    public static void GenerateToStream(Stream stream, object? value, SerializerOptions options, TasonTypeRegistry registry)
+    {
+        using (var writer = new TasonWriter(stream, options))
+        {
+            var generator = new TasonGenerator(writer, options, registry);
+            generator.Generate(value);
+        }
+    }
 
+    /// <summary>
+    /// 生成TASON字符串并向<see cref="TasonWriter"/>中写入
+    /// </summary>
+    /// <param name="value">要序列化的对象</param>
     public void Generate(object? value)
     {
         Value(value);

@@ -46,8 +46,7 @@ public partial class TasonGenerator
     {
         writer.WriteStartArray();
         {
-            writer.CheckDepth();
-            writer.Join(v => 
+            writer.WriteJoin(v => 
             {
                 writer.WriteArrayItem(() => 
                 {
@@ -66,8 +65,7 @@ public partial class TasonGenerator
     {
         writer.WriteStartArray();
         {
-            writer.CheckDepth();
-            writer.Join(v => 
+            writer.WriteJoin(v => 
             {
                 writer.WriteArrayItem(() => Value(v));
                 return true;

@@ -99,8 +99,7 @@ public partial class TasonGenerator
         var props = GetClassProperties(type);
         writer.WriteStartObject();
         {
-            writer.CheckDepth();
-            writer.Join(v => 
+            writer.WriteJoin(v => 
             {
                 Pair(v);
                 return true;
@@ -118,8 +117,7 @@ public partial class TasonGenerator
     {
         writer.WriteStartObject();
         {
-            writer.CheckDepth();
-            writer.Join(v => 
+            writer.WriteJoin(v => 
             {
                 if (!TryWritePair(v)) 
                     return false;
@@ -154,8 +152,7 @@ public partial class TasonGenerator
 
         writer.WriteStartObject();
         {
-            writer.CheckDepth();
-            writer.Join(v => 
+            writer.WriteJoin(v => 
             {
                 Pair(v);
                 return true;

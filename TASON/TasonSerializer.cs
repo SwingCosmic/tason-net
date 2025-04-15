@@ -108,7 +108,7 @@ public class TasonSerializer
     /// <returns>TASON字符串</returns>
     public string Serialize(object? value)
     {
-        return TasonGenerator.ToTasonString(value, Options, Registry);
+        return TasonGenerator.GenerateAsString(value, Options, Registry);
     }
 
 

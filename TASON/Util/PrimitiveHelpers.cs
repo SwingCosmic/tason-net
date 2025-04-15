@@ -4,6 +4,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Numerics;
 using System.Buffers;
+using System.Text.Encodings.Web;
 
 namespace TASON.Util;
 
@@ -61,6 +62,18 @@ public static class PrimitiveHelpers
         }
         return result.ToString();
     }
+
+    private static readonly JavaScriptEncoder stringEncoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+    /// <summary>
+    /// 转义字符串中的不安全字符
+    /// </summary>
+    /// <param name="str">待转义的字符串</param>
+    /// <returns>转义后的字符串</returns>
+    public static string Escape(this string str)
+    {
+        return stringEncoder.Encode(str);
+    }
+
 
     private static char ParseHex(string str, ref int i)
     {

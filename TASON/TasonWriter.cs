@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Encodings.Web;
 using TASON.Grammar;
+using TASON.Util;
 
 namespace TASON;
 
@@ -11,8 +12,7 @@ namespace TASON;
 /// </summary>
 public class TasonWriter : IDisposable
 {
-    private static readonly JavaScriptEncoder stringEncoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-
+    
     readonly TextWriter writer;
     readonly SerializerOptions options;
 
@@ -37,11 +37,22 @@ public class TasonWriter : IDisposable
         Space = options.Indent is null ? string.Empty : " ";
     }
 
+    /// <summary>
+    /// 使用<see cref="StringBuilder"/>创建<see cref="TasonWriter"/>的新实例
+    /// </summary>
+    /// <param name="sb">用于写入字符串的<see cref="StringBuilder"/></param>
+    /// <param name="options">序列化选项</param>
     public TasonWriter(StringBuilder sb, SerializerOptions? options = null) : this(options)
     {
         writer = new StringWriter(sb); 
     }
-    
+
+    /// <summary>
+    /// 使用<see cref="Stream"/>创建<see cref="TasonWriter"/>的新实例
+    /// </summary>
+    /// <param name="stream">用于写入字符串的流</param>
+    /// <param name="options">序列化选项</param>
+    /// <exception cref="IOException"><paramref name="stream"/>不是可写的</exception>
     public TasonWriter(Stream stream, SerializerOptions? options = null): this(options)
     {
         if (!stream.CanWrite)
@@ -55,6 +66,7 @@ public class TasonWriter : IDisposable
     public void Dispose()
     {
         writer.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -62,7 +74,7 @@ public class TasonWriter : IDisposable
         ? string.Empty
         : new string(OneSpace, options.Indent.Value * indentLevel);
 
-    public void CheckDepth()
+    void CheckDepth()
     {
         if (indentLevel > options.MaxDepth)
         {
@@ -95,12 +107,7 @@ public class TasonWriter : IDisposable
     /// <param name="value">字符串</param>
     public void WriteString(string value)
     {
-        writer.Write(EscapeString(value));
-    }
-
-    public string EscapeString(string value) 
-    {
-        return $"{DoubleQuote}{stringEncoder.Encode(value)}{DoubleQuote}";
+        writer.Write($"{DoubleQuote}{value.Escape()}{DoubleQuote}");
     }
 
     /// <summary>
@@ -115,6 +122,7 @@ public class TasonWriter : IDisposable
         }  
         
         indentLevel++;
+        CheckDepth();
     }
 
     /// <summary>
@@ -152,6 +160,7 @@ public class TasonWriter : IDisposable
         }
 
         indentLevel++;
+        CheckDepth();
     }
 
     /// <summary>
@@ -184,7 +193,7 @@ public class TasonWriter : IDisposable
     /// <param name="tryWrite">尝试写入一个数组元素的方法，
     /// 返回 <see langword="true"/> 表示写入成功，<see langword="false"/> 表示跳过该元素</param>
     /// <param name="values">要遍历的数组</param>
-    public void Join<T>(Func<T, bool> tryWrite, IList<T> values) 
+    public void WriteJoin<T>(Func<T, bool> tryWrite, IList<T> values) 
     {
         var len = values.Count;
         if (len == 0) return; 
