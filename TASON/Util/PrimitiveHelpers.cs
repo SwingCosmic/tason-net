@@ -5,6 +5,8 @@ using System.Security.Cryptography;
 using System.Numerics;
 using System.Buffers;
 using System.Text.Encodings.Web;
+using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TASON.Util;
 
@@ -318,4 +320,29 @@ public static class PrimitiveHelpers
         return flags.HasFlag(value);
 #endif
     }
+
+    /// <summary>
+    /// 将<typeparamref name="T1"/>类型的数值转换为<typeparamref name="T2"/>类型
+    /// </summary>
+    /// <typeparam name="T1">原数字类型</typeparam>
+    /// <typeparam name="T2">目标数字类型</typeparam>
+    /// <param name="number">要转换的数值</param>
+    /// <returns>转换后的值</returns>
+    /// <exception cref="InvalidCastException">转换失败</exception>
+    public static T2 CastNumber<T1, T2>(T1 number)
+#if NET7_0_OR_GREATER
+        where T1 : struct, INumber<T1>
+        where T2 : struct, INumber<T2>
+    {
+        return T2.CreateTruncating(number);
+    }
+#else
+        where T1 : struct
+        where T2 : struct
+    {
+        return (T2)Convert.ChangeType(number, typeof(T2));
+    }
+
+#endif
+
 }

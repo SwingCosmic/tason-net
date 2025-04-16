@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using TASON.Util;
+using System.Reflection;
 
 public class ParseGenericTest
 {
@@ -40,6 +41,22 @@ public class ParseGenericTest
     class ADict : Dictionary<A, int>
     {
 
+    }
+
+    [Test]
+    public void EnumTest()
+    {
+        var s = TasonSerializer.Default;
+        var enumValue = s.Deserialize<StringSplitOptions>("1");
+        Assert.That(enumValue, Is.EqualTo(StringSplitOptions.RemoveEmptyEntries));
+
+        var flagValue = s.Deserialize<BindingFlags[]>("[0b01000, 0b10000, 0b11000]");
+        Assert.That(flagValue, Is.EqualTo(new[] 
+        { 
+            BindingFlags.Static, 
+            BindingFlags.Public, 
+            BindingFlags.Static | BindingFlags.Public 
+        }));
     }
 
 

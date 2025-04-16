@@ -156,12 +156,22 @@ public partial class TasonVisitor
 
     ValueType TypedNumberValue(TASONParser.NumberValueContext ctx, Type type)
     {
+        var text = ctx.number().GetText();
         if (!NumberMetadata.TryGetClrType(type, out var _))
         {
-            throw new InvalidCastException($"Cannot cast type '{type.Name}' to number");
+            if (!type.IsEnum)
+            {
+                throw new InvalidCastException($"Cannot cast type '{type.Name}' to number");
+            }
+            else
+            {
+                var numType = Enum.GetUnderlyingType(type);
+                var value = NumberMetadata.Deserialize(numType, text, options);
+                return (ValueType)Enum.ToObject(type, value);
+            }
         }
 
-        return NumberMetadata.Deserialize(type, ctx.number().GetText(), options);
+        return NumberMetadata.Deserialize(type, text, options);
     }
 
     T[] TypedArray<T>(TASONParser.ValueContext[] array)

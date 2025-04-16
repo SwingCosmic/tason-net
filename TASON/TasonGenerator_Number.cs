@@ -34,12 +34,7 @@ public partial class TasonGenerator
             decimal d => LargeNumber(d, NumberTypes.Decimal128, nameof(NumberTypes.Decimal128), scope),
             BigInteger bi => LargeNumber(bi, NumberTypes.BigInt, nameof(NumberTypes.BigInt), scope),
 
-            IntPtr ip => IntPtr.Size == 8 
-                ? LargeNumber(ip.ToInt64(), NumberTypes.Int64, nameof(NumberTypes.Int64), scope) 
-                : SafeNumber(ip.ToInt32(), NumberTypes.Int32, nameof(NumberTypes.Int32), scope),
-            UIntPtr uip => UIntPtr.Size == 8 
-                ? LargeNumber(uip.ToUInt64(), NumberTypes.UInt64, nameof(NumberTypes.UInt64), scope) 
-                : SafeNumber(uip.ToUInt32(), NumberTypes.UInt32, nameof(NumberTypes.UInt32), scope),
+            IntPtr or UIntPtr => UnsafeNumberType(value, scope),
 #if NET6_0_OR_GREATER
             NFloat nf =>
     #if NET7_0_OR_GREATER
@@ -53,6 +48,26 @@ public partial class TasonGenerator
 
             _ => false,
         };
+    }
+
+    bool UnsafeNumberType(object value, ValueScope scope) 
+    {
+        if (!options.AllowUnsafeTypes)
+        {
+            throw new InvalidOperationException($"Cannot serialize type {value.GetType().Name}");
+        }
+
+        return value switch
+        {
+            IntPtr ip => IntPtr.Size == 8
+                ? LargeNumber(ip.ToInt64(), NumberTypes.Int64, nameof(NumberTypes.Int64), scope)
+                : SafeNumber(ip.ToInt32(), NumberTypes.Int32, nameof(NumberTypes.Int32), scope),
+            UIntPtr uip => UIntPtr.Size == 8
+                ? LargeNumber(uip.ToUInt64(), NumberTypes.UInt64, nameof(NumberTypes.UInt64), scope)
+                : SafeNumber(uip.ToUInt32(), NumberTypes.UInt32, nameof(NumberTypes.UInt32), scope),
+            _ => throw new NotImplementedException(),
+        };
+
     }
 
     bool SafeNumber<T>(T value, TasonNumberScalar<T> type, string name, ValueScope scope)
@@ -73,6 +88,7 @@ public partial class TasonGenerator
         } 
         else 
             writer.Write(value.ToString()!);
+
         return true;
     }
 

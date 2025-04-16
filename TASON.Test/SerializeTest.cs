@@ -50,7 +50,7 @@ public class SerializeTest
             int64
         };
         Assert.That(s.Serialize(array), Is.EqualTo(
-"""
+new Regex("[\r\n]+").Replace("""
 [
   1,
   {
@@ -58,8 +58,7 @@ public class SerializeTest
   },
   Int64("43981")
 ]
-""".ReplaceLineEndings(Environment.NewLine)
-            ));
+""", Environment.NewLine)));
     }
     [Test]
     public void JSON()

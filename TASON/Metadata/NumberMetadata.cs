@@ -61,7 +61,7 @@ internal static class NumberMetadata
         var typeInfo = (TasonNumberScalar<T>)ClrTypeMapping[type];
         if (type.IsPrimitive)
         {
-            return (T)Convert.ChangeType(PrimitiveHelpers.ParseTasonNumber(number), type);
+            return PrimitiveHelpers.CastNumber<double, T>(PrimitiveHelpers.ParseTasonNumber(number));
         }
         return typeInfo.DeserializeInternal(number, options);
     }
