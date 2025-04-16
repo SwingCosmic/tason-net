@@ -9,5 +9,36 @@
     <Import_RootNamespace>Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Metadata\ClassPropertyMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Metadata\NumberMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serialization\Attributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serialization\ITasonTypeDiscriminator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serialization\TasonObjectType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serialization\TasonScalarType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerializerOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonGenerator_Array.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonGenerator_Number.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonGenerator_Object.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonTypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonTypeNotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonTypeRegistry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonVisitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonVisitor_Typed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TasonWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ThrowingErrorListener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\BufferType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\BuiltinTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\DateTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\DictionaryType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\NumberTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\RegExpType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\TasonNumberScalar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\Timestamp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\UUIDType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\NamingContractExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\PrimitiveHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\ReflectionHelpers.cs" />
   </ItemGroup>
 </Project>

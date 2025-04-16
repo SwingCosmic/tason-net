@@ -51,6 +51,8 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Half" Version="1.0.0" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
-  </ItemGroup>
+  </ItemGroup>  
+  
+  <Import Project="..\Common\Common.projitems" Label="Shared" />
 
 </Project>

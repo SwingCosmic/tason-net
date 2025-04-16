@@ -18,6 +18,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASON.AspNetCore", "TASON.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASON.AspNetCoreTest", "TASON.AspNetCoreTest\TASON.AspNetCoreTest.csproj", "{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "Common\Common.shproj", "{75858298-1D7A-4D21-8515-032A6DED2150}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TASON_Unity", "TASON_Unity\TASON_Unity.csproj", "{4A3C0666-4B9E-49E6-B197-CC28EE542EA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AOT|Any CPU = AOT|Any CPU
@@ -55,11 +59,21 @@ Global
 		{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A3C0666-4B9E-49E6-B197-CC28EE542EA7}.AOT|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A3C0666-4B9E-49E6-B197-CC28EE542EA7}.AOT|Any CPU.Build.0 = Debug|Any CPU
+		{4A3C0666-4B9E-49E6-B197-CC28EE542EA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A3C0666-4B9E-49E6-B197-CC28EE542EA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A3C0666-4B9E-49E6-B197-CC28EE542EA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A3C0666-4B9E-49E6-B197-CC28EE542EA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F1EE5473-C1C6-4678-BD8A-B32A0E6642E3}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Common\Common.projitems*{75858298-1d7a-4d21-8515-032a6ded2150}*SharedItemsImports = 13
+		Common\Common.projitems*{e18d260d-6357-4006-a68c-74b85a89c490}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
