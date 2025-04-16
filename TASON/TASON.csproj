@@ -15,6 +15,13 @@
     <RepositoryUrl>https://github.com/SwingCosmic/tason-net</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PolySharpIncludeRuntimeSupportedAttributes>True</PolySharpIncludeRuntimeSupportedAttributes>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Configurations>Debug;Release;AOT</Configurations>
+  </PropertyGroup>
+	
+  <PropertyGroup Condition="'$(Configuration)'=='AOT'">
+    <DefineConstants>NATIVE_AOT</DefineConstants>
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <Target Name="GenerateCode" Inputs="Grammar/TASON.g4" Outputs="Grammar/*.cs">

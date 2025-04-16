@@ -330,7 +330,13 @@ public static class PrimitiveHelpers
     /// <returns>转换后的值</returns>
     /// <exception cref="InvalidCastException">转换失败</exception>
     public static T2 CastNumber<T1, T2>(T1 number)
-#if NET7_0_OR_GREATER
+#if NATIVE_AOT
+        where T1 : struct
+        where T2 : struct
+    {
+        return (T2)Convert.ChangeType(number, typeof(T2));
+    }
+#elif NET7_0_OR_GREATER
         where T1 : struct, INumber<T1>
         where T2 : struct, INumber<T2>
     {
@@ -340,9 +346,22 @@ public static class PrimitiveHelpers
         where T1 : struct
         where T2 : struct
     {
-        return (T2)Convert.ChangeType(number, typeof(T2));
+        return Converter<T1, T2>.Convert(number);
     }
 
+    static class Converter<T1, T2>
+    {
+        public static readonly Func<T1, T2> Convert = CreateConverter();
+
+        [RequiresDynamicCode("使用了Expression.Compile()")]
+        private static Func<T1, T2> CreateConverter()
+        {
+            var parameter = Expression.Parameter(typeof(T1));
+            var convertExpression = Expression.Convert(parameter, typeof(T2));
+            var lambda = Expression.Lambda<Func<T1, T2>>(convertExpression, parameter);
+            return lambda.Compile();
+        }
+    }
 #endif
 
 }
