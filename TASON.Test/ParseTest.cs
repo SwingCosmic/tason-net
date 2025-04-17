@@ -92,7 +92,7 @@ public class ParseTest
 public class RegexComparer : EqualityComparer<Regex>
 {
     static RegExpType RegExp = new();
-    static SerializerOptions options = new();
+    static TasonSerializerOptions options = new();
     static Dictionary<Regex, bool> testMap = new(new RegexComparer());
     public override bool Equals(Regex? x, Regex? y)
     {

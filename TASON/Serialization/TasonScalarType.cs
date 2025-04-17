@@ -21,13 +21,13 @@ public abstract class TasonScalarTypeBase<T> : ITasonScalarType where T : notnul
     }
 
     /// <inheritdoc/>
-    public object Deserialize(string text, SerializerOptions options)
+    public object Deserialize(string text, TasonSerializerOptions options)
     {
         return DeserializeCore(text, options);
     }
 
     /// <inheritdoc/>
-    public string Serialize(object value, SerializerOptions options)
+    public string Serialize(object value, TasonSerializerOptions options)
     {
         return SerializeCore((T)value, options);
     }
@@ -38,14 +38,14 @@ public abstract class TasonScalarTypeBase<T> : ITasonScalarType where T : notnul
     /// <param name="text">要序列化的标量类型实例</param>
     /// <param name="options">选项</param>
     /// <returns></returns>
-    protected abstract T DeserializeCore(string text, SerializerOptions options);
+    protected abstract T DeserializeCore(string text, TasonSerializerOptions options);
     /// <summary>
     /// 泛型版本的序列化方法
     /// </summary>
     /// <param name="value">代表该类型的字符串</param>
     /// <param name="options">选项</param>
     /// <returns></returns>
-    protected abstract string SerializeCore(T value, SerializerOptions options);
+    protected abstract string SerializeCore(T value, TasonSerializerOptions options);
 }
 
 /// <summary>
@@ -75,13 +75,13 @@ public sealed class TasonScalarType<T> : TasonScalarTypeBase<T> where T : notnul
 
 
     /// <inheritdoc/>
-    protected override T DeserializeCore(string text, SerializerOptions options)
+    protected override T DeserializeCore(string text, TasonSerializerOptions options)
     {
         return (T)ReflectionCache.Ctor.Invoke([text]);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(T value, SerializerOptions options)
+    protected override string SerializeCore(T value, TasonSerializerOptions options)
     {
         return value.ToString() ?? "";
     }

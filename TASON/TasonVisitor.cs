@@ -7,7 +7,7 @@ using TASON.Util;
 
 namespace TASON;
 
-public partial class TasonVisitor(TasonTypeRegistry registry, SerializerOptions options)
+public partial class TasonVisitor(TasonTypeRegistry registry, TasonSerializerOptions options)
 {
     
     /// <summary>

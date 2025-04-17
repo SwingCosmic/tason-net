@@ -14,7 +14,7 @@ public class TasonWriter : IDisposable
 {
     
     readonly TextWriter writer;
-    readonly SerializerOptions options;
+    readonly TasonSerializerOptions options;
 
     const char StartObject = '{';
     const char EndObject = '}';
@@ -34,7 +34,7 @@ public class TasonWriter : IDisposable
     /// </summary>
     /// <param name="writer">用于写入字符串的<see cref="TextWriter"/></param>
     /// <param name="options">序列化选项</param>
-    public TasonWriter(TextWriter writer, SerializerOptions? options = null) 
+    public TasonWriter(TextWriter writer, TasonSerializerOptions? options = null) 
     {
         options ??= new();
         this.options = options;
@@ -49,7 +49,7 @@ public class TasonWriter : IDisposable
     /// </summary>
     /// <param name="sb">用于写入字符串的<see cref="StringBuilder"/></param>
     /// <param name="options">序列化选项</param>
-    public TasonWriter(StringBuilder sb, SerializerOptions? options = null) 
+    public TasonWriter(StringBuilder sb, TasonSerializerOptions? options = null) 
         : this(new StringWriter(sb), options)
     {
     }
@@ -60,7 +60,7 @@ public class TasonWriter : IDisposable
     /// <param name="stream">用于写入字符串的流</param>
     /// <param name="options">序列化选项</param>
     /// <exception cref="IOException"><paramref name="stream"/>不是可写的</exception>
-    public TasonWriter(Stream stream, SerializerOptions? options = null)
+    public TasonWriter(Stream stream, TasonSerializerOptions? options = null)
         : this(CreateWriterFromStream(stream), options)
     {
     }

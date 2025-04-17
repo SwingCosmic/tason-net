@@ -34,13 +34,13 @@ public class DateType : TasonScalarTypeBase<DateTime>
 {
 
     /// <inheritdoc/>
-    protected override DateTime DeserializeCore(string text, SerializerOptions options)
+    protected override DateTime DeserializeCore(string text, TasonSerializerOptions options)
     {
         return DateTime.Parse(text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(DateTime value, SerializerOptions options)
+    protected override string SerializeCore(DateTime value, TasonSerializerOptions options)
     {
         return value.ToUniversalTime().ToString(DateTypes.StandardFormat, CultureInfo.InvariantCulture);
     }
@@ -52,13 +52,13 @@ public class DateType : TasonScalarTypeBase<DateTime>
 public class DateTimeOffsetType : TasonScalarTypeBase<DateTimeOffset>
 {
     /// <inheritdoc/>
-    protected override DateTimeOffset DeserializeCore(string text, SerializerOptions options)
+    protected override DateTimeOffset DeserializeCore(string text, TasonSerializerOptions options)
     {
         return DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(text, CultureInfo.InvariantCulture));
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(DateTimeOffset value, SerializerOptions options)
+    protected override string SerializeCore(DateTimeOffset value, TasonSerializerOptions options)
     {
         return value.ToUnixTimeMilliseconds().ToString();
     }
@@ -70,13 +70,13 @@ public class DateTimeOffsetType : TasonScalarTypeBase<DateTimeOffset>
 public class TimestampType : TasonScalarTypeBase<Timestamp>
 {
     /// <inheritdoc/>
-    protected override Timestamp DeserializeCore(string text, SerializerOptions options)
+    protected override Timestamp DeserializeCore(string text, TasonSerializerOptions options)
     {
         return long.Parse(text, CultureInfo.InvariantCulture);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(Timestamp value, SerializerOptions options)
+    protected override string SerializeCore(Timestamp value, TasonSerializerOptions options)
     {
         return value.Milliseconds.ToString();
     }

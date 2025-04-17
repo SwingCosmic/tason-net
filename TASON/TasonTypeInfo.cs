@@ -30,14 +30,14 @@ public interface ITasonScalarType : ITasonTypeInfo
     /// <param name="value">要序列化的标量类型实例</param>
     /// <param name="options">选项</param>
     /// <returns>代表该类型的字符串</returns>
-    string Serialize(object value, SerializerOptions options);
+    string Serialize(object value, TasonSerializerOptions options);
     /// <summary>
     /// 将代表该类型的字符串反序列化为对应标量类型实例
     /// </summary>
     /// <param name="text">代表该类型的字符串</param>
     /// <param name="options">选项</param>
     /// <returns>标量类型实例</returns>
-    object Deserialize(string text, SerializerOptions options);
+    object Deserialize(string text, TasonSerializerOptions options);
 }
 
 /// <summary>对象类型实例信息接口，自定义类型可以由此派生</summary>
@@ -49,14 +49,14 @@ public interface ITasonObjectType : ITasonTypeInfo
     /// <param name="value">要序列化的标量类型实例</param>
     /// <param name="options">选项</param>
     /// <returns>代表该类型的字典</returns>
-    Dictionary<string, object?> Serialize(object value, SerializerOptions options);
+    Dictionary<string, object?> Serialize(object value, TasonSerializerOptions options);
     /// <summary>
     /// 将代表该类型的字典反序列化为对应标量类型实例
     /// </summary>
     /// <param name="dict">代表该类型的字典</param>
     /// <param name="options">选项</param>
     /// <returns>标量类型实例</returns>
-    object Deserialize(Dictionary<string, object?> dict, SerializerOptions options);
+    object Deserialize(Dictionary<string, object?> dict, TasonSerializerOptions options);
 }
 
 

@@ -23,7 +23,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     }
 
     /// <inheritdoc/>
-    public virtual object Deserialize(Dictionary<string, object?> dict, SerializerOptions options)
+    public virtual object Deserialize(Dictionary<string, object?> dict, TasonSerializerOptions options)
     {
         var obj = new T();
         foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)
@@ -40,7 +40,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     }
 
     /// <inheritdoc/>
-    public virtual Dictionary<string, object?> Serialize(object value, SerializerOptions options)
+    public virtual Dictionary<string, object?> Serialize(object value, TasonSerializerOptions options)
     {
         var dict = new Dictionary<string, object?>();
         foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)

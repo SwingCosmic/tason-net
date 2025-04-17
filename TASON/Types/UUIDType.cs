@@ -19,7 +19,7 @@ public partial class UUIDType : TasonScalarTypeBase<Guid>
 #else
     private static readonly Regex pattern = new Regex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", RegexOptions.IgnoreCase);
 #endif
-    protected override Guid DeserializeCore(string text, SerializerOptions options)
+    protected override Guid DeserializeCore(string text, TasonSerializerOptions options)
     {
         if (!pattern.IsMatch(text))
         {
@@ -28,7 +28,7 @@ public partial class UUIDType : TasonScalarTypeBase<Guid>
         return Guid.Parse(text);
     }
 
-    protected override string SerializeCore(Guid value, SerializerOptions options)
+    protected override string SerializeCore(Guid value, TasonSerializerOptions options)
     {
         return value.ToString("D");
     }

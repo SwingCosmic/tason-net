@@ -121,13 +121,13 @@ public sealed record class Buffer : IEquatable<Buffer>
 public class BufferType : TasonScalarTypeBase<Buffer>
 {
     /// <inheritdoc/>
-    protected override Buffer DeserializeCore(string text, SerializerOptions options)
+    protected override Buffer DeserializeCore(string text, TasonSerializerOptions options)
     {
         return new Buffer(text);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(Buffer value, SerializerOptions options)
+    protected override string SerializeCore(Buffer value, TasonSerializerOptions options)
     {
         return value.SerializeToString();
     }

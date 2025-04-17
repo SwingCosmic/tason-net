@@ -23,7 +23,7 @@ public partial class RegExpType : TasonScalarTypeBase<Regex>
     private static Regex regexpPattern = new Regex(@"^/(.+)/([gimnsxuy]*)$");
     private static Regex inlineOptionPattern = new Regex(@"\(\?(#|[imnsx-]+)");
 #endif
-    protected override Regex DeserializeCore(string text, SerializerOptions options)
+    protected override Regex DeserializeCore(string text, TasonSerializerOptions options)
     {
         var match = regexpPattern.Match(text);
         if (!match.Success)
@@ -54,7 +54,7 @@ public partial class RegExpType : TasonScalarTypeBase<Regex>
         return new Regex(pattern, option);
     }
 
-    protected override string SerializeCore(Regex value, SerializerOptions options)
+    protected override string SerializeCore(Regex value, TasonSerializerOptions options)
     {
         var s = value.ToString();
         if (inlineOptionPattern.IsMatch(s))

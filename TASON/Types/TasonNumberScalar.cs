@@ -15,13 +15,13 @@ public abstract class TasonNumberScalar<T> : TasonScalarTypeBase<T>
 #endif
     IEquatable<T>
 {
-    internal T DeserializeInternal(string text, SerializerOptions options)
+    internal T DeserializeInternal(string text, TasonSerializerOptions options)
     {
         return DeserializeCore(text, options);
     }
 
     /// <inheritdoc/>
-    protected override T DeserializeCore(string text, SerializerOptions options)
+    protected override T DeserializeCore(string text, TasonSerializerOptions options)
     {
         var (num, radix, isNegative) = PrimitiveHelpers.ParseBuiltinNumber(text);
         return ParseValue(num, radix, isNegative);
@@ -30,7 +30,7 @@ public abstract class TasonNumberScalar<T> : TasonScalarTypeBase<T>
     protected abstract T ParseValue(string text, int radix, bool isNegative);
 
     /// <inheritdoc/>
-    protected override string SerializeCore(T value, SerializerOptions options)
+    protected override string SerializeCore(T value, TasonSerializerOptions options)
     {
         return value.ToString()!;
     }
@@ -217,7 +217,7 @@ public class Float16Type : TasonNumberScalar<Half>
         return Half.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
     }
 
-    protected override string SerializeCore(Half value, SerializerOptions options)
+    protected override string SerializeCore(Half value, TasonSerializerOptions options)
     {
         var s = value.ToString()!;
         return s.Replace(PrimitiveHelpers.InfinitySymbol, PrimitiveHelpers.Infinity);
@@ -235,7 +235,7 @@ public class Float32Type : TasonNumberScalar<float>
         return float.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
     }
 
-    protected override string SerializeCore(float value, SerializerOptions options)
+    protected override string SerializeCore(float value, TasonSerializerOptions options)
     {
         var s = value.ToString()!;
         return s.Replace(PrimitiveHelpers.InfinitySymbol, PrimitiveHelpers.Infinity);
@@ -253,7 +253,7 @@ public class Float64Type : TasonNumberScalar<double>
         return double.Parse(AddNegative(text, isNegative), CultureInfo.InvariantCulture);
     }
 
-    protected override string SerializeCore(double value, SerializerOptions options)
+    protected override string SerializeCore(double value, TasonSerializerOptions options)
     {
         var s = value.ToString()!;
         return s.Replace(PrimitiveHelpers.InfinitySymbol, PrimitiveHelpers.Infinity);

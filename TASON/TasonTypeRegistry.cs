@@ -19,11 +19,11 @@ internal record class TasonRegistryEntry(string Name, List<ITasonTypeInfo> Types
 public class TasonTypeRegistry
 {
     Dictionary<string, TasonRegistryEntry> types = new();
-    private readonly SerializerOptions options;
+    private readonly TasonSerializerOptions options;
 
-    public SerializerOptions Options => options;
+    public TasonSerializerOptions Options => options;
 
-    public TasonTypeRegistry(SerializerOptions options)
+    public TasonTypeRegistry(TasonSerializerOptions options)
     {
         this.options = options;
         // 注册存在依赖关系，顺序必须依次为默认类型，别名，然后是鸭子类型

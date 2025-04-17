@@ -5,7 +5,7 @@ namespace TASON;
 /// <summary>
 /// 序列化选项
 /// </summary>
-public record class SerializerOptions
+public record class TasonSerializerOptions
 {
     /// <summary>
     /// 是否允许使用不安全的类型，默认<see langword="false"/>

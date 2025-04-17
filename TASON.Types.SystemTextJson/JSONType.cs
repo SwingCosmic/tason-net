@@ -6,13 +6,13 @@ namespace TASON.Types.SystemTextJson;
 public class JSONType : TasonScalarTypeBase<JSON>
 {
     /// <inheritdoc/>
-    protected override JSON DeserializeCore(string text, SerializerOptions options)
+    protected override JSON DeserializeCore(string text, TasonSerializerOptions options)
     {
         return new JSON(text, options.GetJsonOptions(), JSONSubType.All);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(JSON value, SerializerOptions options)
+    protected override string SerializeCore(JSON value, TasonSerializerOptions options)
     {
         return value.JsonString;
     }
@@ -22,13 +22,13 @@ public class JSONType : TasonScalarTypeBase<JSON>
 public class JSONArrayType : TasonScalarTypeBase<JSON>
 {
     /// <inheritdoc/>
-    protected override JSON DeserializeCore(string text, SerializerOptions options)
+    protected override JSON DeserializeCore(string text, TasonSerializerOptions options)
     {
         return new JSON(text, options.GetJsonOptions(), JSONSubType.Array);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(JSON value, SerializerOptions options)
+    protected override string SerializeCore(JSON value, TasonSerializerOptions options)
     {
         return value.JsonString;
     }
@@ -37,13 +37,13 @@ public class JSONArrayType : TasonScalarTypeBase<JSON>
 public class JSONObjectType : TasonScalarTypeBase<JSON>
 {
     /// <inheritdoc/>
-    protected override JSON DeserializeCore(string text, SerializerOptions options)
+    protected override JSON DeserializeCore(string text, TasonSerializerOptions options)
     {
         return new JSON(text, options.GetJsonOptions(), JSONSubType.Object);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(JSON value, SerializerOptions options)
+    protected override string SerializeCore(JSON value, TasonSerializerOptions options)
     {
         return value.JsonString;
     }

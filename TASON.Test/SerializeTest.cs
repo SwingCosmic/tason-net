@@ -35,7 +35,7 @@ public class SerializeTest
     [Test]
     public void Primitives()
     {
-        var s = new TasonSerializer(new SerializerOptions
+        var s = new TasonSerializer(new TasonSerializerOptions
         {
             Indent = 2,
         }, TasonSerializer.Default.Registry.Clone());

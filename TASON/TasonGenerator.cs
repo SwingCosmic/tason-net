@@ -17,9 +17,9 @@ internal enum ValueScope
 public partial class TasonGenerator
 {
     readonly TasonWriter writer;
-    readonly SerializerOptions options;
+    readonly TasonSerializerOptions options;
     readonly TasonTypeRegistry registry;
-    public TasonGenerator(TasonWriter writer, SerializerOptions options, TasonTypeRegistry registry)
+    public TasonGenerator(TasonWriter writer, TasonSerializerOptions options, TasonTypeRegistry registry)
     {
         this.writer = writer;
         this.options = options;
@@ -30,10 +30,10 @@ public partial class TasonGenerator
     /// 序列化对象为TASON字符串
     /// </summary>
     /// <param name="value">要序列化的对象</param>
-    /// <param name="options"><see cref="SerializerOptions"/></param>
+    /// <param name="options"><see cref="TasonSerializerOptions"/></param>
     /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
     /// <returns>TASON字符串</returns>
-    public static string GenerateAsString(object? value, SerializerOptions options, TasonTypeRegistry registry)
+    public static string GenerateAsString(object? value, TasonSerializerOptions options, TasonTypeRegistry registry)
     {
         var sb = new StringBuilder();
         using (var writer = new TasonWriter(sb, options))
@@ -49,9 +49,9 @@ public partial class TasonGenerator
     /// </summary>
     /// <param name="stream">输出流</param>
     /// <param name="value">要序列化的对象</param>
-    /// <param name="options"><see cref="SerializerOptions"/></param>
+    /// <param name="options"><see cref="TasonSerializerOptions"/></param>
     /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
-    public static void GenerateToStream(Stream stream, object? value, SerializerOptions options, TasonTypeRegistry registry)
+    public static void GenerateToStream(Stream stream, object? value, TasonSerializerOptions options, TasonTypeRegistry registry)
     {
         using (var writer = new TasonWriter(stream, options))
         {
@@ -65,9 +65,9 @@ public partial class TasonGenerator
     /// </summary>
     /// <param name="textWriter">输出<see cref="TextWriter"/></param>
     /// <param name="value">要序列化的对象</param>
-    /// <param name="options"><see cref="SerializerOptions"/></param>
+    /// <param name="options"><see cref="TasonSerializerOptions"/></param>
     /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
-    public static void GenerateToWriter(TextWriter textWriter, object? value, SerializerOptions options, TasonTypeRegistry registry)
+    public static void GenerateToWriter(TextWriter textWriter, object? value, TasonSerializerOptions options, TasonTypeRegistry registry)
     {
         using (var writer = new TasonWriter(textWriter, options))
         {

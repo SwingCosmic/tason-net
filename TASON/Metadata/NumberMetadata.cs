@@ -50,7 +50,7 @@ internal static class NumberMetadata
         return ClrTypeMapping.TryGetValue(type, out scalarType);
     }
 
-    public static T Deserialize<T>(string number, SerializerOptions options)
+    public static T Deserialize<T>(string number, TasonSerializerOptions options)
         where T : struct,
 #if NET7_0_OR_GREATER
         INumber<T>,
@@ -70,7 +70,7 @@ internal static class NumberMetadata
         .MethodOf(() => Deserialize<int>(null!, null!))
         .GetGenericMethodDefinition();
 
-    public static ValueType Deserialize(Type type, string number, SerializerOptions options)
+    public static ValueType Deserialize(Type type, string number, TasonSerializerOptions options)
     {
         return deserializeMethod.CallGeneric<ValueType>([type], null, [number, options])!;
     }

@@ -5,7 +5,7 @@ namespace Microsoft.AspNetCore.Mvc;
 
 public class MvcTasonOptions
 {
-    public SerializerOptions SerializerOptions { get; set; } = TasonSerializer.Default.Options with { };
+    public TasonSerializerOptions SerializerOptions { get; set; } = TasonSerializer.Default.Options with { };
 
     public TasonTypeRegistry TypeRegistry { get; set; } = TasonSerializer.Default.Registry.Clone();
 

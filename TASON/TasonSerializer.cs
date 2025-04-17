@@ -16,7 +16,7 @@ public class TasonSerializer
     /// <summary>
     /// 序列化选项
     /// </summary>
-    public SerializerOptions Options { get; }
+    public TasonSerializerOptions Options { get; }
     /// <summary>
     /// 类型注册表
     /// </summary>
@@ -32,9 +32,9 @@ public class TasonSerializer
     /// </summary>
     /// <param name="options">序列化选项</param>
     /// <param name="registry">类型注册表</param>
-    public TasonSerializer(SerializerOptions? options = null, TasonTypeRegistry? registry = null)
+    public TasonSerializer(TasonSerializerOptions? options = null, TasonTypeRegistry? registry = null)
     {
-        options ??= new SerializerOptions();
+        options ??= new TasonSerializerOptions();
         Options = options;
 
         registry ??= new TasonTypeRegistry(options);
