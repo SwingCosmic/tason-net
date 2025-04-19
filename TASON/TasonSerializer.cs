@@ -128,6 +128,8 @@ public class TasonSerializer
     /// <returns>新的副本</returns>
     public TasonSerializer Clone()
     {
-        return new TasonSerializer(Options with { }, Registry.Clone());
+        var options = Options with { };
+        var registry = Registry.Clone(options);
+        return new TasonSerializer(options, registry);
     }
 }

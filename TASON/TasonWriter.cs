@@ -38,6 +38,11 @@ public class TasonWriter : IDisposable
     {
         options ??= new();
         this.options = options;
+        if (options.Indent < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), "Indent cannot be negative");
+        }
+
         Separator = options.Indent is null ? "," : $",{NewLine}";
         Space = options.Indent is null ? string.Empty : " ";
 

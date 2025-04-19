@@ -20,6 +20,12 @@ public class SerializeTest
 
     }
 
+    record class TreeNode
+    {
+        public string Name { get; set; }
+        public TreeNode[] Children { get; set; } = [];
+    }
+
 
     JsonSerializerOptions options = null!;
 
@@ -33,17 +39,17 @@ public class SerializeTest
 
 
     [Test]
-    public void Primitives()
+    public void Option_Indent()
     {
         var s = new TasonSerializer(new TasonSerializerOptions
         {
             Indent = 2,
         }, TasonSerializer.Default.Registry.Clone());
         long? int64 = 0xabcdL;
-        var array = new object[] 
-        { 
-            1, 
-            new Dictionary<string, object> 
+        var array = new object[]
+        {
+            1,
+            new Dictionary<string, object>
             {
                 ["a"] = 1,
             },
@@ -59,7 +65,51 @@ new Regex("[\r\n]+").Replace("""
   Int64("43981")
 ]
 """, Environment.NewLine)));
+
     }
+
+    [Test]
+    public void CloneTest()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Options.Indent = 10;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(TasonSerializer.Default.Options.Indent, Is.EqualTo(null));
+            Assert.That(s.Registry.Options.Indent, Is.EqualTo(10));
+        });
+
+    }
+
+
+    [Test]
+    public void Option_MaxDepth()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.CreateObjectType(typeof(TreeNode));
+        var node = new TreeNode
+        {
+            Name = "node0",
+            Children = [],
+        };
+        for (int i = 1; i < 100; i++)
+        {
+            node = new TreeNode
+            {
+                Name = "node" + i,
+                Children = [node],
+            };
+        }
+
+
+        Assert.Throws<StackOverflowException>(() => s.Serialize(node));
+        // 实际应该大于循环次数99的2倍，因为TreeNode类每一个实例就有一层{}和一层[]；
+        // 由于Writer实现的差异会比JavaScript版本多一层
+        s.Options.MaxDepth = 200;
+        Assert.DoesNotThrow(() => s.Serialize(node));
+    }
+
     [Test]
     public void JSON()
     {

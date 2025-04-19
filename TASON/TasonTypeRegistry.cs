@@ -45,9 +45,9 @@ public class TasonTypeRegistry
     }
 
     /// <summary>使用当前实例的选项与注册类型创建副本，以进行独立的操作</summary>
-    public TasonTypeRegistry Clone()
+    public TasonTypeRegistry Clone(TasonSerializerOptions? options = null)
     {
-        return new TasonTypeRegistry(options)
+        return new TasonTypeRegistry(options ?? this.options)
         {
             types = new(types)
         };
