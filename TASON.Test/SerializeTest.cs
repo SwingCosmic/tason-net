@@ -3,7 +3,11 @@ namespace TASON.Test;
 using System.Text.RegularExpressions;
 using TASON;
 using TASON.Types.SystemTextJson;
+using TASON.Types.NewtonsoftJson;
 using System.Text.Json;
+using TASON.Types;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 public class SerializeTest
 {
@@ -28,13 +32,21 @@ public class SerializeTest
 
 
     JsonSerializerOptions options = null!;
+    JsonSerializerSettings setting = null!;
 
     [SetUp]
     public void Setup()
     {
         options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        setting = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        };
+
+        // 两种实现可以同时添加互不影响
         TasonSerializer.Default.Registry
-            .AddSystemTextJson(options);
+            .AddSystemTextJson(options)
+            .AddNewtonsoftJson(setting);
     }
 
 
@@ -115,11 +127,21 @@ new Regex("[\r\n]+").Replace("""
     {
         var s = TasonSerializer.Default;
 
-        var json = new JSON("[1,2,16777215]", options, JSONSubType.Array);
-        Assert.That(s.Serialize(json), Is.EqualTo("JSONArray(\"[1,2,16777215]\")"));
-        
-        var json2 = new JSON(@"{""啊？\r\n"":1}", options, JSONSubType.Object);
-        Assert.That(s.Serialize(json2), Is.EqualTo(@"JSONObject(""{\""啊？\\r\\n\"":1}"")"));
+        var sjson = new JSONSystemText("[1,2,16777215]", options, JSONSubType.Array);
+        var njson = new JSONNewtonsoft("[1,2,16777215]", setting, JSONSubType.Array);
+        Assert.Multiple(() =>
+        {
+            Assert.That(s.Serialize(sjson), Is.EqualTo("JSONArray(\"[1,2,16777215]\")"));
+            Assert.That(s.Serialize(njson), Is.EqualTo("JSONArray(\"[1,2,16777215]\")"));
+        });
+
+        var sjson2 = new JSONSystemText(@"{""啊？\r\n"":1}", options, JSONSubType.Object);
+        var njson2 = new JSONNewtonsoft(@"{""啊？\r\n"":1}", setting, JSONSubType.Object);
+        Assert.Multiple(() =>
+        {
+            Assert.That(s.Serialize(sjson2), Is.EqualTo(@"JSONObject(""{\""啊？\\r\\n\"":1}"")"));
+            Assert.That(s.Serialize(njson2), Is.EqualTo(@"JSONObject(""{\""啊？\\r\\n\"":1}"")"));
+        });
     }
 
     [Test]

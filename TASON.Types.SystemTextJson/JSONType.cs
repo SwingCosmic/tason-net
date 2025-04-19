@@ -3,47 +3,47 @@ using TASON.Serialization;
 namespace TASON.Types.SystemTextJson;
 
 
-public class JSONType : TasonScalarTypeBase<JSON>
+public class JSONType : TasonScalarTypeBase<JSONSystemText>
 {
     /// <inheritdoc/>
-    protected override JSON DeserializeCore(string text, TasonSerializerOptions options)
+    protected override JSONSystemText DeserializeCore(string text, TasonSerializerOptions options)
     {
-        return new JSON(text, options.GetJsonOptions(), JSONSubType.All);
+        return new JSONSystemText(text, options.GetJsonOptions(), JSONSubType.All);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(JSON value, TasonSerializerOptions options)
+    protected override string SerializeCore(JSONSystemText value, TasonSerializerOptions options)
     {
         return value.JsonString;
     }
 }
 
 
-public class JSONArrayType : TasonScalarTypeBase<JSON>
+public class JSONArrayType : TasonScalarTypeBase<JSONSystemText>
 {
     /// <inheritdoc/>
-    protected override JSON DeserializeCore(string text, TasonSerializerOptions options)
+    protected override JSONSystemText DeserializeCore(string text, TasonSerializerOptions options)
     {
-        return new JSON(text, options.GetJsonOptions(), JSONSubType.Array);
+        return new JSONSystemText(text, options.GetJsonOptions(), JSONSubType.Array);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(JSON value, TasonSerializerOptions options)
+    protected override string SerializeCore(JSONSystemText value, TasonSerializerOptions options)
     {
         return value.JsonString;
     }
 }
 
-public class JSONObjectType : TasonScalarTypeBase<JSON>
+public class JSONObjectType : TasonScalarTypeBase<JSONSystemText>
 {
     /// <inheritdoc/>
-    protected override JSON DeserializeCore(string text, TasonSerializerOptions options)
+    protected override JSONSystemText DeserializeCore(string text, TasonSerializerOptions options)
     {
-        return new JSON(text, options.GetJsonOptions(), JSONSubType.Object);
+        return new JSONSystemText(text, options.GetJsonOptions(), JSONSubType.Object);
     }
 
     /// <inheritdoc/>
-    protected override string SerializeCore(JSON value, TasonSerializerOptions options)
+    protected override string SerializeCore(JSONSystemText value, TasonSerializerOptions options)
     {
         return value.JsonString;
     }

@@ -83,7 +83,7 @@ public class ParseTest
         var expect = new Regex("([A-Z]+)\\1", RegexOptions.IgnoreCase | RegexOptions.Multiline);
         Assert.That(RegexComparer.ToString(reg!), Is.EqualTo(RegexComparer.ToString(expect)));
 
-        var json = s.Deserialize("JSONArray('[1,2,3]')") as JSON;
+        var json = s.Deserialize("JSONArray('[1,2,3]')") as JSONSystemText;
         Assert.That(json!.GetValue<List<int>>(), Is.EqualTo(new List<int> { 1, 2, 3 }));
     }
 }

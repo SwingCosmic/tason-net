@@ -4,6 +4,8 @@
 
 ![nuget](https://img.shields.io/nuget/v/TASON.Types.SystemTextJson?label=TASON.Types.SystemTextJson)
 
+![nuget](https://img.shields.io/nuget/v/TASON.Types.NewtonsoftJson?label=TASON.Types.NewtonsoftJson)
+
 ![nuget](https://img.shields.io/nuget/v/TASON.AspNetCore?label=TASON.AspNetCore)
 
 
@@ -40,5 +42,6 @@
 
 * [TASON](./TASON/README.md) : TASON的.NET/C#实现
 * [TASON.Types.SystemTextJson](./TASON.Types.SystemTextJson/README.md) : 基于`System.Text.Json`的JSON类型实现
+* [TASON.Types.NewtonsoftJson](./TASON.Types.NewtonsoftJson/README.md) : 基于`Newtonsoft.Json`的JSON类型实现
 * [TASON.AspNetCore](./TASON.AspNetCore/README.md) : ASP.NET Core集成支持，包括MVC的模型绑定和响应序列化
 

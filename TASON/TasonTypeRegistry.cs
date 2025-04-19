@@ -15,7 +15,6 @@ internal record class TasonRegistryEntry(string Name, List<ITasonTypeInfo> Types
 /// TASON类型注册表。大多数情况下，不应该直接创建全新的注册表，
 /// 而是从实例的<see cref="TasonSerializer.Registry"/>属性进行克隆
 /// </summary>
-/// <param name="options">选项</param>
 public class TasonTypeRegistry
 {
     Dictionary<string, TasonRegistryEntry> types = new();
@@ -23,6 +22,10 @@ public class TasonTypeRegistry
 
     public TasonSerializerOptions Options => options;
 
+    /// <summary>
+    /// 根据指定<see cref="TasonSerializerOptions"/>创建新的实例
+    /// </summary>
+    /// <param name="options">选项</param>
     public TasonTypeRegistry(TasonSerializerOptions options)
     {
         this.options = options;

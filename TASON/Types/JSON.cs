@@ -1,19 +1,18 @@
 using System.Numerics;
-using System.Text.Json;
 using TASON.Serialization;
 
-namespace TASON.Types.SystemTextJson;
+namespace TASON.Types;
 
 /// <summary>
-/// 表示一个JSON对象
+/// 抽象类，表示一个JSON对象
 /// </summary>
-public sealed record class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
-#if NET7_0_OR_GREATER
-    , IEqualityOperators<JSON, JSON, bool>
-#endif
+public abstract record class JSON<TOption> : IEquatable<JSON<TOption>>, ITasonTypeDiscriminator
 {
-    readonly JsonSerializerOptions options;
-    public JSON(JsonSerializerOptions options, JSONSubType subType = JSONSubType.All)
+    /// <summary>
+    /// 序列化JSON所需的配置对象
+    /// </summary>
+    protected readonly TOption options;
+    public JSON(TOption options, JSONSubType subType = JSONSubType.All)
     {
         this.options = options;
         SubType = subType;
@@ -21,21 +20,25 @@ public sealed record class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
             subType == JSONSubType.Object ? "{}" : "null";
     }
     
-    public JSON(string json, JsonSerializerOptions options, JSONSubType subType = JSONSubType.All)
+    public JSON(string json, TOption options, JSONSubType subType = JSONSubType.All)
     {
         this.options = options;
         JsonString = json;
         SubType = subType;
     }
     
-    public JSON(object? obj, JsonSerializerOptions options, JSONSubType subType = JSONSubType.All)
+    public JSON(object? obj, TOption options, JSONSubType subType = JSONSubType.All)
     {
         this.options = options;
-        JsonString = JsonSerializer.Serialize(obj, options);
+        JsonString = Serialize(obj, options);
         SubType = subType;
     }
 
-    private string jsonString;
+    public abstract string Serialize<T>(T obj, TOption options);
+    public abstract T Deserialize<T>(string json, TOption options);
+    public abstract void CheckSyntax(string json, TOption options);
+
+    protected string jsonString;
 
     /// <summary>JSON字符串值</summary>
     public string JsonString 
@@ -46,7 +49,7 @@ public sealed record class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
             var text = value.Trim();
             CheckSubType(text);
             // 仅检查JSON字符串是否合法，丢弃结果
-            _ = JsonDocument.Parse(text);
+            CheckSyntax(text, options);
             jsonString = text;
         }
     }
@@ -55,12 +58,12 @@ public sealed record class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
     public JSONSubType SubType { get; }
 
     /// <summary>反序列化JSON字符串为.NET对象</summary>
-    public T? GetValue<T>() => JsonSerializer.Deserialize<T>(JsonString, options);
+    public T? GetValue<T>() => Deserialize<T>(JsonString, options);
 
     /// <summary>替换JSON字符串代表的对象</summary>
     public void ReplaceValue(object? obj)
     {
-        JsonString = JsonSerializer.Serialize(obj, options);
+        JsonString = Serialize(obj, options);
     }
 
     void CheckSubType(string jsonString)
@@ -76,7 +79,7 @@ public sealed record class JSON : IEquatable<JSON>, ITasonTypeDiscriminator
     }
 
     /// <inheritdoc/>
-    public bool Equals(JSON? other)
+    public virtual bool Equals(JSON<TOption> ? other)
     {
         if (other is null) return false;
         return JsonString == other.JsonString && SubType == other.SubType;

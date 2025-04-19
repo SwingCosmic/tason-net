@@ -2,6 +2,8 @@
 
 该包提供了基于`System.Text.Json`的JSON类型实现，包括`JSON`, `JSONObject`和 `JSONArray`。
 
+支持处理`JsonDocument`和`JsonElement`类型
+
 ## 快速开始
 
 ```csharp

@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASON.AspNetCore", "TASON.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASON.AspNetCoreTest", "TASON.AspNetCoreTest\TASON.AspNetCoreTest.csproj", "{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TASON.Types.NewtonsoftJson", "TASON.Types.NewtonsoftJson\TASON.Types.NewtonsoftJson.csproj", "{49665726-3CA5-4538-89A8-821A7F110D05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AOT|Any CPU = AOT|Any CPU
@@ -55,6 +57,12 @@ Global
 		{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C001E80-B5DB-4C61-8AC2-1BEE8B43F932}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49665726-3CA5-4538-89A8-821A7F110D05}.AOT|Any CPU.ActiveCfg = Debug|Any CPU
+		{49665726-3CA5-4538-89A8-821A7F110D05}.AOT|Any CPU.Build.0 = Debug|Any CPU
+		{49665726-3CA5-4538-89A8-821A7F110D05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49665726-3CA5-4538-89A8-821A7F110D05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49665726-3CA5-4538-89A8-821A7F110D05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49665726-3CA5-4538-89A8-821A7F110D05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

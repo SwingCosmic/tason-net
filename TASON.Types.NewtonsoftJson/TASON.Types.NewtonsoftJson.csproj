@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>netstandard2.1;net6.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<LangVersion>12.0</LangVersion>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<Title>TASON.Types.NewtonsoftJson</Title>
+	<Version>0.11.2</Version>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<Authors>LoveKicher</Authors>
+	<Description>基于JSON.NET的TASON JSON类型实现</Description>
+	<RepositoryUrl>https://github.com/SwingCosmic/tason-net</RepositoryUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<Configurations>Debug;Release;AOT</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+  	<None Include="README.md">
+  	  <Pack>True</Pack>
+  	  <PackagePath>\</PackagePath>
+  	</None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TASON\TASON.csproj" />
+  </ItemGroup>
+
+</Project>
