@@ -23,6 +23,9 @@ internal class ClassPropertyMetadata
             if (p.GetCustomAttribute<TasonIgnoreAttribute>(true) is not null)
                 continue;
 
+            if (p.GetIndexParameters().Length > 0) 
+                continue;
+
             var realName = p.Name;
             var aliasAttr = p.GetCustomAttribute<TasonPropertyAttribute>(true);
             if (aliasAttr is not null)

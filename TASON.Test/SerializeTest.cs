@@ -8,6 +8,7 @@ using System.Text.Json;
 using TASON.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Threading.Tasks;
 
 public class SerializeTest
 {
@@ -176,5 +177,31 @@ new Regex("[\r\n]+").Replace("""
         s2.Registry.CreateObjectType(typeof(A));
 
         Assert.Throws<NotSupportedException>(() => s2.Serialize(expect));
+    }
+
+
+    class IndexerClass
+    {
+        Dictionary<string, string?> dict = new();
+        public string? this[string key]
+        {
+            get => dict.GetValueOrDefault(key, null);
+            set => dict[key] = value;
+        }
+
+        public string NormalProperty { get; set; } = "";
+    }
+
+    [Test]
+    public void IndexerTest()
+    {
+        var s = TasonSerializer.Default;
+
+        var obj = new IndexerClass
+        {
+            NormalProperty = "a",
+        };
+        obj["indexer"] = "b";
+        Assert.That(s.Serialize(obj), Is.EqualTo("""{NormalProperty:"a"}"""));
     }
 }

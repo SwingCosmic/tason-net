@@ -1,3 +1,7 @@
+# 0.11.3
+
+* 增加更多JSON类型支持，如`Newtonsoft.Json`的`JObject`
+* fix: 类存在索引器会序列化报错
 
 # 0.11.2
 
