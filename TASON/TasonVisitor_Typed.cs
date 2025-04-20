@@ -278,7 +278,18 @@ public partial class TasonVisitor
         {
             var key = Key(pair.key());
             if (!properties.TryGetValue(key, out var prop))
-                continue;
+            {
+                if (options.UnknownObjectArgProperty == UnknownPropertyHandling.Ignore)
+                    continue;
+                else if (options.UnknownObjectArgProperty == UnknownPropertyHandling.Error)
+                    throw new ArgumentException($"Unknown property '{key}' in type '{type.Name}'");
+                else
+                {
+                    var autoValue = ValueContext(pair.value());
+                    obj[key] = autoValue;
+                    continue;
+                }
+            }
             
             if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
                 throw new ArgumentException($"Duplicate key '{key}' in object");
