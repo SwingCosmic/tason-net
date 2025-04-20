@@ -85,9 +85,16 @@ public partial class TasonVisitor
 
     internal object? TypedValueContext(TASONParser.ValueContext ctx, Type type)
     {
+        var isNullableStruct = false;
+        if (type.IsValueType)
+        {
+            isNullableStruct = ReflectionHelpers.IsNullable(type, out var realType);
+            if (isNullableStruct) type = realType!;
+        }
+
         if (ctx is TASONParser.NullValueContext)
         {
-            if (type.IsValueType)
+            if (type.IsValueType && !isNullableStruct)
             {
                 throw new InvalidCastException($"Cannot cast null to struct {type.Name}");
             }

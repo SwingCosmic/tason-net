@@ -1,3 +1,7 @@
+# 0.11.4
+
+* feat: 支持`Nullable<T>`类型
+
 # 0.11.3
 
 * 增加更多JSON类型支持，如`Newtonsoft.Json`的`JObject`

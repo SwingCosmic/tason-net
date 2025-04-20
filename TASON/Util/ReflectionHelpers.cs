@@ -76,15 +76,23 @@ internal static class ReflectionHelpers
     public static bool IsValueTuple(Type type, out Type[] types)
     {
         types = [];
-        if (!type.IsGenericType || !type.IsValueType)
-        {
-            return false;
-        }
-        if (!type.Name.StartsWith("ValueTuple`"))
-        {
-            return false;
-        }
+        if (!type.IsGenericType || !type.IsValueType) return false;
+        
+        if (!type.Name.StartsWith("ValueTuple`")) return false;
+        
         types = type.GetGenericArguments();
+        return true;
+    }
+
+    public static bool IsNullable(Type type, [NotNullWhen(true)]out Type? structType)
+    {
+        structType = null;
+        if (!type.IsGenericType)  return false;
+
+        var g = type.GetGenericTypeDefinition();
+        if (g != typeof(Nullable<>)) return false;
+
+        structType = type.GetGenericArguments()[0];
         return true;
     }
 

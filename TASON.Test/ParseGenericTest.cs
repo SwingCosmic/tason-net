@@ -185,4 +185,33 @@ public class ParseGenericTest
         return JToken.Parse(json);
     }
 
+
+    record class NullableC
+    {
+        public int? IntVal { get; set; }
+
+        public DateTime? DateTimeVal { get; set; }
+    }
+
+    [Test]
+    public void NullableTest()
+    {
+        var s = TasonSerializer.Default;
+
+        var tason = "{a:1,b: null,c: -88}";
+        Assert.That(s.Deserialize<Dictionary<string, int?>>(tason), Is.EqualTo(new Dictionary<string, int?>()
+        {
+            ["a"] = 1,
+            ["b"] = null,
+            ["c"] = -88,
+        }));
+
+        var tason2 = "{IntVal:null,DateTimeVal:Date('2025-04-18 00:00:00Z')}";
+        Assert.That(s.Deserialize<NullableC>(tason2), Is.EqualTo(new NullableC()
+        {
+            IntVal = null,
+            DateTimeVal = new DateTime(2025,4,18,0,0,0,DateTimeKind.Utc),
+        }));
+    }
+
 }
