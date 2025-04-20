@@ -61,5 +61,7 @@ public static class JSONTypes
 
     public static JsonDocumentType JsonDocument { get; } = new();
     public static JsonElementType JsonElement { get; } = new();
+    public static JsonObjectType JsonObject { get; } = new();
+    public static JsonArrayType JsonArray { get; } = new();
 #pragma warning restore CS1591
 }

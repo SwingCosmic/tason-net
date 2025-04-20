@@ -60,5 +60,7 @@ public static class JSONTypes
 
 
     public static JTokenType JToken { get; } = new();
+    public static JObjectType JObject { get; } = new();
+    public static JArrayType JArray { get; } = new();
 #pragma warning restore CS1591
 }

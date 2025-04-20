@@ -27,6 +27,8 @@ public static class JSONExtensions
         // 注册System.Text.Json类型为其它实现
         registry.RegisterType(nameof(JSONTypes.JSON), JSONTypes.JsonDocument);
         registry.RegisterType(nameof(JSONTypes.JSON), JSONTypes.JsonElement);
+        registry.RegisterType(nameof(JSONTypes.JSONObject), JSONTypes.JsonObject);
+        registry.RegisterType(nameof(JSONTypes.JSONArray), JSONTypes.JsonArray);
 
         return registry;
     }

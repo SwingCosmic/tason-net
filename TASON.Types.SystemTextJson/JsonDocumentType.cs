@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using TASON.Serialization;
 
 namespace TASON.Types.SystemTextJson;
@@ -29,6 +30,38 @@ public class JsonElementType : TasonScalarTypeBase<JsonElement>
 
     /// <inheritdoc/>
     protected override string SerializeCore(JsonElement value, TasonSerializerOptions options)
+    {
+        return value.ToString();
+    }
+}
+
+public class JsonObjectType : TasonScalarTypeBase<JsonObject>
+{
+    /// <inheritdoc/>
+    protected override JsonObject DeserializeCore(string text, TasonSerializerOptions options)
+    {
+        var node = JsonNode.Parse(text, documentOptions: options.GetJsonOptions().GetDocumentOptions());
+        return node as JsonObject ?? throw new ArgumentException($"Node {node?.GetValueKind()} is not a JSONObject");
+    }
+
+    /// <inheritdoc/>
+    protected override string SerializeCore(JsonObject value, TasonSerializerOptions options)
+    {
+        return value.ToString();
+    }
+}
+
+public class JsonArrayType : TasonScalarTypeBase<JsonArray>
+{
+    /// <inheritdoc/>
+    protected override JsonArray DeserializeCore(string text, TasonSerializerOptions options)
+    {
+        var node = JsonNode.Parse(text, documentOptions: options.GetJsonOptions().GetDocumentOptions());
+        return node as JsonArray ?? throw new ArgumentException($"Node {node?.GetValueKind()} is not a JSONArray");
+    }
+
+    /// <inheritdoc/>
+    protected override string SerializeCore(JsonArray value, TasonSerializerOptions options)
     {
         return value.ToString();
     }

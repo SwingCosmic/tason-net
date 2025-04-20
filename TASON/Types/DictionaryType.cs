@@ -8,7 +8,7 @@ namespace TASON.Types;
 /// <summary>
 /// 表示一个键不是字符串的字典
 /// </summary>
-public sealed record class ObjectDictionary<K, V>
+public sealed record class ObjectDictionary<K, V> where K : notnull
 {
 
 #pragma warning disable IDE1006 // 命名样式
@@ -60,7 +60,7 @@ internal static class DictionaryType
         return new()
         {
             [nameof(ObjectDictionary<K, V>.keyValuePairs)] = objDict.keyValuePairs
-                .Select(p => new object [] {p.Key!, p.Value! })
+                .Select(p => new object[] { p.Key!, p.Value! })
                 .ToArray(),
         };
     }

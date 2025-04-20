@@ -6,6 +6,7 @@ namespace TASON.Types;
 /// <summary>
 /// 抽象类，表示一个JSON对象
 /// </summary>
+/// <typeparam name="TOption">在派生类继承时，所用的JSON实现所需的配置对象类型</typeparam>
 public abstract record class JSON<TOption> : IEquatable<JSON<TOption>>, ITasonTypeDiscriminator
 {
     /// <summary>
@@ -33,11 +34,30 @@ public abstract record class JSON<TOption> : IEquatable<JSON<TOption>>, ITasonTy
         JsonString = Serialize(obj, options);
         SubType = subType;
     }
-
+    /// <summary>
+    /// 将<paramref name="obj"/>序列化为字符串
+    /// </summary>
+    /// <typeparam name="T">对象的类型</typeparam>
+    /// <param name="obj">对象</param>
+    /// <param name="options">配置对象</param>
     public abstract string Serialize<T>(T obj, TOption options);
+    /// <summary>
+    /// 将JSON字符串反序列化为类型<typeparamref name="T"/>
+    /// </summary>
+    /// <typeparam name="T">要反序列化的类型</typeparam>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="options">配置对象</param>
     public abstract T Deserialize<T>(string json, TOption options);
+    /// <summary>
+    /// 检查JSON字符串是否存在语法错误；如果存在错误，应该抛出异常
+    /// </summary>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="options">配置对象</param>
     public abstract void CheckSyntax(string json, TOption options);
 
+    /// <summary>
+    /// 实际存JSON字符串的字段
+    /// </summary>
     protected string jsonString;
 
     /// <summary>JSON字符串值</summary>
@@ -48,7 +68,6 @@ public abstract record class JSON<TOption> : IEquatable<JSON<TOption>>, ITasonTy
         {
             var text = value.Trim();
             CheckSubType(text);
-            // 仅检查JSON字符串是否合法，丢弃结果
             CheckSyntax(text, options);
             jsonString = text;
         }

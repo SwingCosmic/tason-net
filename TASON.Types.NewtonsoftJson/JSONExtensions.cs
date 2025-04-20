@@ -27,6 +27,8 @@ public static class JSONExtensions
 
         // 注册Newtonsoft.Json类型为其它实现
         registry.RegisterType(nameof(JSONTypes.JSON), JSONTypes.JToken);
+        registry.RegisterType(nameof(JSONTypes.JSONObject), JSONTypes.JObject);
+        registry.RegisterType(nameof(JSONTypes.JSONArray), JSONTypes.JArray);
 
         return registry;
     }
