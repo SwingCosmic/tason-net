@@ -7,6 +7,8 @@ using TASON.Grammar;
 using TASON.Metadata;
 using TASON.Types;
 using TASON.Util;
+using KV = System.Collections.Generic.Dictionary<string, object?>;
+using IKV = System.Collections.Generic.IDictionary<string, object?>;
 
 namespace TASON;
 
@@ -249,48 +251,53 @@ public partial class TasonVisitor
 
     internal T TypedObject<T>(TASONParser.ObjectContext ctx) where T : class, new()
     {
-        var obj = new T();
-        var propSet = new HashSet<string>();
-        foreach (var pair in ctx.pair())
+        var ret = new T();
+        IKV? extra = null;
+
+        var meta = ClassPropertyMetadata.Cache<T>.Metadata;
+        if (meta.ExtraFieldsProperty is KeyValuePair<string, PropertyInfo> extraProp)
         {
-            var key = Key(pair.key());
-            if (!ClassPropertyMetadata.Cache<T>.Properties.TryGetValue(key, out var prop))
-                continue;
-            
-            if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
-                throw new ArgumentException($"Duplicate key '{key}' in object");
-
-            if (!prop.CanWrite)
-                continue;
-
-            var value = TypedValueContext(pair.value(), prop.PropertyType);
-            prop.SetValue(obj, value);
+            extra = ReflectionHelpers.CreateDictionary<string, object?>(extraProp.Value.PropertyType);
+            extraProp.Value.SetValue(ret, extra);
         }
-        return obj;
+
+        FillObjectProperties(ctx, meta, (_, prop, value) => prop.SetValue(ret, value), extra);
+
+        return ret;
     }
     
-    internal Dictionary<string, object?> TypedObjectArg(TASONParser.ObjectContext ctx, Type type)
+    internal KV TypedObjectArg(TASONParser.ObjectContext ctx, Type type)
     {
-        var obj = new Dictionary<string, object?>();
-        var properties = ReflectionHelpers.GetClassProperties(type);
+        var meta = ReflectionHelpers.GetPropertyMetadata(type);
+        var obj = new KV();
+
+        FillObjectProperties(ctx, meta, (key, _, value) => obj[key] = value, obj);
+
+        return obj;
+    }   
+
+    internal void FillObjectProperties(
+        TASONParser.ObjectContext ctx,
+        ClassPropertyMetadata meta,
+        Action<string, PropertyInfo, object?> setValue,
+        IKV? extra)
+    {
+        var props = meta.Properties;
+
         var propSet = new HashSet<string>();
         foreach (var pair in ctx.pair())
         {
             var key = Key(pair.key());
-            if (!properties.TryGetValue(key, out var prop))
+            if (!props.TryGetValue(key, out var prop))
             {
-                if (options.UnknownObjectArgProperty == UnknownPropertyHandling.Ignore)
-                    continue;
-                else if (options.UnknownObjectArgProperty == UnknownPropertyHandling.Error)
-                    throw new ArgumentException($"Unknown property '{key}' in type '{type.Name}'");
-                else
+                if (extra is not null)
                 {
                     var autoValue = ValueContext(pair.value());
-                    obj[key] = autoValue;
-                    continue;
+                    extra[key] = autoValue;
                 }
+                continue;
             }
-            
+
             if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
                 throw new ArgumentException($"Duplicate key '{key}' in object");
 
@@ -298,11 +305,11 @@ public partial class TasonVisitor
                 continue;
 
             var value = TypedValueContext(pair.value(), prop.PropertyType);
-            obj[key] = value;
+            setValue(key, prop, value);
         }
-        return obj;
-    }   
-    
+    }
+
+
     internal IDictionary<K, V> TypedDictionaryArg<K, V>(TASONParser.ObjectContext ctx, Type type) where K : notnull
     {
         var obj = ReflectionHelpers.CreateDictionary<K, V>(type);
@@ -396,4 +403,5 @@ INVALID:
             throw new InvalidCastException($"Cannot cast type '{type.Name}' to '{displayName ?? expect.Name}'");
         }
     }
+
 }

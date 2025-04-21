@@ -13,25 +13,6 @@ using System.Threading.Tasks;
 public class SerializeTest
 {
 
-    record class A
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-    }
-
-
-    class ADict : Dictionary<A, int>
-    {
-
-    }
-
-    record class TreeNode
-    {
-        public string Name { get; set; }
-        public TreeNode[] Children { get; set; } = [];
-    }
-
-
     JsonSerializerOptions options = null!;
     JsonSerializerSettings setting = null!;
 
@@ -180,18 +161,6 @@ new Regex("[\r\n]+").Replace("""
     }
 
 
-    class IndexerClass
-    {
-        Dictionary<string, string?> dict = new();
-        public string? this[string key]
-        {
-            get => dict.GetValueOrDefault(key, null);
-            set => dict[key] = value;
-        }
-
-        public string NormalProperty { get; set; } = "";
-    }
-
     [Test]
     public void IndexerTest()
     {
@@ -203,5 +172,30 @@ new Regex("[\r\n]+").Replace("""
         };
         obj["indexer"] = "b";
         Assert.That(s.Serialize(obj), Is.EqualTo("""{NormalProperty:"a"}"""));
+    }
+
+    [Test]
+    public void ExtensionFields()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.CreateObjectType(typeof(DynamicFieldClass));
+
+        var tason = "{NormalProperty:\"foo\",a:1,b:2}";
+        var typeTason = $"DynamicFieldClass({tason})";
+        var obj = new DynamicFieldClass()
+        {
+            NormalProperty = "foo",
+            DynamicFields = new Dictionary<string, object?>()
+            {
+                ["a"] = 1,
+                ["b"] = 2,
+            }
+        };
+
+        Assert.That(s.Serialize(obj), Is.EqualTo(typeTason));
+
+
+        var s2 = TasonSerializer.Default.Clone();
+        Assert.That(s2.Serialize(obj), Is.EqualTo(tason));
     }
 }

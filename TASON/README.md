@@ -30,6 +30,43 @@ TASON特色功能，通过TASON文本包含的信息自动匹配最合适的.NET
 例如在执行MongoDB查询时，可以避免前端因为序列化为JSON时，Date和Int64等类型变成字符串丢失类型，从而影响查询的执行结果的情况发生。
 
 
+## 快速开始
+
+```csharp
+using TASON;
+
+// 使用默认序列化器
+var serializer = TasonSerializer.Default;
+
+// 使用默认实现注册POCO类
+serializer.Registry.CreateObjectType(typeof(SomeModelClass));
+
+// 序列化
+
+var model = new SomeModelClass 
+{
+  SomeProperty = "SomeValue"
+};
+string tason = serializer.Serialize(model); // SomeModelClass({SomeProperty:"SomeValue"})
+
+
+// 自动类型模式反序列化
+
+var list = serializer.Deserialize($"[{tason}]"); 
+// 得到List<object>，其中每个元素都是SomeModelClass
+
+var dict = serializer.Deserialize("{a:1,b:'foo'}"); 
+// 得到Dictionary<string, object>，其中每个键值对都是自动推断类型
+
+
+// 指定类型模式反序列化
+
+var list2 = serializer.Deserialize<SomeModelClass[]>($"[{tason}]"); 
+//得到SomeModelClass[]
+
+```
+
+
 ## .NET版本差异
 
 ⚠️ 由于不同.NET版本之间库API的差异，各个版本提供的功能存在区别，主要有以下方面：
@@ -42,6 +79,37 @@ TASON特色功能，通过TASON文本包含的信息自动匹配最合适的.NET
   * `Int128`和`NFloat`: 仅在受支持的版本中启用
 * .NET 7引入的泛型数学，特别是abstract static接口方法的支持，对基础数据类型的支持有较大的变动，例如泛型参数约束等
 * 字符串解析的支持不同，特别是非十进制解析，部分未提供的方法采用了可能效率较低的实现
+
+
+## 类型支持
+
+以下列出了序列化和反序列化中.NET类型的支持情况，不含TASON规范禁止的类型
+### 完全支持的类型
+
+* 所有基元类型和数字类型，包含`BigInteger`等
+* 所有带有无参构造函数的非泛型、非抽象类和结构
+* 注册了自定义TASON类型信息的标量类型和对象类型，包括所有内置类型
+* 以上类型作为嵌套类型
+* 以上类型的数组
+* `Nullable<T>`类型
+
+### 完全支持序列化，但反序列化有一定限制的类型
+
+* 完全支持的类型作为泛型参数`T`的集合类型
+  * `IEnumerable<T>`、`IDictionary<string, TValue>`及其衍生接口
+  * 具有无参构造函数，或者`IEnumerable<T>`类型参数构造函数的`IEnumerable<T>`非抽象实现类，如`List<T>`
+  * 具有无参构造函数的`IDictionary<string, TValue>`的非抽象实现类，如`Dictionary<string, TValue>`
+* 非泛型集合类
+  * 仅支持`ArrayList`、`Queue`、`Stack`
+* Key不是字符串的`IDictionary<TKey, TValue>`类型，需要开启参数
+
+### 可以序列化，暂时无法反序列化的类型
+
+* ValueTuple
+* 抽象类
+* `IEnumerable<T>`以外的接口
+* 泛型类
+* 匿名类型
 
 
 ## 内置类型支持

@@ -96,19 +96,27 @@ public partial class TasonGenerator
 
     void ObjectValue(object value, Type type) 
     {
-        var props = GetClassProperties(type);
+        var meta = GetPropertyMetadata(type);
+        var props = meta.Properties;
         writer.WriteStartObject();
         {
+            var pairs = props.Select(p =>
+            {
+                var (key, propInfo) = p;
+                return new KeyValuePair<string, object?>(key, propInfo.GetValue(value));
+            }).ToList();
+            if (meta.ExtraFieldsProperty is KeyValuePair<string, PropertyInfo> e)
+            {
+                if (e.Value.GetValue(value) is not IDictionary<string, object?> rest)
+                    throw new InvalidCastException();
+                pairs.AddRange(rest);
+            }
+
             writer.WriteJoin(v => 
             {
                 Pair(v);
                 return true;
-            }, 
-            props.Select(p => 
-            {
-                var (key, propInfo) = p;
-                return new KeyValuePair<string, object?>(key, propInfo.GetValue(value));
-            }).ToArray());
+            }, pairs);
         }
         writer.WriteEndObject();
     }

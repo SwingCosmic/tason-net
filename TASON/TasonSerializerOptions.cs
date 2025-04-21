@@ -23,11 +23,6 @@ public record class TasonSerializerOptions
     public bool AllowDuplicatedKeys { get; set; } = true;
 
     /// <summary>
-    /// 反序列化ObjectTypeInstance时，如何处理arg对象中的未知属性
-    /// </summary>
-    public UnknownPropertyHandling UnknownObjectArgProperty { get; set; } = UnknownPropertyHandling.Ignore;
-
-    /// <summary>
     /// 序列化时的缩进大小（单位为空格数），0表示不缩进，<see langword="null"/>表示压缩内容。默认<see langword="null"/>
     /// </summary>
     public int? Indent { get; set; } = null;
@@ -68,23 +63,4 @@ public enum BuiltinNumberOption
     /// 在其他地方相当于<see cref="UnsafeOnly"/>
     /// </summary>
     ObjectTypeProperty,
-}
-
-/// <summary>
-/// 指示反序列化ObjectTypeInstance时，如何处理arg对象中的未知属性
-/// </summary>
-public enum UnknownPropertyHandling
-{
-    /// <summary>
-    /// 忽略并跳过
-    /// </summary>
-    Ignore,
-    /// <summary>
-    /// 以自动类型模式反序列化，并保留到<see cref="ITasonObjectType.Deserialize"/>方法的参数中
-    /// </summary>
-    Preserve,
-    /// <summary>
-    /// 抛出异常
-    /// </summary>
-    Error,
 }

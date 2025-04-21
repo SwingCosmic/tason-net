@@ -16,11 +16,6 @@ public class ParseTest
             .AddSystemTextJson(new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 
-    record class A
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-    }
 
     [Test]
     public void Primitives()
@@ -86,37 +81,4 @@ public class ParseTest
         var json = s.Deserialize("JSONArray('[1,2,3]')") as JSONSystemText;
         Assert.That(json!.GetValue<List<int>>(), Is.EqualTo(new List<int> { 1, 2, 3 }));
     }
-}
-
-
-public class RegexComparer : EqualityComparer<Regex>
-{
-    static RegExpType RegExp = new();
-    static TasonSerializerOptions options = new();
-    static Dictionary<Regex, bool> testMap = new(new RegexComparer());
-    public override bool Equals(Regex? x, Regex? y)
-    {
-        if (x == null && y == null) return true;
-        if (x == null || y == null) return false;
-        return ToString(x) == ToString(y);
-    }
-
-    public static string ToString(Regex obj)
-    {
-        return RegExp.Serialize(obj, options);
-    }
-
-    public override int GetHashCode([DisallowNull] Regex obj)
-    {
-        return ToString(obj).GetHashCode();
-    }
-
-    public static bool IsEqual(Regex obj1, Regex obj2)
-    {
-        testMap[obj1] = true;
-        var ret = testMap.ContainsKey(obj2);
-        testMap.Clear();
-        return ret;
-    }
-
 }

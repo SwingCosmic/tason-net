@@ -1,3 +1,8 @@
+# 0.12.1
+
+* feat: 新增`TasonExtraFieldsAttribute`，效果类似于`JsonExtensionDataAttribute`，用于扩展字段的序列化与反序列化。
+同时支持普通对象和TASON对象实例
+
 # 0.11.4
 
 * feat: 支持`Nullable<T>`类型

@@ -11,6 +11,16 @@ public class TasonIgnoreAttribute : Attribute
 }
 
 /// <summary>
+/// 指示该字段或者属性用来存放额外的字段。
+/// 类型必须是<see cref="IDictionary{String, Object}"/>的子类型，每个类最多只能有一个包含该特性的属性
+/// </summary>
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true)]
+public class TasonExtraFieldsAttribute : Attribute
+{
+
+}
+
+/// <summary>
 /// 指示该字段或者属性序列化所使用的名称
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true)]

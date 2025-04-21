@@ -16,14 +16,7 @@ using Newtonsoft.Json.Linq;
 
 public class ParseGenericTest
 {
-    class TestList : List<string>
-    {
-        public TestList() : base()
-        { 
-        }
-
-        public TestList(IEnumerable<string> items) : base(items) { }
-    }
+    
 
     JsonSerializerOptions options = null!;
     JsonSerializerSettings setting = null!;
@@ -43,17 +36,7 @@ public class ParseGenericTest
             .AddNewtonsoftJson(setting);
     }
 
-    record class A
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-    }
-
-
-    class ADict : Dictionary<A, int>
-    {
-
-    }
+    
 
     [Test]
     public void EnumTest()
@@ -186,13 +169,6 @@ public class ParseGenericTest
     }
 
 
-    record class NullableC
-    {
-        public int? IntVal { get; set; }
-
-        public DateTime? DateTimeVal { get; set; }
-    }
-
     [Test]
     public void NullableTest()
     {
@@ -207,11 +183,62 @@ public class ParseGenericTest
         }));
 
         var tason2 = "{IntVal:null,DateTimeVal:Date('2025-04-18 00:00:00Z')}";
-        Assert.That(s.Deserialize<NullableC>(tason2), Is.EqualTo(new NullableC()
+        Assert.That(s.Deserialize<NullableClass>(tason2), Is.EqualTo(new NullableClass()
         {
             IntVal = null,
             DateTimeVal = new DateTime(2025,4,18,0,0,0,DateTimeKind.Utc),
         }));
+    }
+
+
+    [Test]
+    public void AnonymousClass()
+    {
+        var anonymousClass = new { a = 1, b = "foo" };
+
+        var tason = "{a:1,b:'foo'}";
+        Assert.Throws<InvalidOperationException>(() => 
+            TasonSerializer.Default.Deserialize(tason, anonymousClass.GetType()));
+
+    }
+
+
+    [Test]
+    public void ExtensionFields()
+    {
+        var s = TasonSerializer.Default.Clone();
+        // 注册类型，走类型实例
+        s.Registry.CreateObjectType(typeof(DynamicFieldClass));
+
+        var tason = "DynamicFieldClass({NormalProperty:\"foo\",a:1,b:2})";
+        var expect = new DynamicFieldClass()
+        {
+            NormalProperty = "foo",
+            DynamicFields = new Dictionary<string, object?>()
+            {
+                ["a"] = 1,
+                ["b"] = 2,
+            }
+        };
+
+        var actual = s.Deserialize<DynamicFieldClass>(tason)!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual.NormalProperty, Is.EqualTo(expect.NormalProperty));
+            Assert.That(actual.DynamicFields, Is.EqualTo(expect.DynamicFields));
+        });
+
+
+        var s2 = TasonSerializer.Default.Clone();
+        // 不注册类型，走对象
+
+        var tason2 = "{NormalProperty:\"foo\",a:1,b:2}";
+        var actual2 = s2.Deserialize<DynamicFieldClass>(tason2)!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual2.NormalProperty, Is.EqualTo(expect.NormalProperty));
+            Assert.That(actual2.DynamicFields, Is.EqualTo(expect.DynamicFields));
+        });
     }
 
 }

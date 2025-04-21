@@ -28,13 +28,23 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
         var obj = new T();
         foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)
         {
-            if (dict.TryGetValue(name, out var value))
+            if (dict.Remove(name, out var value))
             {
                 if (prop.CanWrite)
                 {
                     prop.SetValue(obj, value);
                 }
             }
+        }
+        var extra = ClassPropertyMetadata.Cache<T>.ExtraFieldsProperty;
+        if (extra is not null)
+        {
+            var fieldsDict = ReflectionHelpers.CreateDictionary<string, object?>(extra.Value.Value.PropertyType);
+            foreach (var (k, v) in dict)
+            {
+                fieldsDict[k] = v;
+            }
+            extra.Value.Value.SetValue(obj, fieldsDict);
         }
         return obj;
     }
@@ -46,6 +56,17 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
         foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)
         {
             dict[name] = prop.GetValue(value);
+        }
+        var extra = ClassPropertyMetadata.Cache<T>.ExtraFieldsProperty;
+        if (extra is not null)
+        {
+            if (extra.Value.Value.GetValue(value) is IDictionary<string, object?> data)
+            {
+                foreach (var (k, v) in data)
+                {
+                    dict[k] = v;
+                }
+            }
         }
         return dict;
     }

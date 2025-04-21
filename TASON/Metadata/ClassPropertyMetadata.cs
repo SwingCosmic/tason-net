@@ -13,6 +13,8 @@ internal class ClassPropertyMetadata
     /// <summary>类的属性</summary>
     public Dictionary<string, PropertyInfo> Properties { get; }
 
+    public KeyValuePair<string, PropertyInfo>? ExtraFieldsProperty { get; }
+
     public ClassPropertyMetadata(Type type)
     {
         Properties = new();
@@ -33,7 +35,17 @@ internal class ClassPropertyMetadata
             else if (contractAttr is not null)
                 realName = p.Name.ToCase(contractAttr.Policy);
 
-            Properties[realName] = p;
+            if (p.GetCustomAttribute<TasonExtraFieldsAttribute>(true) is not null)
+            {
+                if (ExtraFieldsProperty is not null)
+                {
+                    throw new InvalidOperationException("TasonExtraFieldsAttribute should apply to only one field or property");
+                }
+                ExtraFieldsProperty = new (realName, p);
+            } else
+            {
+                Properties[realName] = p;
+            }    
         }
     }
 
@@ -43,11 +55,13 @@ internal class ClassPropertyMetadata
     /// <typeparamref name="T">缓存的类型</typeparamref>
     public static class Cache<T>
     {
-        public static Dictionary<string, PropertyInfo> Properties { get; }
+        public static ClassPropertyMetadata Metadata { get; }
+        public static Dictionary<string, PropertyInfo> Properties => Metadata.Properties;
+        public static KeyValuePair<string, PropertyInfo>? ExtraFieldsProperty => Metadata.ExtraFieldsProperty;
 
         static Cache()
         {
-            Properties = new ClassPropertyMetadata(typeof(T)).Properties;
+            Metadata = new ClassPropertyMetadata(typeof(T));
         }
     }
 }
