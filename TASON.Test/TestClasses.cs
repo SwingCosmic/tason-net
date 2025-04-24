@@ -59,3 +59,24 @@ record class DynamicFieldClass
 
     public string NormalProperty { get; set; } = "";
 }
+
+
+abstract record class ShapeBase
+{
+    public abstract string Kind { get; }
+}
+
+record class Circle : ShapeBase
+{
+    public override string Kind => "circle";
+
+    public double Radius { get; set; }
+}
+
+record class Rectangle : ShapeBase
+{
+    public override string Kind => "rectangle";
+
+    public double Width { get; set; }
+    public double Height { get; set; }
+}

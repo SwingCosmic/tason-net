@@ -241,4 +241,29 @@ public class ParseGenericTest
         });
     }
 
+
+    [Test]
+    public void PolymorphismInstance()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.CreateObjectType<Circle>();
+        s.Registry.CreateObjectType<Rectangle>();
+
+        var tason1 = "Rectangle({Width:10,Height:20})";
+        var tason2 = "Circle({Radius:50,Type:'circle'})";
+
+        var rect = new Rectangle { Width = 10, Height = 20 };
+        var circle = new Circle { Radius = 50 };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(s.Deserialize<ShapeBase>(tason1), Is.EqualTo(rect));
+            Assert.That(s.Deserialize<ShapeBase>(tason2), Is.EqualTo(circle));
+        });
+
+        var list = new List<ShapeBase> { rect, circle };
+        var tason = $"[{tason1},{tason2}]";
+
+        Assert.That(s.Deserialize<List<ShapeBase>>(tason), Is.EqualTo(list));
+    }
 }

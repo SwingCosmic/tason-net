@@ -1,3 +1,7 @@
+# 0.12.2
+
+* fix: 多态反序列化报错，无法将具体的TASON类型实例反序列化给其抽象基类或者接口
+
 # 0.12.1
 
 * feat: 新增`TasonExtraFieldsAttribute`，效果类似于`JsonExtensionDataAttribute`，用于扩展字段的序列化与反序列化。

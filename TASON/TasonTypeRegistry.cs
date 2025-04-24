@@ -99,6 +99,23 @@ public class TasonTypeRegistry
         return typeInfo;
     }
 
+    /// <summary>
+    /// 通过反射创建并注册一个自动实现的<see cref="TasonObjectType{T}"/>
+    /// </summary>
+    /// <typeparam name="T">要注册的类型，必须有无参构造函数</typeparam>
+    /// <returns>创建的<see cref="ITasonObjectType"/></returns>   
+    public TasonObjectType<T> CreateObjectType<T>() where T : notnull, new()
+    {
+        if (!ReflectionHelpers.CanDirectConstruct(typeof(T)))
+        {
+            throw new ArgumentException("Invalid type");
+        }
+
+        var typeInfo = new TasonObjectType<T>();
+        RegisterType(typeof(T).Name, typeInfo);
+        return typeInfo;
+    }
+
 
     #region 获取类型信息
 
@@ -122,7 +139,7 @@ public class TasonTypeRegistry
             return null;
         };
 
-        return entry.Types.FirstOrDefault(t => t.Type.IsAssignableFrom(type));
+        return entry.Types.FirstOrDefault(t => type.IsAssignableFrom(t.Type));
     }
 
     /// <summary>
