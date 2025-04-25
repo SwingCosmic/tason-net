@@ -106,11 +106,6 @@ public class TasonTypeRegistry
     /// <returns>创建的<see cref="ITasonObjectType"/></returns>   
     public TasonObjectType<T> CreateObjectType<T>() where T : notnull, new()
     {
-        if (!ReflectionHelpers.CanDirectConstruct(typeof(T)))
-        {
-            throw new ArgumentException("Invalid type");
-        }
-
         var typeInfo = new TasonObjectType<T>();
         RegisterType(typeof(T).Name, typeInfo);
         return typeInfo;

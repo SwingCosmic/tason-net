@@ -81,7 +81,7 @@ public class ParseGenericTest
     {
         var s = TasonSerializer.Default.Clone();
 
-        s.Registry.CreateObjectType(typeof(A));
+        s.Registry.CreateObjectType<A>();
         Assert.That(s.Deserialize<A>("{X:1, Y:2, }"), Is.EqualTo(new A() { X = 1, Y = 2 }));
 
 
@@ -97,7 +97,7 @@ public class ParseGenericTest
         // 测试UseBuiltinDictionary=true的非string key字典
         var s = TasonSerializer.Default.Clone();
         s.Options.UseBuiltinDictionary = true;
-        s.Registry.CreateObjectType(typeof(A));
+        s.Registry.CreateObjectType<A>();
 
         Assert.That(s.Deserialize<ADict>(tason), 
             Is.EqualTo(new ADict() 
@@ -109,7 +109,7 @@ public class ParseGenericTest
         // 测试UseBuiltinDictionary=false的非string key字典，应该报错
         var s2 = TasonSerializer.Default.Clone();
         s2.Options.UseBuiltinDictionary = false;
-        s2.Registry.CreateObjectType(typeof(A));
+        s2.Registry.CreateObjectType<A>();
 
         Assert.Throws<ArgumentException>(() => s2.Deserialize<ADict>(tason));
     }
@@ -208,7 +208,7 @@ public class ParseGenericTest
     {
         var s = TasonSerializer.Default.Clone();
         // 注册类型，走类型实例
-        s.Registry.CreateObjectType(typeof(DynamicFieldClass));
+        s.Registry.CreateObjectType<DynamicFieldClass>();
 
         var tason = "DynamicFieldClass({NormalProperty:\"foo\",a:1,b:2})";
         var expect = new DynamicFieldClass()

@@ -81,7 +81,7 @@ new Regex("[\r\n]+").Replace("""
     public void Option_MaxDepth()
     {
         var s = TasonSerializer.Default.Clone();
-        s.Registry.CreateObjectType(typeof(TreeNode));
+        s.Registry.CreateObjectType<TreeNode>();
         var node = new TreeNode
         {
             Name = "node0",
@@ -143,7 +143,7 @@ new Regex("[\r\n]+").Replace("""
 
         var s = TasonSerializer.Default.Clone();
         s.Options.UseBuiltinDictionary = true;
-        s.Registry.CreateObjectType(typeof(A));
+        s.Registry.CreateObjectType<A>();
 
         var expect = new ADict()
         {
@@ -155,7 +155,7 @@ new Regex("[\r\n]+").Replace("""
 
         var s2 = TasonSerializer.Default.Clone();
         s2.Options.UseBuiltinDictionary = false;
-        s2.Registry.CreateObjectType(typeof(A));
+        s2.Registry.CreateObjectType<A>();
 
         Assert.Throws<NotSupportedException>(() => s2.Serialize(expect));
     }
@@ -178,7 +178,7 @@ new Regex("[\r\n]+").Replace("""
     public void ExtensionFields()
     {
         var s = TasonSerializer.Default.Clone();
-        s.Registry.CreateObjectType(typeof(DynamicFieldClass));
+        s.Registry.CreateObjectType<DynamicFieldClass>();
 
         var tason = "{NormalProperty:\"foo\",a:1,b:2}";
         var typeTason = $"DynamicFieldClass({tason})";
