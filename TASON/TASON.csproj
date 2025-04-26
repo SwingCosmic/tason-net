@@ -7,7 +7,7 @@
     <LangVersion>12.0</LangVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>TASON</Title>
-    <Version>0.12.2</Version>
+    <Version>0.12.3</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>LoveKicher</Authors>
@@ -52,6 +52,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Half" Version="1.0.0" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+	  <PackageReference Include="Portable.System.DateTimeOnly" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

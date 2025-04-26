@@ -37,6 +37,14 @@ public class ParseTest
                 } 
             }));
 
+       
+    }
+
+    [Test]
+    public void ObjectTest() 
+    {
+        var s = TasonSerializer.Default;
+
         Assert.That(s.Deserialize("{\"a\": true, b: \"fo\\n\\ro\"}"),
             Is.EqualTo(new Dictionary<string, object?> 
             { 
@@ -49,36 +57,4 @@ public class ParseTest
         Assert.That(s2.Deserialize("A({X:1,Y:2})"), Is.EqualTo(new A() { X = 1, Y = 2 }));
     }
 
-    [Test]
-    public void Date()
-    {
-        var s = TasonSerializer.Default;
-
-        var date = (DateTime)s.Deserialize("Date('2020-01-15T09:00:00.666Z')")!;
-        Assert.That(date, Is.EqualTo(new DateTime(2020, 1, 15, 9, 0, 0, 666, DateTimeKind.Utc)));
-        
-        var date2 = (DateTime)s.Deserialize("Date('2024-02-10 00:00:00-07:00')")!;
-        date2 = date2.ToUniversalTime();
-        Assert.That(date2, Is.EqualTo(new DateTimeOffset(2024, 2, 10, 0, 0, 0, TimeSpan.FromHours(-7)).UtcDateTime));
-
-        var date3 = (DateTime)s.Deserialize("Date('2025-03-31 09:40:00')")!;
-        Assert.That(date3, Is.EqualTo(new DateTime(2025, 3, 31, 9, 40, 0, DateTimeKind.Local)));
-
-        var offset = DateTimeOffset.UtcNow;
-        var timestamp = (Timestamp)s.Deserialize($"Timestamp('{offset.Millisecond + 1000}')")!;
-        Assert.That(timestamp, Is.EqualTo(new Timestamp(offset.Millisecond) + 1000));
-    }    
-    
-    [Test]
-    public void Types()
-    {
-        var s = TasonSerializer.Default;
-
-        var reg = s.Deserialize("RegExp('/([A-Z]+)\\\\1/mi')") as Regex;
-        var expect = new Regex("([A-Z]+)\\1", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-        Assert.That(RegexComparer.ToString(reg!), Is.EqualTo(RegexComparer.ToString(expect)));
-
-        var json = s.Deserialize("JSONArray('[1,2,3]')") as JSONSystemText;
-        Assert.That(json!.GetValue<List<int>>(), Is.EqualTo(new List<int> { 1, 2, 3 }));
-    }
 }

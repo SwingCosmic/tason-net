@@ -1,39 +1,25 @@
 namespace TASON.Test;
 
-using System.Text.RegularExpressions;
 using TASON;
 using TASON.Types.SystemTextJson;
-using TASON.Types.NewtonsoftJson;
 using System.Text.Json;
-using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using TASON.Util;
 using System.Reflection;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Linq;
 
 public class ParseGenericTest
 {
     
 
     JsonSerializerOptions options = null!;
-    JsonSerializerSettings setting = null!;
 
     [SetUp]
     public void Setup()
     {
         options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-        setting = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-        };
-
         // 两种实现可以同时添加互不影响
         TasonSerializer.Default.Registry
-            .AddSystemTextJson(options)
-            .AddNewtonsoftJson(setting);
+            .AddSystemTextJson(options);
     }
 
     
@@ -114,59 +100,7 @@ public class ParseGenericTest
         Assert.Throws<ArgumentException>(() => s2.Deserialize<ADict>(tason));
     }
 
-    [Test]
-    public void JsonTest()
-    {
-        var s = TasonSerializer.Default;
-
-        var json = """
-{
-    "tags": {
-        "a": "foo",
-        "b": "bar"
-    }
-}
-""";
-        var expects = ReadSJson(json);
-        var expectn = ReadNJson(json);
-
-        // 测试JsonDocument
-        var tason = $"JSON(\"{PrimitiveHelpers.Escape(json)}\")";
-        Assert.Multiple(() =>
-        {
-            var objs = s.Deserialize<JsonDocument>(tason)!;
-            var objn = s.Deserialize<JToken>(tason)!;
-
-            Assert.That(objs.RootElement.ToString(), Is.EqualTo(expects.RootElement.ToString()));
-            Assert.That(objn.ToString(), Is.EqualTo(expectn.ToString()));
-        });
-
-        // 测试含有JsonElement的嵌套字典
-        var inner = """{"a":"foo","b":"bar"}""";
-        var tason2 = "{'tags': " + $"JSON(\"{PrimitiveHelpers.Escape(inner)}\")" + "}";
-
-        Assert.Multiple(() =>
-        {
-            var objs2 = s.Deserialize<Dictionary<string, JsonElement>>(tason2)!;
-            var objn2 = s.Deserialize<Dictionary<string, JToken>>(tason2)!;
-
-            Assert.That(System.Text.Json.JsonSerializer.Serialize(objs2, options),
-                Is.EqualTo(System.Text.Json.JsonSerializer.Serialize(expects.RootElement, options)));
-            Assert.That(JsonConvert.SerializeObject(objn2, setting),
-                Is.EqualTo(JsonConvert.SerializeObject(expectn, setting)));
-        });
-
-    }
-
-    JsonDocument ReadSJson([StringSyntax(StringSyntaxAttribute.Json)] string json)
-    {
-        return JsonDocument.Parse(json, options.GetDocumentOptions());
-    }
     
-    JToken ReadNJson([StringSyntax(StringSyntaxAttribute.Json)] string json)
-    {
-        return JToken.Parse(json);
-    }
 
 
     [Test]

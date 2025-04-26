@@ -45,9 +45,11 @@ serializer.Registry.CreateObjectType(typeof(SomeModelClass));
 
 var model = new SomeModelClass 
 {
-  SomeProperty = "SomeValue"
+  SomeProperty = "SomeValue",
+  LongValue = 2L << 56,
 };
-string tason = serializer.Serialize(model); // SomeModelClass({SomeProperty:"SomeValue"})
+string tason = serializer.Serialize(model); 
+// SomeModelClass({SomeProperty:"SomeValue",LongValue:Int64("144115188075855872")})
 
 
 // 自动类型模式反序列化
@@ -61,8 +63,8 @@ var dict = serializer.Deserialize("{a:1,b:'foo'}");
 
 // 指定类型模式反序列化
 
-var list2 = serializer.Deserialize<SomeModelClass[]>($"[{tason}]"); 
-//得到SomeModelClass[]
+var list2 = serializer.Deserialize<ICollection<SomeModelClass>>($"[{tason}]"); 
+//得到List<SomeModelClass>
 
 ```
 
@@ -80,6 +82,9 @@ var list2 = serializer.Deserialize<SomeModelClass[]>($"[{tason}]");
 * .NET 7引入的泛型数学，特别是abstract static接口方法的支持，对基础数据类型的支持有较大的变动，例如泛型参数约束等
 * 字符串解析的支持不同，特别是非十进制解析，部分未提供的方法采用了可能效率较低的实现
 
+### 日期类型
+
+* .NET 6新增了一些日期类型`DateOnly`和`TimeOnly`：在不受支持的环境中使用了[Portable.System.DateTimeOnly](https://github.com/OlegRa/System.DateTimeOnly)包，在支持的版本中使用原生类型，两者公开的API几乎一致。
 
 ## 类型支持
 
@@ -102,12 +107,12 @@ var list2 = serializer.Deserialize<SomeModelClass[]>($"[{tason}]");
 * 非泛型集合类
   * 仅支持`ArrayList`、`Queue`、`Stack`
 * Key不是字符串的`IDictionary<TKey, TValue>`类型，需要开启参数
+* 抽象类和`IEnumerable<T>`以外的接口
+  * 仅支持对象类型实例，可以进行多态反序列化
 
 ### 可以序列化，暂时无法反序列化的类型
 
 * ValueTuple
-* 抽象类
-* `IEnumerable<T>`以外的接口
 * 泛型类
 * 匿名类型
 
