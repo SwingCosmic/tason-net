@@ -1,4 +1,5 @@
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TASON.Serialization;
 using TASON.Util;
@@ -15,7 +16,8 @@ internal class ClassPropertyMetadata
 
     public KeyValuePair<string, PropertyInfo>? ExtraFieldsProperty { get; }
 
-    public ClassPropertyMetadata(Type type)
+    public ClassPropertyMetadata(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type)
     {
         Properties = new();
 

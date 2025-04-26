@@ -27,11 +27,14 @@ internal delegate IEnumerable<E> CreateCollection<E>(E[] array);
 
 internal static class ReflectionHelpers
 {
-    private const string UseMakeGenericMethod = "该方法使用MethodInfo.MakeGenericMethod()";
-    private const string NotMemberAccess = "Expression must be a member access";
-    private const string NotMethodCall = "Expression must be a method call";
+    public const string UseMakeGenericMethod = "该方法使用MethodInfo.MakeGenericMethod()";
+    public const string UseMakeGenericType = "该方法使用Type.MakeGenericType()";
+    public const string NotMemberAccess = "Expression must be a member access";
+    public const string NotMethodCall = "Expression must be a method call";
 
-    public static EnumerableType IsEnumerable(Type type, out Type? elementType, out Type? keyType)
+    public static EnumerableType IsEnumerable(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] Type type, 
+        out Type? elementType, out Type? keyType)
     {
         keyType = null;
 
@@ -233,6 +236,7 @@ internal static class ReflectionHelpers
 
 
     [RequiresUnreferencedCode(UseMakeGenericMethod)]
+    [RequiresDynamicCode(UseMakeGenericMethod)]
     public static R? CallGeneric<R>(this MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
     {
         var m = genericMethod.MakeGenericMethod(genericArgs);
@@ -240,6 +244,7 @@ internal static class ReflectionHelpers
     }
 
     [RequiresUnreferencedCode(UseMakeGenericMethod)]
+    [RequiresDynamicCode(UseMakeGenericMethod)]
     public static void CallGeneric(this MethodInfo genericMethod, Type[] genericArgs, object? thisArg, object?[] args)
     {
         var m = genericMethod.MakeGenericMethod(genericArgs);

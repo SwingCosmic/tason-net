@@ -78,6 +78,7 @@ public class TasonTypeRegistry
         types[name] = entry;
     }
 
+    const string CreateObjectTypeWarning = ReflectionHelpers.UseMakeGenericType + "，改用CreateObjectType<T>";
     /// <summary>
     /// 通过反射创建并注册一个自动实现的<see cref="ITasonObjectType"/>
     /// </summary>
@@ -85,7 +86,8 @@ public class TasonTypeRegistry
     /// <returns>创建的<see cref="ITasonObjectType"/></returns>
     /// <exception cref="ArgumentException">类型不是类、是抽象类、是泛型类或者没有公共无参构造函数</exception>
 
-    [RequiresUnreferencedCode("该方法使用Type.MakeGenericType()")]
+    [RequiresUnreferencedCode(CreateObjectTypeWarning)]
+    [RequiresDynamicCode(CreateObjectTypeWarning)]
     public ITasonObjectType CreateObjectType(Type type)
     {
         if (!ReflectionHelpers.CanDirectConstruct(type))
@@ -104,7 +106,7 @@ public class TasonTypeRegistry
     /// </summary>
     /// <typeparam name="T">要注册的类型，必须有无参构造函数</typeparam>
     /// <returns>创建的<see cref="ITasonObjectType"/></returns>   
-    public TasonObjectType<T> CreateObjectType<T>() where T : notnull, new()
+    public TasonObjectType<T> CreateObjectType<T>() where T : class, new()
     {
         var typeInfo = new TasonObjectType<T>();
         RegisterType(typeof(T).Name, typeInfo);
@@ -281,6 +283,14 @@ public class TasonTypeRegistry
 
     #endregion
 
+    /// <summary>
+    /// 根据TASON类型名称和实例生成表示对象的参数
+    /// </summary>
+    /// <param name="typeName">类型名称</param>
+    /// <param name="value">要生成的对象</param>
+    /// <returns>表示对象的参数</returns>
+    /// <exception cref="TasonTypeNotFoundException">类型未注册</exception>
+    /// <exception cref="InvalidOperationException">未知的<see cref="ITasonTypeInfo"/></exception>
     public object SerializeToArg(string typeName, object value)
     {
         var type = GetType(typeName, value) ?? throw new TasonTypeNotFoundException(typeName);
@@ -292,11 +302,23 @@ public class TasonTypeRegistry
         };
     }       
     
+    /// <summary>
+    /// 据TASON标量类型名称和实例生成表示标量的字符串
+    /// </summary>
+    /// <param name="type">类型</param>
+    /// <param name="value">标量实例</param>
+    /// <returns>表示标量的字符串</returns>
     public string SerializeToArg(ITasonScalarType type, object value)
     {
         return type.Serialize(value, options);
     }    
     
+    /// <summary>
+    /// 据TASON对象类型名称和实例生成表示对象的字典
+    /// </summary>
+    /// <param name="type">类型</param>
+    /// <param name="value">对象实例</param>
+    /// <returns>表示对象的字典</returns>
     public Dictionary<string, object?> SerializeToArg(ITasonObjectType type, object value)
     {
         return type.Serialize(value, options);
