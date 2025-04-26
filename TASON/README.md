@@ -11,10 +11,23 @@
 
 和其它序列化框架一致，通过指定所需的类型（泛型参数或者Type对象）来反序列化特定类型的实例。该模式下，
 
-* 支持鸭子类型反序列化，即同一名称的TASON类型实例，可以有多种不同的.NET实现类型。例如，TASON`Timestamp`类型实例，可以反序列化为`DateTimeOffset`类型和内置的`Timestamp`类型，取决于你传入的Type是哪个
-* 支持将`IEnumerable<T>`和`IDictionary<TKey, TValue>`反序列化为自定义的实现类型
-  * `IEnumerable<T>`的实现类需要有一个公共无参构造函数，或者有一个参数传入`IEnumerable<T>`的子类。
-  * `IDictionary<TKey, TValue>`的实现类需要有一个公共无参构造函数。
+#### ✅ 鸭子类型(Duck Type)反序列化
+
+同一名称的TASON类型实例，可以有多种不同的.NET实现类型。
+
+例如，定义一个TASON `Color`类型实例，可以将`System.Windows.Media.Color`，`System.Drawing.Color`，甚至`UnityEngine.Color`都作为`Color`类型实例进行反序列化。
+#### ✅ 多态(Polymorphism)反序列化
+
+指定一个非泛型的抽象类或者接口`T`，允许多种不同的TASON对象实例映射到`T`，只要它们是`T`的子类型
+
+* 支持`IEnumerable<T>`，可以将多种具体类的集合反序列化到其基类或者接口的集合
+
+#### 自定义集合类型
+
+支持将`IEnumerable<T>`和`IDictionary<TKey, TValue>`反序列化为自定义的实现类型
+
+* `IEnumerable<T>`的实现类需要有一个公共无参构造函数，或者有一个参数传入`IEnumerable<T>`的子类。
+* `IDictionary<TKey, TValue>`的实现类需要有一个公共无参构造函数。
 
 
 ### 自动类型模式
