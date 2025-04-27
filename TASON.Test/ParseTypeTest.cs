@@ -121,4 +121,22 @@ public class ParseTypeTest
     {
         return JToken.Parse(json);
     }
+
+    [Test]
+    public void Buffer()
+    {
+        var s = TasonSerializer.Default;
+
+        var base64 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
+        var buffer = s.Deserialize<Buffer>($"Buffer('base64,{base64}')")!;
+        var expect = Convert.FromBase64String(base64);
+
+        Assert.That(buffer.Data, Is.EqualTo(expect));
+
+        var hex = "2e09c9650a9779f1ce8dc232881f06736c6e5e0a3236292d2679ffce2e9f49bc";
+        var buffer2 = s.Deserialize<Buffer>($"Buffer('HEX, {hex}')")!;
+        var expect2 = Convert.FromHexString(hex);
+
+        Assert.That(buffer2.Data, Is.EqualTo(expect2));
+    }
 }

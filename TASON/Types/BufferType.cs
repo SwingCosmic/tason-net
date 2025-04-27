@@ -75,6 +75,9 @@ public sealed record class Buffer : IEquatable<Buffer>
         }
     }
 
+    /// <summary>
+    /// 获取Buffer数据的引用
+    /// </summary>
     public byte[] Data => data;
 
     /// <summary>
