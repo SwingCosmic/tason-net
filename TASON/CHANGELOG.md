@@ -1,3 +1,10 @@
+# 0.13.1
+
+* feat: 新增`NullPropertyHandling`序列化选项
+* refact: 现在`TasonWriter`是抽象类，分别由具体的子类实现关于回溯的逻辑
+* fix: 修复`TasonWriter`处理属性跳过时最后一个尾随逗号的处理
+* ⚠️ BREAKING CHANGE: 将`UseBuiltinNumber`选项重命名为`BuiltinNumberHandling`
+
 # 0.12.3
 
 * feat: 新增`DateOnly`和`TimeOnly`类型支持

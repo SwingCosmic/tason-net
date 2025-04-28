@@ -6,6 +6,7 @@ using TASON.Types.SystemTextJson;
 using TASON.Types.NewtonsoftJson;
 using System.Text.Json;
 using TASON.Types;
+using System.Text;
 
 public class SerializeTest
 {
@@ -93,6 +94,33 @@ new Regex("[\r\n]+").Replace("""
         // 由于Writer实现的差异会比JavaScript版本多一层
         s.Options.MaxDepth = 200;
         Assert.DoesNotThrow(() => s.Serialize(node));
+    }
+
+    [Test]
+    public void Option_NullProperty()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Options.NullPropertyHandling = NullValueHandling.Ignore;
+
+        var obj = new Dictionary<string, object?>()
+        {
+            ["a"] = 1,
+            ["b"] = null,
+            ["c"] = null,
+            ["d"] = 4,
+            ["e"] = new int?[] { 5, null, null, 7, null },
+            ["f"] = null,
+            ["g"] = 10,
+        };
+
+        var tason = "{a:1,d:4,e:[5,null,null,7,null],g:10}";
+
+        Assert.That(s.Serialize(obj), Is.EqualTo(tason));
+
+        using var ms = new MemoryStream();
+        s.Serialize(obj, ms);
+        var actual = Encoding.UTF8.GetString(ms.ToArray());
+        Assert.That(actual, Is.EqualTo(tason));
     }
 
     

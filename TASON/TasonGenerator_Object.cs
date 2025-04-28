@@ -65,6 +65,11 @@ public partial class TasonGenerator
             return false;
         }
 
+        if (keyValue.Value is null && options.NullPropertyHandling == NullValueHandling.Ignore)
+        {
+            return false;
+        }
+
         if (keyValue.Value is not null && IsBanTypes(keyValue.Value.GetType()))
         {
             return false;
@@ -75,14 +80,21 @@ public partial class TasonGenerator
     }
 
     // 泛型字典的key, value类型均已校验，不会遇到不可序列化的类型
-    void Pair<K, V>(KeyValuePair<K, V> keyValue)
+    bool TryWritePair<K, V>(KeyValuePair<K, V> keyValue)
     {
         if (keyValue.Key is not string key)
         {
             // 仅用于过类型校验，不应该走到这里
             throw new InvalidOperationException("Key must be a string");
         }
+
+        if (keyValue.Value is null && options.NullPropertyHandling == NullValueHandling.Ignore)
+        {
+            return false;
+        }
+
         writer.WriteObjectPair(() => Key(key), () => Value(keyValue.Value, ValueScope.ObjectValue));
+        return true;
     }
 
     void MaybeObjectValue(object value, Type type)
@@ -112,11 +124,7 @@ public partial class TasonGenerator
                 pairs.AddRange(rest);
             }
 
-            writer.WriteJoin(v => 
-            {
-                Pair(v);
-                return true;
-            }, pairs);
+            writer.WriteJoin(TryWritePair, pairs);
         }
         writer.WriteEndObject();
     }
@@ -125,17 +133,12 @@ public partial class TasonGenerator
     {
         writer.WriteStartObject();
         {
-            writer.WriteJoin(v => 
-            {
-                if (!TryWritePair(v)) 
-                    return false;
-                return true;
-            }, dict.Cast<DictionaryEntry>().ToArray());
+            writer.WriteJoin(TryWritePair, dict.Cast<DictionaryEntry>().ToArray());
         }
         writer.WriteEndObject();
     }
 
-    void DictionaryValue<K, V>(IDictionary<K, V> dict)
+    void DictionaryValue<K, V>(IDictionary<K, V> dict) where K : notnull
     {
         if (options.UseBuiltinDictionary)
         {
@@ -160,12 +163,7 @@ public partial class TasonGenerator
 
         writer.WriteStartObject();
         {
-            writer.WriteJoin(v => 
-            {
-                Pair(v);
-                return true;
-            }, 
-            dict.ToArray());
+            writer.WriteJoin(TryWritePair, dict.ToArray());
         }
         writer.WriteEndObject();
     }

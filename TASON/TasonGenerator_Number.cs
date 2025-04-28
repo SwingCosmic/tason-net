@@ -77,9 +77,9 @@ public partial class TasonGenerator
 #endif
         IEquatable<T>    
     {
-        if (options.UseBuiltinNumber == BuiltinNumberOption.All)
+        if (options.BuiltinNumberHandling == BuiltinNumberOption.All)
             TypeInstanceValue(value, type, name);
-        else if (options.UseBuiltinNumber == BuiltinNumberOption.ObjectTypeProperty)
+        else if (options.BuiltinNumberHandling == BuiltinNumberOption.ObjectTypeProperty)
         {
             if (scope == ValueScope.ObjectValue)
                 TypeInstanceValue(value, type, name);
@@ -99,9 +99,9 @@ public partial class TasonGenerator
 #endif
         IEquatable<T>
     {
-        if (options.UseBuiltinNumber == BuiltinNumberOption.None) 
+        if (options.BuiltinNumberHandling == BuiltinNumberOption.None) 
             writer.Write(value.ToString()!);
-        else if (options.UseBuiltinNumber == BuiltinNumberOption.ObjectTypeProperty) 
+        else if (options.BuiltinNumberHandling == BuiltinNumberOption.ObjectTypeProperty) 
         {
             if (scope == ValueScope.ObjectValue) 
                 TypeInstanceValue(value, type, name);

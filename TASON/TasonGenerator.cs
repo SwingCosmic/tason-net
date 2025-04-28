@@ -36,7 +36,7 @@ public partial class TasonGenerator
     public static string GenerateAsString(object? value, TasonSerializerOptions options, TasonTypeRegistry registry)
     {
         var sb = new StringBuilder();
-        using (var writer = new TasonWriter(sb, options))
+        using (var writer = new TasonStringWriter(sb, options))
         {
             var generator = new TasonGenerator(writer, options, registry);
             generator.Generate(value);
@@ -53,7 +53,7 @@ public partial class TasonGenerator
     /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
     public static void GenerateToStream(Stream stream, object? value, TasonSerializerOptions options, TasonTypeRegistry registry)
     {
-        using (var writer = new TasonWriter(stream, options))
+        using (var writer = new TasonStreamWriter(stream, options))
         {
             var generator = new TasonGenerator(writer, options, registry);
             generator.Generate(value);
@@ -61,7 +61,7 @@ public partial class TasonGenerator
     }
 
     /// <summary>
-    /// 序列化对象到指定<see cref="TextWriter"/>
+    /// 序列化对象到指定<see cref="TextWriter"/>，该方法使用内存生成字符串并写入
     /// </summary>
     /// <param name="textWriter">输出<see cref="TextWriter"/></param>
     /// <param name="value">要序列化的对象</param>
@@ -69,11 +69,8 @@ public partial class TasonGenerator
     /// <param name="registry"><see cref="TasonTypeRegistry"/></param>
     public static void GenerateToWriter(TextWriter textWriter, object? value, TasonSerializerOptions options, TasonTypeRegistry registry)
     {
-        using (var writer = new TasonWriter(textWriter, options))
-        {
-            var generator = new TasonGenerator(writer, options, registry);
-            generator.Generate(value);
-        }
+        textWriter.Write(GenerateAsString(value, options, registry));
+        textWriter.Flush();
     }
 
     /// <summary>

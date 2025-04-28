@@ -35,11 +35,15 @@ public record class TasonSerializerOptions
     /// <summary>
     /// 序列化时如何使用内置数值类型
     /// </summary>
-    public BuiltinNumberOption UseBuiltinNumber { get; set; } = BuiltinNumberOption.UnsafeOnly;
-
+    public BuiltinNumberOption BuiltinNumberHandling { get; set; } = BuiltinNumberOption.UnsafeOnly;
 
     /// <summary>
-    /// 由其他库提供的额外选项
+    /// 遇到<see langword="null"/>值属性时的序列化方式
+    /// </summary>
+    public NullValueHandling NullPropertyHandling { get; set; } = NullValueHandling.Preserve;
+
+    /// <summary>
+    /// 存储由其他库提供的额外选项
     /// </summary>
     public Dictionary<string, object?> ExtraOptions { get; set; } = new();
 
@@ -63,4 +67,19 @@ public enum BuiltinNumberOption
     /// 在其他地方相当于<see cref="UnsafeOnly"/>
     /// </summary>
     ObjectTypeProperty,
+}
+
+/// <summary>
+/// 指示序列化时如何处理<see langword="null"/>
+/// </summary>
+public enum NullValueHandling
+{
+    /// <summary>
+    /// 默认值，当值为<see langword="null"/>时，序列化为<see langword="null"/>
+    /// </summary>
+    Preserve,
+    /// <summary>
+    /// 当值为<see langword="null"/>时，丢弃该属性。
+    /// </summary>
+    Ignore,
 }
