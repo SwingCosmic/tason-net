@@ -105,7 +105,7 @@ var list2 = serializer.Deserialize<ICollection<SomeModelClass>>($"[{tason}]");
 ### 完全支持的类型
 
 * 所有基元类型和数字类型，包含`BigInteger`等
-* 所有带有无参构造函数的非泛型、非抽象类和结构
+* 所有带有无参构造函数的非泛型、非抽象类
 * 注册了自定义TASON类型信息的标量类型和对象类型，包括所有内置类型
 * 以上类型作为嵌套类型
 * 以上类型的数组
@@ -122,6 +122,8 @@ var list2 = serializer.Deserialize<ICollection<SomeModelClass>>($"[{tason}]");
 * Key不是字符串的`IDictionary<TKey, TValue>`类型，需要开启参数
 * 抽象类和`IEnumerable<T>`以外的接口
   * 仅支持对象类型实例，可以进行多态反序列化
+* 基元类型以外的结构（值类型）
+  * 由于值类型的反射限制，除基元类型以外，必须注册类型实例才可以反序列化
 
 ### 可以序列化，暂时无法反序列化的类型
 
