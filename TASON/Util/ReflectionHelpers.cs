@@ -251,23 +251,6 @@ internal static class ReflectionHelpers
         m.Invoke(thisArg, BindingFlags.DoNotWrapExceptions, null, args, null);
     }
 
-    static ConditionalWeakTable<Type, ClassPropertyMetadata> cache = new();
-
-    public static ClassPropertyMetadata GetPropertyMetadata(Type type)
-    {
-        if (!type.IsClass || type.IsAbstract)
-        {
-            throw new InvalidOperationException("Invalid type");
-        }
-
-        if (!cache.TryGetValue(type, out var meta))
-        {
-            meta = new ClassPropertyMetadata(type);
-            cache.Add(type, meta);
-        }
-
-        return meta;
-    }
 
     public static bool CanDirectConstruct(Type type)
     {

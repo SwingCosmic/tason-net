@@ -26,7 +26,8 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     public virtual object Deserialize(Dictionary<string, object?> dict, TasonSerializerOptions options)
     {
         var obj = new T();
-        foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)
+        var meta = TasonTypeMetadataProvider.GetMetadata<T>();
+        foreach (var (name, prop) in meta.Properties)
         {
             if (dict.Remove(name, out var value))
             {
@@ -36,7 +37,7 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
                 }
             }
         }
-        var extra = ClassPropertyMetadata.Cache<T>.ExtraFieldsProperty;
+        var extra = meta.ExtraFieldsProperty;
         if (extra is not null)
         {
             var fieldsDict = ReflectionHelpers.CreateDictionary<string, object?>(extra.Value.Value.PropertyType);
@@ -53,11 +54,12 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     public virtual Dictionary<string, object?> Serialize(object value, TasonSerializerOptions options)
     {
         var dict = new Dictionary<string, object?>();
-        foreach (var (name, prop) in ClassPropertyMetadata.Cache<T>.Properties)
+        var meta = TasonTypeMetadataProvider.GetMetadata<T>();
+        foreach (var (name, prop) in meta.Properties)
         {
             dict[name] = prop.GetValue(value);
         }
-        var extra = ClassPropertyMetadata.Cache<T>.ExtraFieldsProperty;
+        var extra = meta.ExtraFieldsProperty;
         if (extra is not null)
         {
             if (extra.Value.Value.GetValue(value) is IDictionary<string, object?> data)

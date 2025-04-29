@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using TASON.Metadata;
 using TASON.Serialization;
 using TASON.Types;
 using TASON.Util;
@@ -108,7 +109,7 @@ public partial class TasonGenerator
 
     void ObjectValue(object value, Type type) 
     {
-        var meta = GetPropertyMetadata(type);
+        var meta = TasonTypeMetadataProvider.GetMetadata(type);
         var props = meta.Properties;
         writer.WriteStartObject();
         {

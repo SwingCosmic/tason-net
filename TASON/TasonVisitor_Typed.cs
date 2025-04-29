@@ -254,7 +254,7 @@ public partial class TasonVisitor
         var ret = new T();
         IKV? extra = null;
 
-        var meta = ClassPropertyMetadata.Cache<T>.Metadata;
+        var meta = TasonTypeMetadataProvider.GetMetadata<T>();
         if (meta.ExtraFieldsProperty is KeyValuePair<string, PropertyInfo> extraProp)
         {
             extra = ReflectionHelpers.CreateDictionary<string, object?>(extraProp.Value.PropertyType);
@@ -268,7 +268,7 @@ public partial class TasonVisitor
     
     internal KV TypedObjectArg(TASONParser.ObjectContext ctx, Type type)
     {
-        var meta = ReflectionHelpers.GetPropertyMetadata(type);
+        var meta = TasonTypeMetadataProvider.GetMetadata(type);
         var obj = new KV();
 
         FillObjectProperties(ctx, meta, (key, _, value) => obj[key] = value, obj);
@@ -278,7 +278,7 @@ public partial class TasonVisitor
 
     internal void FillObjectProperties(
         TASONParser.ObjectContext ctx,
-        ClassPropertyMetadata meta,
+        ITasonTypeMetadata meta,
         Action<string, PropertyInfo, object?> setValue,
         IKV? extra)
     {
