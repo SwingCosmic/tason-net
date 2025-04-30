@@ -200,7 +200,22 @@ internal static class ReflectionHelpers
             throw new InvalidOperationException(NotMemberAccess);
         return body.Member as FieldInfo ?? throw new InvalidOperationException("Member must be a field");
     }
+    
+    public static FieldInfo FieldOf<TTarget, T>(Expression<Func<TTarget, T>> expression)
+    {
+        var body = expression.Body as MemberExpression ??
+            throw new InvalidOperationException(NotMemberAccess);
+        return body.Member as FieldInfo ?? throw new InvalidOperationException("Member must be a field");
+    }
+
     public static PropertyInfo PropertyOf<T>(Expression<Func<T>> expression)
+    {
+        var body = expression.Body as MemberExpression ??
+            throw new InvalidOperationException(NotMemberAccess);
+        return body.Member as PropertyInfo ?? throw new InvalidOperationException("Member must be a property");
+    }    
+    
+    public static PropertyInfo PropertyOf<TTarget, T>(Expression<Func<TTarget, T>> expression)
     {
         var body = expression.Body as MemberExpression ??
             throw new InvalidOperationException(NotMemberAccess);

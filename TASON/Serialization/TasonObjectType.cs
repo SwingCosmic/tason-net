@@ -1,7 +1,6 @@
 
 using System.Reflection;
 using TASON.Metadata;
-using TASON.Util;
 
 namespace TASON.Serialization;
 
@@ -25,51 +24,12 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     /// <inheritdoc/>
     public virtual object Deserialize(Dictionary<string, object?> dict, TasonSerializerOptions options)
     {
-        var obj = new T();
-        var meta = TasonTypeMetadataProvider.GetMetadata<T>();
-        foreach (var (name, prop) in meta.Properties)
-        {
-            if (dict.Remove(name, out var value))
-            {
-                if (prop.CanWrite)
-                {
-                    prop.SetValue(obj, value);
-                }
-            }
-        }
-        var extra = meta.ExtraFieldsProperty;
-        if (extra is not null)
-        {
-            var fieldsDict = ReflectionHelpers.CreateDictionary<string, object?>(extra.Value.Value.PropertyType);
-            foreach (var (k, v) in dict)
-            {
-                fieldsDict[k] = v;
-            }
-            extra.Value.Value.SetValue(obj, fieldsDict);
-        }
-        return obj;
+        return SerializationHelpers.DeserializeClass<T>(dict);
     }
 
     /// <inheritdoc/>
     public virtual Dictionary<string, object?> Serialize(object value, TasonSerializerOptions options)
     {
-        var dict = new Dictionary<string, object?>();
-        var meta = TasonTypeMetadataProvider.GetMetadata<T>();
-        foreach (var (name, prop) in meta.Properties)
-        {
-            dict[name] = prop.GetValue(value);
-        }
-        var extra = meta.ExtraFieldsProperty;
-        if (extra is not null)
-        {
-            if (extra.Value.Value.GetValue(value) is IDictionary<string, object?> data)
-            {
-                foreach (var (k, v) in data)
-                {
-                    dict[k] = v;
-                }
-            }
-        }
-        return dict;
+        return SerializationHelpers.SerializeType<T>(value);
     }
 }

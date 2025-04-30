@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Drawing;
+using TASON.Serialization;
 
 public class ParseGenericTest
 {
@@ -199,5 +201,30 @@ public class ParseGenericTest
         var tason = $"[{tason1},{tason2}]";
 
         Assert.That(s.Deserialize<List<ShapeBase>>(tason), Is.EqualTo(list));
+    }
+
+    [Test]
+    public void StructTest()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.RegisterType("Point", new PointType());
+
+        Assert.That(s.Deserialize<Point[]>("[Point({X:1,Y:2}), Point({X:3,Y:4})]"),
+            Is.EqualTo(new Point[] { new (1, 2), new (3, 4) }));
+    }
+}
+
+
+class PointType : TasonObjectType<Point>
+{
+    public override object Deserialize(Dictionary<string, object?> dict, TasonSerializerOptions options)
+    {
+        var point = new Point();
+        foreach (var (p, v) in dict)
+        {
+            if (p == nameof(Point.X)) point.X = v is int x ? x : default;
+            if (p == nameof(Point.Y)) point.Y = v is int y ? y : default;
+        }
+        return point;
     }
 }

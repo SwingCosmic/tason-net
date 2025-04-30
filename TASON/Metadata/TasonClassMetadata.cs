@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TASON.Serialization;
-using TASON.Util;
 
 namespace TASON.Metadata;
 
@@ -60,18 +59,13 @@ public class TasonClassMetadata : ITasonTypeMetadata
             if (p.GetIndexParameters().Length > 0)
                 continue;
 
-            var realName = p.Name;
-            var aliasAttr = p.GetCustomAttribute<TasonPropertyAttribute>(true);
-            if (aliasAttr is not null)
-                realName = aliasAttr.Name;
-            else if (contractAttr is not null)
-                realName = p.Name.ToCase(contractAttr.Policy);
+            var realName = SerializationHelpers.GetPropertyName(p, contractAttr);
 
             if (p.GetCustomAttribute<TasonExtraFieldsAttribute>(true) is not null)
             {
                 if (ExtraFieldsProperty is not null)
                 {
-                    throw new InvalidOperationException("TasonExtraFieldsAttribute should apply to only one field or property");
+                    throw new InvalidOperationException("TasonExtraFieldsAttribute should only apply to one field or property");
                 }
                 ExtraFieldsProperty = new(realName, p);
             }
