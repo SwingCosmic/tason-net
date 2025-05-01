@@ -111,14 +111,26 @@ public partial class TasonGenerator
     {
         var meta = TasonTypeMetadataProvider.GetMetadata(type);
         var props = meta.Properties;
+        var fields = meta.Fields;
         writer.WriteStartObject();
         {
-            var pairs = props.Select(p =>
+            var _pairs = props.Select(p =>
             {
                 var (key, propInfo) = p;
                 return new KeyValuePair<string, object?>(key, propInfo.GetValue(value));
-            }).ToList();
-            if (meta.ExtraFieldsProperty is KeyValuePair<string, PropertyInfo> e)
+            });
+
+            if (options.AllowFields)
+            {
+                _pairs = _pairs.Concat(fields.Select(f =>
+                {
+                    var (key, fieldInfo) = f;
+                    return new KeyValuePair<string, object?>(key, fieldInfo.GetValue(value));
+                }));
+            }
+            var pairs = _pairs.ToList();
+
+            if (meta.ExtraMemberProperty is KeyValuePair<string, PropertyInfo> e)
             {
                 if (e.Value.GetValue(value) is not IDictionary<string, object?> rest)
                     throw new InvalidCastException();

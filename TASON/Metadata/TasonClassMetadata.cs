@@ -28,7 +28,9 @@ public class TasonClassMetadata : ITasonTypeMetadata
     /// <inheritdoc/>
     public Dictionary<string, PropertyInfo> Properties { get; }
     /// <inheritdoc/>
-    public KeyValuePair<string, PropertyInfo>? ExtraFieldsProperty { get; }
+    public Dictionary<string, FieldInfo> Fields { get; }
+    /// <inheritdoc/>
+    public KeyValuePair<string, PropertyInfo>? ExtraMemberProperty { get; }
     /// <inheritdoc/>
     public Type Type { get; }
 
@@ -38,7 +40,7 @@ public class TasonClassMetadata : ITasonTypeMetadata
     /// <param name="type">要检查的类型</param>
     /// <exception cref="InvalidOperationException">
     /// <list type="bullet">
-    ///   <item><see cref="TasonExtraFieldsAttribute"/>出现在多于一个属性上</item>
+    ///   <item><see cref="TasonExtraMemberAttribute"/>出现在多于一个属性上</item>
     ///   <item>类型是抽象类、委托，或者类和结构以外的其它类型</item>
     /// </list>
     /// </exception>
@@ -49,6 +51,7 @@ public class TasonClassMetadata : ITasonTypeMetadata
 
         Type = type;
         Properties = new();
+        Fields = new();
 
         var contractAttr = type.GetCustomAttribute<TasonNamingContractAttribute>(true);
         foreach (var p in type.GetProperties())
@@ -61,18 +64,28 @@ public class TasonClassMetadata : ITasonTypeMetadata
 
             var realName = SerializationHelpers.GetPropertyName(p, contractAttr);
 
-            if (p.GetCustomAttribute<TasonExtraFieldsAttribute>(true) is not null)
+            if (p.GetCustomAttribute<TasonExtraMemberAttribute>(true) is not null)
             {
-                if (ExtraFieldsProperty is not null)
+                if (ExtraMemberProperty is not null)
                 {
                     throw new InvalidOperationException("TasonExtraFieldsAttribute should only apply to one field or property");
                 }
-                ExtraFieldsProperty = new(realName, p);
+                ExtraMemberProperty = new(realName, p);
             }
             else
             {
                 Properties[realName] = p;
             }
+        }
+        
+
+        foreach (var f in type.GetFields())
+        {
+            if (f.GetCustomAttribute<TasonIgnoreAttribute>(true) is not null)
+                continue;
+
+            var realName = SerializationHelpers.GetFieldName(f, contractAttr);
+            Fields[realName] = f;
         }
     }
 

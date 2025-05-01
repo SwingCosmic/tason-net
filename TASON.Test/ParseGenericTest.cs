@@ -212,19 +212,25 @@ public class ParseGenericTest
         Assert.That(s.Deserialize<Point[]>("[Point({X:1,Y:2}), Point({X:3,Y:4})]"),
             Is.EqualTo(new Point[] { new (1, 2), new (3, 4) }));
     }
-}
 
 
-class PointType : TasonObjectType<Point>
-{
-    public override object Deserialize(Dictionary<string, object?> dict, TasonSerializerOptions options)
+    [Test]
+    public void PublicFieldTest() 
     {
-        var point = new Point();
-        foreach (var (p, v) in dict)
-        {
-            if (p == nameof(Point.X)) point.X = v is int x ? x : default;
-            if (p == nameof(Point.Y)) point.Y = v is int y ? y : default;
-        }
-        return point;
+        var tason = "{PublicField:'foo',PublicProperty:666}";
+
+        var s = TasonSerializer.Default.Clone();
+        s.Options.AllowFields = true;
+        s.Registry.CreateObjectType<PublicFieldClass>();
+
+        Assert.That(s.Deserialize<PublicFieldClass>(tason),
+            Is.EqualTo(new PublicFieldClass() { PublicField = "foo", PublicProperty = 666 }));
+
+        var s2 = TasonSerializer.Default.Clone();
+        s2.Options.AllowFields = false;
+        s2.Registry.CreateObjectType<PublicFieldClass>();
+
+        Assert.That(s2.Deserialize<PublicFieldClass>(tason),
+            Is.EqualTo(new PublicFieldClass() { PublicProperty = 666 }));
     }
 }

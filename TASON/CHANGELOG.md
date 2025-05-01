@@ -1,3 +1,14 @@
+# 0.14.1
+
+* feat: 新增`AllowFields`序列化选项，现在可以序列化和反序列化公共字段
+* ⚠️ BREAKING CHANGE: 将`TasonExtraFieldsAttribute`重命名为`TasonExtraMemberAttribute`，
+以避免"field"这个称呼造成混淆，实际上包含任何不在对象的公共属性和字段定义中的键值对
+
+# 0.13.2
+
+* fix: 现在可以反序列化结构了，通过注册自定义对象类型实例
+* refact: 重构了元数据相关的类型和实现
+
 # 0.13.1
 
 * feat: 新增`NullPropertyHandling`序列化选项

@@ -53,7 +53,7 @@ class IndexerClass
 
 record class DynamicFieldClass
 {
-    [TasonExtraFields]
+    [TasonExtraMember]
     public IDictionary<string, object?> DynamicFields { get; set; } = new Dictionary<string, object?>();
 
 
@@ -79,4 +79,13 @@ record class Rectangle : ShapeBase
 
     public double Width { get; set; }
     public double Height { get; set; }
+}
+
+record class PublicFieldClass
+{
+    public string PublicField = "";
+
+    public int PublicProperty { get; set; } = 1;
+
+    int _privateField = 5;
 }

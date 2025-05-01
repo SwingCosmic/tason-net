@@ -15,7 +15,7 @@ public class TasonIgnoreAttribute : Attribute
 /// 类型必须是<see cref="IDictionary{String, Object}"/>的子类型，每个类最多只能有一个包含该特性的属性
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true)]
-public class TasonExtraFieldsAttribute : Attribute
+public class TasonExtraMemberAttribute : Attribute
 {
 
 }

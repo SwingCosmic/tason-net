@@ -27,6 +27,24 @@ internal static class SerializationHelpers
         return realName;
     }
 
+    /// <summary>
+    /// 获取指定字段TASON序列化时所用的名称
+    /// </summary>
+    /// <param name="field">要获取的字段</param>
+    /// <param name="namingContract">可选，字段所在的类的<see cref="TasonNamingContractAttribute" /></param>
+    /// <returns></returns>
+    public static string GetFieldName(FieldInfo field, TasonNamingContractAttribute? namingContract = null)
+    {
+        var realName = field.Name;
+        var aliasAttr = field.GetCustomAttribute<TasonPropertyAttribute>(true);
+        if (aliasAttr is not null)
+            realName = aliasAttr.Name;
+        else if (namingContract is not null)
+            realName = field.Name.ToCase(namingContract.Policy);
+
+        return realName;
+    }
+
 
     public static T DeserializeClass<T>(KV dict) where T : notnull, new()
     {
@@ -46,7 +64,7 @@ internal static class SerializationHelpers
                 }
             }
         }
-        var extra = meta.ExtraFieldsProperty;
+        var extra = meta.ExtraMemberProperty;
         if (extra is not null)
         {
             var fieldsDict = ReflectionHelpers.CreateDictionary<string, object?>(extra.Value.Value.PropertyType);
@@ -68,7 +86,7 @@ internal static class SerializationHelpers
         {
             dict[name] = prop.GetValue(value);
         }
-        var extra = meta.ExtraFieldsProperty;
+        var extra = meta.ExtraMemberProperty;
         if (extra is not null)
         {
             if (extra.Value.Value.GetValue(value) is IDictionary<string, object?> data)

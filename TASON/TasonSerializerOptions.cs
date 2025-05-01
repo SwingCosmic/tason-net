@@ -13,17 +13,27 @@ public record class TasonSerializerOptions
     public bool AllowUnsafeTypes { get; set; } = false;
 
     /// <summary>
-    /// 是否使用内置字典类型来序列化<see cref="IDictionary{K,V}"/>，默认<see langword="false"/>（序列化为普通对象）
+    /// 是否使用内置字典类型来序列化<see cref="IDictionary{K,V}"/>，默认<see langword="false"/>（序列化为普通对象，只允许字符串键）
     /// </summary>
     public bool UseBuiltinDictionary { get; set; } = false;
 
     /// <summary>
-    /// 是否允许对象拥有重复的键，默认<see langword="true"/>
+    /// 是否允许对象拥有重复的键，默认<see langword="false"/>
     /// </summary>
-    public bool AllowDuplicatedKeys { get; set; } = true;
+    public bool AllowDuplicatedKeys { get; set; } = false;
 
     /// <summary>
-    /// 序列化时的缩进大小（单位为空格数），0表示不缩进，<see langword="null"/>表示压缩内容。默认<see langword="null"/>
+    /// 是否允许序列化字段，默认<see langword="false"/>
+    /// </summary>
+    public bool AllowFields { get; set; } = false;
+
+    /// <summary>
+    /// 序列化时的缩进大小，默认<see langword="null"/>
+    /// <list type="bullet">
+    ///   <item><see langword="null"/>表示尽可能压缩内容，移除不必要的空白字符</item>
+    ///   <item>正数值表示启用格式化文档，并设定每一级缩进使用的空格数</item>
+    ///   <item>0表示仍然启用格式化文档，但不缩进</item>
+    /// </list>
     /// </summary>
     public int? Indent { get; set; } = null;
 

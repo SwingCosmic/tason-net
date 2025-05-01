@@ -16,7 +16,10 @@ public interface ITasonTypeMetadata
 
     /// <summary>类的可序列化属性</summary>
     Dictionary<string, PropertyInfo> Properties { get; }
+    
+    /// <summary>类的可序列化字段</summary>
+    Dictionary<string, FieldInfo> Fields { get; }
 
-    /// <summary>类的额外字段属性，通常通过<see cref="TasonExtraFieldsAttribute"/>标记</summary>
-    KeyValuePair<string, PropertyInfo>? ExtraFieldsProperty { get; }
+    /// <summary>类的额外字段属性，通常通过<see cref="TasonExtraMemberAttribute"/>标记</summary>
+    KeyValuePair<string, PropertyInfo>? ExtraMemberProperty { get; }
 }

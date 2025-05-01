@@ -255,13 +255,19 @@ public partial class TasonVisitor
         IKV? extra = null;
 
         var meta = TasonTypeMetadataProvider.GetMetadata<T>();
-        if (meta.ExtraFieldsProperty is KeyValuePair<string, PropertyInfo> extraProp)
+        if (meta.ExtraMemberProperty is KeyValuePair<string, PropertyInfo> extraProp)
         {
             extra = ReflectionHelpers.CreateDictionary<string, object?>(extraProp.Value.PropertyType);
             extraProp.Value.SetValue(ret, extra);
         }
 
-        FillObjectProperties(ctx, meta, (_, prop, value) => prop.SetValue(ret, value), extra);
+        FillObjectMembers(ctx, meta, (_, member, value) =>
+        {
+            if (member is PropertyInfo prop)
+                prop.SetValue(ret, value);
+            else if (member is FieldInfo field)
+                field.SetValue(ret, value);
+        }, extra);
 
         return ret;
     }
@@ -271,18 +277,19 @@ public partial class TasonVisitor
         var meta = TasonTypeMetadataProvider.GetMetadata(type);
         var obj = new KV();
 
-        FillObjectProperties(ctx, meta, (key, _, value) => obj[key] = value, obj);
+        FillObjectMembers(ctx, meta, (key, _, value) => obj[key] = value, obj);
 
         return obj;
     }   
 
-    internal void FillObjectProperties(
+    internal void FillObjectMembers(
         TASONParser.ObjectContext ctx,
         ITasonTypeMetadata meta,
-        Action<string, PropertyInfo, object?> setValue,
+        Action<string, MemberInfo, object?> setValue,
         IKV? extra)
     {
         var props = meta.Properties;
+        var fields = meta.Fields;
 
         var propSet = new HashSet<string>();
         foreach (var pair in ctx.pair())
@@ -290,7 +297,20 @@ public partial class TasonVisitor
             var key = Key(pair.key());
             if (!props.TryGetValue(key, out var prop))
             {
-                if (extra is not null)
+                // 字段
+                if (options.AllowFields && fields.TryGetValue(key, out var field))
+                {
+                    if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
+                        throw new ArgumentException($"Duplicate key '{key}' in object");
+
+                    if (field.IsInitOnly)
+                        continue;
+
+                    var value_f = TypedValueContext(pair.value(), field.FieldType);
+                    setValue(key, field, value_f);
+                } 
+                // 额外数据
+                else if (extra is not null)
                 {
                     var autoValue = ValueContext(pair.value());
                     extra[key] = autoValue;
@@ -298,6 +318,7 @@ public partial class TasonVisitor
                 continue;
             }
 
+            // 属性
             if (!propSet.Add(key) && !options.AllowDuplicatedKeys)
                 throw new ArgumentException($"Duplicate key '{key}' in object");
 
