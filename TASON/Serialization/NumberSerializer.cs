@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 using TASON.Util;
 using System.Reflection;
 
-namespace TASON.Metadata;
+namespace TASON.Serialization;
 
-internal static class NumberMetadata
+internal static class NumberSerializer
 {
 
     static readonly Dictionary<Type, ITasonScalarType> ClrTypeMapping = new()

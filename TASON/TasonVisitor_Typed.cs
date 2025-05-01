@@ -9,6 +9,7 @@ using TASON.Types;
 using TASON.Util;
 using KV = System.Collections.Generic.Dictionary<string, object?>;
 using IKV = System.Collections.Generic.IDictionary<string, object?>;
+using TASON.Serialization;
 
 namespace TASON;
 
@@ -166,7 +167,7 @@ public partial class TasonVisitor
     ValueType TypedNumberValue(TASONParser.NumberValueContext ctx, Type type)
     {
         var text = ctx.number().GetText();
-        if (!NumberMetadata.TryGetClrType(type, out var _))
+        if (!NumberSerializer.TryGetClrType(type, out var _))
         {
             if (!type.IsEnum)
             {
@@ -175,12 +176,12 @@ public partial class TasonVisitor
             else
             {
                 var numType = Enum.GetUnderlyingType(type);
-                var value = NumberMetadata.Deserialize(numType, text, options);
+                var value = NumberSerializer.Deserialize(numType, text, options);
                 return (ValueType)Enum.ToObject(type, value);
             }
         }
 
-        return NumberMetadata.Deserialize(type, text, options);
+        return NumberSerializer.Deserialize(type, text, options);
     }
 
     T[] TypedArray<T>(TASONParser.ValueContext[] array)
