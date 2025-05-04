@@ -46,7 +46,7 @@ internal static class SerializationHelpers
     }
 
 
-    public static T DeserializeClass<T>(KV dict) where T : notnull, new()
+    public static T DeserializeClass<T>(KV dict, TasonSerializerOptions options) where T : notnull, new()
     {
         // 不在泛型约束上限制class，不然无法通过继承TasonObjectType自定义反序列化结构
         if (typeof(T).IsValueType) 
@@ -54,6 +54,7 @@ internal static class SerializationHelpers
 
         var obj = new T();
         var meta = TasonTypeMetadataProvider.GetMetadata<T>();
+
         foreach (var (name, prop) in meta.Properties)
         {
             if (dict.Remove(name, out var value))
@@ -64,6 +65,21 @@ internal static class SerializationHelpers
                 }
             }
         }
+
+        if (options.AllowFields)
+        {
+            foreach (var (name, field) in meta.Fields)
+            {
+                if (dict.Remove(name, out var value))
+                {
+                    if (!field.IsInitOnly)
+                    {
+                        field.SetValue(obj, value);
+                    }
+                }
+            }            
+        }
+
         var extra = meta.ExtraMemberProperty;
         if (extra is not null)
         {
@@ -78,14 +94,24 @@ internal static class SerializationHelpers
     } 
     
 
-    public static KV SerializeType<T>(object value) where T : notnull
+    public static KV SerializeType<T>(object value, TasonSerializerOptions options) where T : notnull
     {
         var dict = new KV();
         var meta = TasonTypeMetadataProvider.GetMetadata<T>();
+
         foreach (var (name, prop) in meta.Properties)
         {
             dict[name] = prop.GetValue(value);
         }
+
+        if (options.AllowFields)
+        {
+            foreach (var (name, field) in meta.Fields)
+            {
+                dict[name] = field.GetValue(value);
+            }
+        }
+
         var extra = meta.ExtraMemberProperty;
         if (extra is not null)
         {

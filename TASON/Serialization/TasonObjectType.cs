@@ -24,12 +24,12 @@ public class TasonObjectType<T> : ITasonObjectType where T : notnull, new()
     /// <inheritdoc/>
     public virtual object Deserialize(Dictionary<string, object?> dict, TasonSerializerOptions options)
     {
-        return SerializationHelpers.DeserializeClass<T>(dict);
+        return SerializationHelpers.DeserializeClass<T>(dict, options);
     }
 
     /// <inheritdoc/>
     public virtual Dictionary<string, object?> Serialize(object value, TasonSerializerOptions options)
     {
-        return SerializationHelpers.SerializeType<T>(value);
+        return SerializationHelpers.SerializeType<T>(value, options);
     }
 }
