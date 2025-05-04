@@ -2,7 +2,7 @@
 
 该包提供了基于`JSON.NET`(`Newtonsoft.Json`)的JSON类型实现，包括`JSON`, `JSONObject`和 `JSONArray`。
 
-支持处理`JToken`类型
+支持处理`JToken`, `JObject`和`JArray`类型
 
 ## 快速开始
 
