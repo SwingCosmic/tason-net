@@ -196,12 +196,18 @@ new Regex("[\r\n]+").Replace("""
 
         var s = TasonSerializer.Default.Clone();
         s.Options.AllowFields = true;
-
         Assert.That(s.Serialize(obj), Is.EqualTo("{PublicProperty:666,PublicField:\"foo\"}"));
+
+        s.Registry.CreateObjectType<PublicFieldClass>();
+        Assert.That(s.Serialize(obj), Is.EqualTo("PublicFieldClass({PublicProperty:666,PublicField:\"foo\"})"));
+
+
 
         var s2 = TasonSerializer.Default.Clone();
         s2.Options.AllowFields = false;
-
         Assert.That(s2.Serialize(obj), Is.EqualTo("{PublicProperty:666}"));
+
+        s2.Registry.CreateObjectType<PublicFieldClass>();
+        Assert.That(s2.Serialize(obj), Is.EqualTo("PublicFieldClass({PublicProperty:666})"));
     }
 }

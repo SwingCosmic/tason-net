@@ -218,19 +218,26 @@ public class ParseGenericTest
     public void PublicFieldTest() 
     {
         var tason = "{PublicField:'foo',PublicProperty:666}";
+        var tason2 = $"PublicFieldClass({tason})";
 
         var s = TasonSerializer.Default.Clone();
         s.Options.AllowFields = true;
-        s.Registry.CreateObjectType<PublicFieldClass>();
-
         Assert.That(s.Deserialize<PublicFieldClass>(tason),
             Is.EqualTo(new PublicFieldClass() { PublicField = "foo", PublicProperty = 666 }));
 
+        s.Registry.CreateObjectType<PublicFieldClass>();
+        Assert.That(s.Deserialize<PublicFieldClass>(tason2),
+            Is.EqualTo(new PublicFieldClass() { PublicField = "foo", PublicProperty = 666 }));
+
+
+
         var s2 = TasonSerializer.Default.Clone();
         s2.Options.AllowFields = false;
-        s2.Registry.CreateObjectType<PublicFieldClass>();
-
         Assert.That(s2.Deserialize<PublicFieldClass>(tason),
+            Is.EqualTo(new PublicFieldClass() { PublicProperty = 666 }));
+
+        s2.Registry.CreateObjectType<PublicFieldClass>();
+        Assert.That(s2.Deserialize<PublicFieldClass>(tason2),
             Is.EqualTo(new PublicFieldClass() { PublicProperty = 666 }));
     }
 }
