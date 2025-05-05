@@ -1,3 +1,7 @@
+# 1.0.0
+
+* fix: 当指定类型为`object`时，无法反序列化对象和数组
+
 # 1.0.0-rc.2
 
 * ⚠️ BREAKING CHANGE: 将内置字典类型存储键值对的属性名从`keyValuePairs`缩短为`pairs`，以减小占用大小

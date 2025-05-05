@@ -62,6 +62,9 @@ public class ParseGenericTest
         
         var list3 = s.Deserialize<ReadOnlyCollection<string>>(stringListTason);
         Assert.That(list3, Is.EqualTo(new ReadOnlyCollection<string>(stringList)));
+
+        var list4 = s.Deserialize<object>(stringListTason);
+        Assert.That(list4, Is.EqualTo(stringList));
     }
 
     [Test]
@@ -70,8 +73,17 @@ public class ParseGenericTest
         var s = TasonSerializer.Default.Clone();
 
         s.Registry.CreateObjectType<A>();
-        Assert.That(s.Deserialize<A>("{X:1, Y:2, }"), Is.EqualTo(new A() { X = 1, Y = 2 }));
-
+        Assert.Multiple(() =>
+        {
+            Assert.That(s.Deserialize<A>("{X:1, Y:2, }"), 
+                Is.EqualTo(new A() { X = 1, Y = 2 }));
+            Assert.That(s.Deserialize<object>("{X:1, Y:2, }"),
+                Is.EqualTo(new Dictionary<string, object?>()
+                {
+                    ["X"] = 1,
+                    ["Y"] = 2,
+                }));
+        });
 
     }    
     

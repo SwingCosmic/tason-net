@@ -120,6 +120,9 @@ public partial class TasonVisitor
         else if (ctx is TASONParser.ArrayValueContext arrayValue)
         {
             var array = arrayValue.array().value();
+            if (type == typeof(object))
+                return Array(array);
+
             var enumerableType = ReflectionHelpers.IsEnumerable(type, out var elementType, out _);
             if (enumerableType == EnumerableType.Enumerable)
             {
@@ -130,16 +133,15 @@ public partial class TasonVisitor
                 return typedCollectionMethod.CallGeneric<IEnumerable>([elementType!], this, [array, type]);
             }
             else if (enumerableType == EnumerableType.NonGenericEnumerable)
-            {
                 return NonGenericCollection(array, type);
-            }
             else
-            {
                 throw new InvalidCastException($"Type '{type.Name}' is not an Enumerable");
-            }
         } 
         else if (ctx is TASONParser.ObjectValueContext objectValue)
         {
+            if (type == typeof(object))
+                return ObjectValue(objectValue);
+
             if (ReflectionHelpers.CanDirectConstruct(type))
             {
                 return typedObjectMethod.CallGeneric<object>([type], this, [objectValue.@object()]);
