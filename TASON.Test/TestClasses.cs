@@ -1,4 +1,8 @@
+using System.Reflection;
+using System.Security.Cryptography;
+using TASON.Metadata;
 using TASON.Serialization;
+using TASON.Util;
 
 namespace TASON.Test;
 
@@ -88,4 +92,47 @@ record class PublicFieldClass
     public int PublicProperty { get; set; } = 1;
 
     int _privateField = 5;
+}
+
+[Serializable]
+class ClassWithPrivateField : IEquatable<ClassWithPrivateField>
+{
+    private int m_serializeField = 5;
+
+    [TasonIgnore]
+    public int SerializeField => m_serializeField;
+
+    public void UpdateValue(int value)
+    {
+        DoSomeCheck(value);
+        m_serializeField = value;
+    }
+
+    static void DoSomeCheck(int value) 
+    {
+        if (value < 0)
+        {
+            throw new ArgumentException("Value must be positive");
+        }
+    }
+
+    public bool Equals(ClassWithPrivateField? other)
+    {
+        return other is not null && other.SerializeField == SerializeField;
+    }
+
+    public class Metadata : ITasonTypeMetadata
+    {
+        public Type Type => typeof(ClassWithPrivateField);
+
+        public Dictionary<string, PropertyInfo> Properties { get; } = new();
+
+        public Dictionary<string, FieldInfo> Fields { get; } = new() 
+        {
+            [nameof(m_serializeField)] = ReflectionHelpers.FieldOf((ClassWithPrivateField c) => c.m_serializeField),
+        };
+
+        public KeyValuePair<string, PropertyInfo>? ExtraMemberProperty => null;
+    }
+
 }

@@ -19,13 +19,7 @@ public static class TasonTypeMetadataProvider
     /// </exception>
     public static ITasonTypeMetadata GetMetadata(Type type)
     {
-        if (!cache.TryGetValue(type, out var meta))
-        {
-            meta = new TasonClassMetadata(type);
-            cache.Add(type, meta);
-        }
-
-        return meta;
+        return cache.GetValue(type, t => new TasonClassMetadata(t));
     }
 
     /// <summary>

@@ -7,6 +7,8 @@ using TASON.Types.NewtonsoftJson;
 using System.Text.Json;
 using TASON.Types;
 using System.Text;
+using TASON.Serialization;
+using System.Collections.Generic;
 
 public class SerializeTest
 {
@@ -209,5 +211,23 @@ new Regex("[\r\n]+").Replace("""
 
         s2.Registry.CreateObjectType<PublicFieldClass>();
         Assert.That(s2.Serialize(obj), Is.EqualTo("PublicFieldClass({PublicProperty:666})"));
+    }
+
+
+
+    [Test]
+    public void CustomMetadata()
+    { 
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.RegisterType(
+            nameof(ClassWithPrivateField), 
+            new TasonObjectType<ClassWithPrivateField>(),
+            new ClassWithPrivateField.Metadata());
+        s.Options.AllowFields = true;
+
+        var obj = new ClassWithPrivateField();
+        obj.UpdateValue(666);
+
+        Assert.That(s.Serialize(obj), Is.EqualTo("ClassWithPrivateField({m_serializeField:666})"));
     }
 }

@@ -11,10 +11,11 @@ public class TasonIgnoreAttribute : Attribute
 }
 
 /// <summary>
-/// 指示该字段或者属性用来存放额外的字段。
-/// 类型必须是<see cref="IDictionary{String, Object}"/>的子类型，每个类最多只能有一个包含该特性的属性
+/// 指示该属性用来存放额外的对象属性。
+/// 类型必须是<c>IDictionary&lt;string, object?&gt;</c>的子类型，每个类最多只能有一个包含该特性的属性；
+/// 不能放置在字段上
 /// </summary>
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true)]
+[AttributeUsage(AttributeTargets.Property, Inherited = true)]
 public class TasonExtraMemberAttribute : Attribute
 {
 

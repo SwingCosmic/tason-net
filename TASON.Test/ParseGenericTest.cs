@@ -240,4 +240,21 @@ public class ParseGenericTest
         Assert.That(s2.Deserialize<PublicFieldClass>(tason2),
             Is.EqualTo(new PublicFieldClass() { PublicProperty = 666 }));
     }
+
+
+    [Test]
+    public void CustomMetadata()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.RegisterType(
+            nameof(ClassWithPrivateField),
+            new TasonObjectType<ClassWithPrivateField>(),
+            new ClassWithPrivateField.Metadata());
+        s.Options.AllowFields = true;
+
+        var obj = new ClassWithPrivateField();
+        obj.UpdateValue(666);
+
+        Assert.That(s.Deserialize<ClassWithPrivateField>("ClassWithPrivateField({m_serializeField:666})"), Is.EqualTo(obj));
+    }
 }

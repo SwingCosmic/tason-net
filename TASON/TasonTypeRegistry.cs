@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
+using TASON.Metadata;
 using TASON.Serialization;
 using TASON.Types;
 using TASON.Util;
@@ -56,11 +57,28 @@ public class TasonTypeRegistry
         };
     }
 
-    /// <summary>注册一个类型</summary>
+    /// <summary>
+    /// 注册一个类型实例
+    /// </summary>
+    /// <param name="name">TASON类型名称</param>
+    /// <param name="typeInfo">TASON类型信息</param>
     public void RegisterType(string name, ITasonTypeInfo typeInfo)
     {
         var entry = GetEntry(name);
         entry.Types.Add(typeInfo);
+    }
+
+    /// <summary>
+    /// 注册一个带有自定义元数据的类型实例
+    /// </summary>
+    /// <param name="name">TASON类型名称</param>
+    /// <param name="typeInfo">TASON类型信息</param>
+    /// <param name="metadata">自定义类型元数据，该元数据是全局（跨越<see cref="TasonTypeRegistry"/>实例）生效的</param>
+    public void RegisterType(string name, ITasonTypeInfo typeInfo, ITasonTypeMetadata metadata)
+    {
+        var entry = GetEntry(name);
+        entry.Types.Add(typeInfo);
+        TasonTypeMetadataProvider.SetMetadata(typeInfo.Type, metadata);
     }
 
     /// <summary>

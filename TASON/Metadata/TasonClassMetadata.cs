@@ -68,7 +68,7 @@ public class TasonClassMetadata : ITasonTypeMetadata
             {
                 if (ExtraMemberProperty is not null)
                 {
-                    throw new InvalidOperationException("TasonExtraFieldsAttribute should only apply to one field or property");
+                    throw new InvalidOperationException("TasonExtraFieldsAttribute should only apply to one property");
                 }
                 ExtraMemberProperty = new(realName, p);
             }
