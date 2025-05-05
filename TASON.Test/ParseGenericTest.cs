@@ -80,7 +80,7 @@ public class ParseGenericTest
     public void DictionaryTest()
     {
         var pairs = "[A({X:1,Y:2}),1],[A({X:2,Y:4}),2]";
-        var tason = $"Dictionary({{keyValuePairs:[{pairs}]}})";
+        var tason = $"Dictionary({{pairs:[{pairs}]}})";
 
         // 测试UseBuiltinDictionary=true的非string key字典
         var s = TasonSerializer.Default.Clone();

@@ -16,26 +16,26 @@ namespace TASON;
 public partial class TasonVisitor
 {
 
-    static readonly MethodInfo typedArrayValueMethod = ReflectionHelpers
+    static readonly MethodInfo typedArrayValueMethod = ExpressionHelpers
         .MethodOf((TasonVisitor v) => v.TypedArray<int>(default!))
         .GetGenericMethodDefinition();
     
-    static readonly MethodInfo typedCollectionMethod = ReflectionHelpers
+    static readonly MethodInfo typedCollectionMethod = ExpressionHelpers
         .MethodOf((TasonVisitor v) => v.TypedCollection<int>(default!, default!))
         .GetGenericMethodDefinition();     
     
-    static readonly MethodInfo typedObjectMethod = ReflectionHelpers
+    static readonly MethodInfo typedObjectMethod = ExpressionHelpers
         .MethodOf((TasonVisitor v) => v.TypedObject<object>(default!))
         .GetGenericMethodDefinition(); 
     
-    static readonly MethodInfo typedDictMethod = ReflectionHelpers
+    static readonly MethodInfo typedDictMethod = ExpressionHelpers
         .MethodOf((TasonVisitor v) => v.TypedDictionary<object>(default!, null!))
         .GetGenericMethodDefinition(); 
-    static readonly MethodInfo typedDictArgMethod = ReflectionHelpers
+    static readonly MethodInfo typedDictArgMethod = ExpressionHelpers
         .MethodOf((TasonVisitor v) => v.TypedDictionaryArg<object, object>(default!, null!))
         .GetGenericMethodDefinition(); 
     
-    static readonly MethodInfo enumerableFactoryMethod = ReflectionHelpers
+    static readonly MethodInfo enumerableFactoryMethod = ExpressionHelpers
         .MethodOf(() => ReflectionHelpers.GetEnumerableFactory<int[], int>())
         .GetGenericMethodDefinition();
 
@@ -340,7 +340,7 @@ public partial class TasonVisitor
         foreach (var pair in ctx.pair())
         {
             var key = Key(pair.key());
-            if (key != nameof(ObjectDictionary<K, V>.keyValuePairs))
+            if (key != nameof(ObjectDictionary<K, V>.pairs))
                 continue;
 
             var valueContext = pair.value();

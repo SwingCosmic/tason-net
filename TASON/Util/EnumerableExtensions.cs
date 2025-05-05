@@ -1,5 +1,8 @@
 namespace TASON.Util;
 
+/// <summary>
+/// 提供关于集合相关的辅助方法
+/// </summary>
 public static class EnumerableExtensions 
 {
     /// <summary>

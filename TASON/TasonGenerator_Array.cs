@@ -9,9 +9,9 @@ namespace TASON;
 
 public partial class TasonGenerator
 {
-    static readonly MethodInfo arrayMethod = MethodOf((TasonGenerator t) => t.ArrayValue<int>(null!))
+    static readonly MethodInfo arrayMethod = ExpressionHelpers.MethodOf((TasonGenerator t) => t.ArrayValue<int>(null!))
         .GetGenericMethodDefinition();
-    static readonly MethodInfo dictionaryMethod = MethodOf((TasonGenerator t) => t.DictionaryValue<string, int>(null!))
+    static readonly MethodInfo dictionaryMethod = ExpressionHelpers.MethodOf((TasonGenerator t) => t.DictionaryValue<string, int>(null!))
         .GetGenericMethodDefinition();
 
 

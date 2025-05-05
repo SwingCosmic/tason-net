@@ -29,8 +29,6 @@ internal static class ReflectionHelpers
 {
     public const string UseMakeGenericMethod = "该方法使用MethodInfo.MakeGenericMethod()";
     public const string UseMakeGenericType = "该方法使用Type.MakeGenericType()";
-    public const string NotMemberAccess = "Expression must be a member access";
-    public const string NotMethodCall = "Expression must be a method call";
 
     public static EnumerableType IsEnumerable(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] Type type, 
@@ -193,62 +191,6 @@ internal static class ReflectionHelpers
         
         return obj;
     }
-
-    public static FieldInfo FieldOf<T>(Expression<Func<T>> expression)
-    {
-        var body = expression.Body as MemberExpression ??
-            throw new InvalidOperationException(NotMemberAccess);
-        return body.Member as FieldInfo ?? throw new InvalidOperationException("Member must be a field");
-    }
-    
-    public static FieldInfo FieldOf<TTarget, T>(Expression<Func<TTarget, T>> expression)
-    {
-        var body = expression.Body as MemberExpression ??
-            throw new InvalidOperationException(NotMemberAccess);
-        return body.Member as FieldInfo ?? throw new InvalidOperationException("Member must be a field");
-    }
-
-    public static PropertyInfo PropertyOf<T>(Expression<Func<T>> expression)
-    {
-        var body = expression.Body as MemberExpression ??
-            throw new InvalidOperationException(NotMemberAccess);
-        return body.Member as PropertyInfo ?? throw new InvalidOperationException("Member must be a property");
-    }    
-    
-    public static PropertyInfo PropertyOf<TTarget, T>(Expression<Func<TTarget, T>> expression)
-    {
-        var body = expression.Body as MemberExpression ??
-            throw new InvalidOperationException(NotMemberAccess);
-        return body.Member as PropertyInfo ?? throw new InvalidOperationException("Member must be a property");
-    }
-
-    public static MethodInfo MethodOf<T>(Expression<Func<T>> expression)
-    {
-        var body = expression.Body as MethodCallExpression ??
-            throw new InvalidOperationException(NotMethodCall);
-        return body.Method;
-    }
-
-    public static MethodInfo MethodOf<TThis, T>(Expression<Func<TThis, T>> expression)
-    {
-        var body = expression.Body as MethodCallExpression ??
-            throw new InvalidOperationException(NotMethodCall);
-        return body.Method;
-    }
-
-    public static MethodInfo MethodOf(Expression<Action> expression)
-    {
-        var body = expression.Body as MethodCallExpression ??
-            throw new InvalidOperationException(NotMethodCall);
-        return body.Method;
-    }
-    public static MethodInfo MethodOf<TThis>(Expression<Action<TThis>> expression)
-    {
-        var body = expression.Body as MethodCallExpression ??
-            throw new InvalidOperationException(NotMethodCall);
-        return body.Method;
-    }
-
 
     [RequiresUnreferencedCode(UseMakeGenericMethod)]
     [RequiresDynamicCode(UseMakeGenericMethod)]

@@ -1,3 +1,8 @@
+# 1.0.0-rc.2
+
+* ⚠️ BREAKING CHANGE: 将内置字典类型存储键值对的属性名从`keyValuePairs`缩短为`pairs`，以减小占用大小
+* refact: 公开`ExpressionHelpers`类，提供快速获取类成员反射信息的方法
+
 # 1.0.0-rc.1
 
 * feat: 自定义类型元数据，针对现存的采用私有字段存值的类型

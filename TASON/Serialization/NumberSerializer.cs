@@ -66,7 +66,7 @@ internal static class NumberSerializer
         return typeInfo.DeserializeInternal(number, options);
     }
 
-    static readonly MethodInfo deserializeMethod = ReflectionHelpers
+    static readonly MethodInfo deserializeMethod = ExpressionHelpers
         .MethodOf(() => Deserialize<int>(null!, null!))
         .GetGenericMethodDefinition();
 

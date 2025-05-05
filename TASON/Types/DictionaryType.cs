@@ -15,13 +15,13 @@ public sealed record class ObjectDictionary<K, V> where K : notnull
     /// <summary>
     /// 储存键值对的列表
     /// </summary>
-    public List<(K Key, V Value)> keyValuePairs { get; set; } = new();
+    public List<(K Key, V Value)> pairs { get; set; } = new();
 #pragma warning restore IDE1006
     public ObjectDictionary() { }
 
     public ObjectDictionary(IEnumerable<(K Key, V Value)> pairs)
     {
-        keyValuePairs = pairs.ToList();
+        this.pairs = pairs.ToList();
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public sealed record class ObjectDictionary<K, V> where K : notnull
     {
         return new ObjectDictionary<K, V>
         {
-            keyValuePairs = dict
+            pairs = dict
                 .Select(p => (p.Key!, p.Value!))
                 .ToList(),
         };
@@ -44,7 +44,7 @@ public sealed record class ObjectDictionary<K, V> where K : notnull
     /// </summary>
     public Dictionary<K, V> ToDictionary()
     {
-        return keyValuePairs.ToDictionary(p => p.Key!, p => p.Value!);
+        return pairs.ToDictionary(p => p.Key!, p => p.Value!);
     }
 }
 
@@ -55,11 +55,11 @@ internal static class DictionaryType
     /// </summary>
     public const string TypeName = "Dictionary";
 
-    public static Dictionary<string, object?> SerializeToArg<K, V>(this ObjectDictionary<K, V> objDict)
+    public static Dictionary<string, object?> SerializeToArg<K, V>(this ObjectDictionary<K, V> objDict) where K : notnull
     {
         return new()
         {
-            [nameof(ObjectDictionary<K, V>.keyValuePairs)] = objDict.keyValuePairs
+            [nameof(ObjectDictionary<K, V>.pairs)] = objDict.pairs
                 .Select(p => new object[] { p.Key!, p.Value! })
                 .ToArray(),
         };

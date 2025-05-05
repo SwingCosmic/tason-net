@@ -129,7 +129,7 @@ class ClassWithPrivateField : IEquatable<ClassWithPrivateField>
 
         public Dictionary<string, FieldInfo> Fields { get; } = new() 
         {
-            [nameof(m_serializeField)] = ReflectionHelpers.FieldOf((ClassWithPrivateField c) => c.m_serializeField),
+            [nameof(m_serializeField)] = ExpressionHelpers.FieldOf((ClassWithPrivateField c) => c.m_serializeField),
         };
 
         public KeyValuePair<string, PropertyInfo>? ExtraMemberProperty => null;
