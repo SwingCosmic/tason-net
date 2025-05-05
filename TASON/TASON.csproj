@@ -18,6 +18,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Configurations>Debug;Release;AOT</Configurations>
     <PackageTags>json;serialization;parser;antlr</PackageTags>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)'=='AOT'">
