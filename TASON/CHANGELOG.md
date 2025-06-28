@@ -1,3 +1,8 @@
+# 1.1.0
+
+* feat: 支持指定枚举类型采用字符串进行序列化和反序列化
+* refact: `ITasonTypeMetadata`接口拆分，属性`Type`移到新的父接口`ITasonMetadata`
+
 # 1.0.0
 
 * fix: 当指定类型为`object`时，无法反序列化对象和数组
