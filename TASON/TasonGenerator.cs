@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Encodings.Web;
+using TASON.Metadata;
 
 namespace TASON;
 
@@ -115,9 +116,12 @@ public partial class TasonGenerator
 
     void EnumValue(Enum value)
     {
-        var baseType = value.GetType().GetEnumUnderlyingType();
-        var n = Convert.ChangeType(value, baseType);
-        TryWriteNumberValue(n);
+        var meta = TasonTypeMetadataProvider.GetEnumMetadata(value.GetType());
+        var n = meta.GetValue(value);
+        if (n is string s)
+            writer.WriteString(s);
+        else 
+            TryWriteNumberValue(n);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -7,13 +7,19 @@ namespace TASON.Metadata;
 /// <summary>
 /// 提供指定类型的反射元数据
 /// </summary>
-public interface ITasonTypeMetadata
+public interface ITasonMetadata
 {
     /// <summary>
     /// 获取关联的类型
     /// </summary>
     Type Type { get; }
+}
 
+/// <summary>
+/// 提供结构或者类的反射元数据
+/// </summary>
+public interface ITasonTypeMetadata : ITasonMetadata
+{
     /// <summary>类的可序列化属性</summary>
     Dictionary<string, PropertyInfo> Properties { get; }
     

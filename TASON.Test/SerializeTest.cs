@@ -217,10 +217,10 @@ new Regex("[\r\n]+").Replace("""
 
     [Test]
     public void CustomMetadata()
-    { 
+    {
         var s = TasonSerializer.Default.Clone();
         s.Registry.RegisterType(
-            nameof(ClassWithPrivateField), 
+            nameof(ClassWithPrivateField),
             new TasonObjectType<ClassWithPrivateField>(),
             new ClassWithPrivateField.Metadata());
         s.Options.AllowFields = true;
@@ -229,5 +229,20 @@ new Regex("[\r\n]+").Replace("""
         obj.UpdateValue(666);
 
         Assert.That(s.Serialize(obj), Is.EqualTo("ClassWithPrivateField({m_serializeField:666})"));
+    }
+
+    [Test]
+    public void StringEnum()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.CreateObjectType<ClassWithStringEnum>();
+
+        var obj = new ClassWithStringEnum
+        {
+            Language = Languages.TraditionalChinese,
+            Theme = ThemeColors.Dark,
+        };
+
+        Assert.That(s.Serialize(obj), Is.EqualTo("ClassWithStringEnum({Language:\"zh-Hant\",Theme:1})"));
     }
 }

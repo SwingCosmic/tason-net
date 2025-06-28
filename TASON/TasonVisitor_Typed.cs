@@ -110,6 +110,12 @@ public partial class TasonVisitor
         }
         else if (ctx is TASONParser.StringValueContext stringValue)
         {
+            if (type.IsEnum)
+            {
+                var meta = TasonTypeMetadataProvider.GetEnumMetadata(type);
+                var str = StringValue(stringValue);
+                return meta.GetEnum(str);
+            }
             CheckType(type, typeof(string), "string");
             return StringValue(stringValue);
         }
@@ -177,9 +183,9 @@ public partial class TasonVisitor
             }
             else
             {
-                var numType = Enum.GetUnderlyingType(type);
-                var value = NumberSerializer.Deserialize(numType, text, options);
-                return (ValueType)Enum.ToObject(type, value);
+                var meta = TasonTypeMetadataProvider.GetEnumMetadata(type);
+                var value = NumberSerializer.Deserialize(meta.UnderlyingType, text, options);
+                return meta.GetEnum(value);
             }
         }
 

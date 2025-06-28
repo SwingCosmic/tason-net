@@ -23,38 +23,52 @@ public class ParseTest
         var s = TasonSerializer.Default;
         Assert.That(s.Deserialize("null"), Is.EqualTo(null));
         Assert.That(s.Deserialize("[0o777, 'ds', [Infinity, [Int64('-0xabCDef123456789')]]]"),
-            Is.EqualTo(new object[] 
-            { 
-                511, 
-                "ds", 
-                new object[] 
-                { 
+            Is.EqualTo(new object[]
+            {
+                511,
+                "ds",
+                new object[]
+                {
                     double.PositiveInfinity,
                     new object[]
                     {
                         -0xabCDef123456789L
                     }
-                } 
+                }
             }));
 
-       
+
     }
 
     [Test]
-    public void ObjectTest() 
+    public void ObjectTest()
     {
         var s = TasonSerializer.Default;
 
         Assert.That(s.Deserialize("{\"a\": true, b: \"fo\\n\\ro\"}"),
-            Is.EqualTo(new Dictionary<string, object?> 
-            { 
-                ["a"] = true, 
-                ["b"] = "fo\n\ro" 
+            Is.EqualTo(new Dictionary<string, object?>
+            {
+                ["a"] = true,
+                ["b"] = "fo\n\ro"
             }));
 
         var s2 = s.Clone();
         s2.Registry.CreateObjectType<A>();
         Assert.That(s2.Deserialize("A({X:1,Y:2})"), Is.EqualTo(new A() { X = 1, Y = 2 }));
+    }
+
+    [Test]
+    public void StringEnum()
+    {
+        var s = TasonSerializer.Default.Clone();
+        s.Registry.CreateObjectType<ClassWithStringEnum>();
+
+        var tason = "ClassWithStringEnum({Language:'ja-JP',Theme:0x1})";
+        Assert.That(s.Deserialize(tason), Is.EqualTo(new ClassWithStringEnum
+        {
+            Language = Languages.Japanese,
+            Theme = ThemeColors.Dark,
+        }));
     }
 
 }

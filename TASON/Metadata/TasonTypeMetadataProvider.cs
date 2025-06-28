@@ -8,6 +8,7 @@ namespace TASON.Metadata;
 public static class TasonTypeMetadataProvider 
 {
     static readonly ConditionalWeakTable<Type, ITasonTypeMetadata> cache = new();
+    static readonly ConditionalWeakTable<Type, ITasonEnumMetadata> enumCache = new();
 
     /// <summary>
     /// 获取<paramref name="type"/>对应的默认<see cref="ITasonTypeMetadata"/>
@@ -35,5 +36,21 @@ public static class TasonTypeMetadataProvider
     internal static void SetMetadata(Type type, ITasonTypeMetadata meta)
     {
         cache.AddOrUpdate(type, meta);
+    }
+
+    public static ITasonEnumMetadata GetEnumMetadata(Type type)
+    {
+        return enumCache.GetValue(type, CreateEnumMetadata);
+    }
+
+    static readonly Type enumClassType = typeof(TasonEnumMetadata<,>);
+    static ITasonEnumMetadata CreateEnumMetadata(Type type)
+    {
+        if (!type.IsEnum)
+            throw new InvalidOperationException();
+
+        var enumType = type.GetEnumUnderlyingType();
+        var cls = enumClassType.MakeGenericType(type, enumType);
+        return (Activator.CreateInstance(cls) as ITasonEnumMetadata)!;
     }
 }

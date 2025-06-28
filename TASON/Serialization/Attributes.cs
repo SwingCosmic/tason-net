@@ -25,14 +25,10 @@ public class TasonExtraMemberAttribute : Attribute
 /// 指示该字段或者属性序列化所使用的名称
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true)]
-public class TasonPropertyAttribute : Attribute
+public class TasonPropertyAttribute(string name) : Attribute
 {
-    public TasonPropertyAttribute(string name)
-    {
-        Name = name;
-    }
     /// <summary>序列化所用的名称</summary>
-    public string Name { get; }
+    public string Name { get; } = name;
 }
 
 /// <summary>指定属性命名策略</summary>
@@ -54,13 +50,31 @@ public enum TasonNamingPolicy
 /// 指定整个类的属性命名约定
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = true)]
-public class TasonNamingContractAttribute : Attribute
+public class TasonNamingContractAttribute(TasonNamingPolicy policy) : Attribute
 {
-    public TasonNamingContractAttribute(TasonNamingPolicy policy)
-    {
-        Policy = policy;
-    }
 
     /// <summary>命名策略</summary>
-    public TasonNamingPolicy Policy { get; }
+    public TasonNamingPolicy Policy { get; } = policy;
+}
+
+
+/// <summary>
+/// 指示该枚举采用字符串值进行序列化
+/// </summary>
+[AttributeUsage(AttributeTargets.Enum, Inherited = false, AllowMultiple = false)]
+public sealed class TasonStringEnumAttribute() : Attribute
+{
+}
+
+/// <summary>
+/// 针对<see cref="TasonStringEnumAttribute"/>标记的枚举，指定枚举值对应的字符串形式
+/// </summary>
+/// <param name="value"></param>
+[AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+public sealed class TasonEnumValueAttribute(string value) : Attribute
+{
+    /// <summary>
+    /// 序列化的字符串值
+    /// </summary>
+    public string Value { get; } = value;
 }

@@ -108,7 +108,7 @@ class ClassWithPrivateField : IEquatable<ClassWithPrivateField>
         m_serializeField = value;
     }
 
-    static void DoSomeCheck(int value) 
+    static void DoSomeCheck(int value)
     {
         if (value < 0)
         {
@@ -127,7 +127,7 @@ class ClassWithPrivateField : IEquatable<ClassWithPrivateField>
 
         public Dictionary<string, PropertyInfo> Properties { get; } = new();
 
-        public Dictionary<string, FieldInfo> Fields { get; } = new() 
+        public Dictionary<string, FieldInfo> Fields { get; } = new()
         {
             [nameof(m_serializeField)] = ExpressionHelpers.FieldOf((ClassWithPrivateField c) => c.m_serializeField),
         };
@@ -135,4 +135,31 @@ class ClassWithPrivateField : IEquatable<ClassWithPrivateField>
         public KeyValuePair<string, PropertyInfo>? ExtraMemberProperty => null;
     }
 
+}
+
+[TasonStringEnum]
+enum Languages
+{
+    [TasonEnumValue("en-US")]
+    English = 0,
+    [TasonEnumValue("zh-Hans")]
+    SimplifiedChinese,
+    [TasonEnumValue("zh-Hant")]
+    TraditionalChinese,
+    [TasonEnumValue("ja-JP")]
+    Japanese,
+    [TasonEnumValue("ko-KR")]
+    Korean,
+}
+
+enum ThemeColors
+{
+    Light,
+    Dark,
+}
+
+record class ClassWithStringEnum
+{
+    public Languages Language { get; set; }
+    public ThemeColors Theme { get; set; }
 }
