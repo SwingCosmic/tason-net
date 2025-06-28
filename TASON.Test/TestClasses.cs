@@ -163,3 +163,11 @@ record class ClassWithStringEnum
     public Languages Language { get; set; }
     public ThemeColors Theme { get; set; }
 }
+
+
+record class AnyObject
+{
+    public object? A { get; set; }
+    public object? B { get; set; }
+    public object? C { get; set; }
+}

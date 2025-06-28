@@ -79,15 +79,17 @@ public partial class TasonVisitor
     public object? StartDeserialize(TASONParser.StartContext context, Type type)
     {
         var ctx = context.value();
-        if (type == typeof(object))
-            return ValueContext(ctx);
-        else
-            return TypedValueContext(ctx, type);
+        return TypedValueContext(ctx, type);
     }
 
 
     internal object? TypedValueContext(TASONParser.ValueContext ctx, Type type)
     {
+        if (type == typeof(object))
+        {
+            return ValueContext(ctx);
+        }
+
         var isNullableStruct = false;
         if (type.IsValueType)
         {
@@ -126,8 +128,6 @@ public partial class TasonVisitor
         else if (ctx is TASONParser.ArrayValueContext arrayValue)
         {
             var array = arrayValue.array().value();
-            if (type == typeof(object))
-                return Array(array);
 
             var enumerableType = ReflectionHelpers.IsEnumerable(type, out var elementType, out _);
             if (enumerableType == EnumerableType.Enumerable)
@@ -145,8 +145,6 @@ public partial class TasonVisitor
         } 
         else if (ctx is TASONParser.ObjectValueContext objectValue)
         {
-            if (type == typeof(object))
-                return ObjectValue(objectValue);
 
             if (ReflectionHelpers.CanDirectConstruct(type))
             {

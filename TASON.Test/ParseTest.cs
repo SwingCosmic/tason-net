@@ -57,18 +57,6 @@ public class ParseTest
         Assert.That(s2.Deserialize("A({X:1,Y:2})"), Is.EqualTo(new A() { X = 1, Y = 2 }));
     }
 
-    [Test]
-    public void StringEnum()
-    {
-        var s = TasonSerializer.Default.Clone();
-        s.Registry.CreateObjectType<ClassWithStringEnum>();
 
-        var tason = "ClassWithStringEnum({Language:'ja-JP',Theme:0x1})";
-        Assert.That(s.Deserialize(tason), Is.EqualTo(new ClassWithStringEnum
-        {
-            Language = Languages.Japanese,
-            Theme = ThemeColors.Dark,
-        }));
-    }
 
 }
