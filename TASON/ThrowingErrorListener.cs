@@ -7,6 +7,7 @@ namespace TASON;
 /// </summary>
 public class ThrowingErrorListener : BaseErrorListener
 {
+    /// <inheritdoc/>
     public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
     {
         throw new FormatException(msg, e);

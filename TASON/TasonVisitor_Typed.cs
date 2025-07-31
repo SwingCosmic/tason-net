@@ -177,7 +177,7 @@ public partial class TasonVisitor
         {
             if (!type.IsEnum)
             {
-                throw new InvalidCastException($"Cannot cast type '{type.Name}' to number");
+                throw new InvalidCastException($"Cannot cast TASON number to type '{type.Name}'");
             }
             else
             {
@@ -428,7 +428,7 @@ INVALID:
     {
         if (type != expect)
         {
-            throw new InvalidCastException($"Cannot cast type '{type.Name}' to '{displayName ?? expect.Name}'");
+            throw new InvalidCastException($"Cannot cast '{displayName ?? expect.Name}' to type '{type.Name}'");
         }
     }
 
