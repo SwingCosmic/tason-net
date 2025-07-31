@@ -58,5 +58,17 @@ public class ParseTest
     }
 
 
+    [Test]
+    public void StringQuoteTest()
+    {
+        var tason = "{a:'\\\"d\"d\\'s', b:\"\\'s's\\\"d\"}";
 
+        var s = TasonSerializer.Default;
+        Assert.That(s.Deserialize(tason),
+            Is.EqualTo(new Dictionary<string, object?>
+            {
+                ["a"] = "\"d\"d's",
+                ["b"] = "'s's\"d",
+            }));
+    }
 }
